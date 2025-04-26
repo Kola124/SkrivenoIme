@@ -1878,17 +1878,17 @@ void GenerateMiniMapSquare(int x0,int y0,int nx,int ny){
 							if(OS->SG==&STONES){
 								int sgi=OS->SGIndex;
 								GPS.ShowGP(SX-(OS->SG->Dx[sgi]>>2),SY-(OS->z>>2)-(OS->SG->Dy[sgi]>>2),StnGP,OS->SG->ObjChar[sgi].SpriteIndex,0);
-								NS++;
+                            NS++;
 							};
 							if(OS->SG==&HOLES&&HolesGP>0){
 								int sgi=OS->SGIndex;
 								GPS.ShowGP(SX-(OS->SG->Dx[sgi]>>2),SY-(OS->z>>2)-(OS->SG->Dy[sgi]>>2),HolesGP,OS->SG->ObjChar[sgi].SpriteIndex,0);
-								NS++;
+                            NS++;
 							};
 							if(OS->SG==&TREES){
 								int sgi=OS->SGIndex;
 								ZB.Add((OS->y>>3)-DY,((OS->x-OS->SG->Dx[sgi])>>2)-DX,(((OS->y>>1)-OS->z-OS->SG->Dy[sgi])>>2)-DY,DerGP,OS->SG->ObjChar[sgi].SpriteIndex);
-								NT++;
+                            NT++;
 							};
 						};
 					};
@@ -2009,8 +2009,8 @@ void PreShowMiniSprites(){
 
 	int x0=mapx<<5;
 	int y0=(mapy)<<4;
-	int Lx=smaplx<<5;
-	int Ly=(smaply)<<4;
+	int Lx= RealLx;
+	int Ly= RealLy;
 	int x1=x0+Lx;
 	int y1=y0+Ly;
 	int SH=5-Shifter;
