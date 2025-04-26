@@ -891,128 +891,218 @@ int GetWallType(char* Name){
     return -1;
 };
 extern bool TransMode;
-extern int CLM_Shift;
-extern int CLM_ShiftY;
+extern int RealLy;
+extern int RealLx;
+extern int DD;
 
 void RegisterVisibleGP(word Index,int FileIndex,int SprIndex,int x,int y);
 //ADDED THIS TO TRY TO ADD WALLS TO L MODE
 void WallCluster::ViewMiniWall() {
-        int x0 = mapx << 5;
-        int y0 = mul3(mapy) << 4;
-        int Lx = smaplx << 5;
-        int Ly = mul3(smaply) << 4;
-        int SH = 5 - Shifter;
-        OneObject* CUR = NULL;
-        if (TransMode) {
-            for (int i = 0; i < NCells; i++) {
-                WallCell* WCL = Cells + i;
-                if (WCL->Visible) {
-                    if (WCL->OIndex < ULIMIT) {
-                        CUR = Group[WCL->OIndex];
-                        if (!(CUR && (!CUR->Sdoxlo) && CUR->WallX == WCL->x && CUR->WallY == WCL->y))
-                            CUR = NULL;
-                    };
-                    CurDrawNation = WCL->NI;
-                    int xx = (WCL->x << 6) - x0;
-                    int yy = (mul3(WCL->y) << 3) - y0 + 16;
-                    int dz = GetHeight((WCL->x << 6) + 32, (WCL->y << 6) + 32);
-                    WallCharacter* WCR = &WChar[WCL->Type];
-                    if (xx > -128 && xx<Lx + 128, yy - dz>-128 - dz && yy - dz < Ly + 128 - dz) {
-                        //AddOptPoint(ZBF_LO,0,0,xx-WCR->dx,yy-WCR->dy-dz,NULL,WCR->GateFile,WCL->Sprite-32,AV_TRANSPARENT|AV_SHADOWONLY);
-                        if (WCL->Sprite >= 32) {
-                            if (WCL->Sprite < 64) {
-                                AddOptPoint(ZBF_LO, 0, 0, (xx - WCR->GateDx + 32) >> 2, (yy - WCR->GateDy - dz + 16), NULL, WCR->GateFile, WCL->Sprite - 32, AV_TRANSPARENT | AV_SHADOWONLY);
-                                switch (WCL->Sprite) {
-                                case 32:
-                                    AddOptPoint(ZBF_NORMAL, xx + 32, yy + 16, (xx - WCR->GateDx + 32) >> 2, (yy - WCR->GateDy - dz + 16), NULL, WCR->GateFile, WCL->Sprite - 32, AV_TRANSPARENT | AV_WITHOUTSHADOW);
-                                    break;
-                                case 33:
-                                    AddOptLine(xx + 96, yy - 48, (xx - 32) >> 2, (yy + 48), (xx - WCR->GateDx + 32) >> 2, (yy - WCR->GateDy - dz + 16), NULL, WCR->GateFile, WCL->Sprite - 32, AV_TRANSPARENT | AV_WITHOUTSHADOW);
-                                    break;
-                                case 34:
-                                    AddOptPoint(ZBF_NORMAL, xx + 32, yy + 16, (xx - WCR->GateDx + 32) >> 2, (yy - WCR->GateDy - dz + 16), NULL, WCR->GateFile, WCL->Sprite - 32, AV_TRANSPARENT | AV_WITHOUTSHADOW);
-                                    break;
-                                case 35:
-                                    AddOptLine(xx - 32, yy - 16, (xx + 96) >> 2, (yy + 48), (xx - WCR->GateDx + 32) >> 2, (yy - WCR->GateDy - dz + 16), NULL, WCR->GateFile, WCL->Sprite - 32, AV_TRANSPARENT | AV_WITHOUTSHADOW);
-                                    break;
-                                };
-                            };
+    int x0 = mapx << 3;
+    int y0 = mapy << 2;
+    int Lx = RealLx - DD;
+    int Ly = RealLy;
+    int SH = 5 - Shifter;
+    OneObject* CUR = nullptr;
+
+    // Adjusted constants for better isometric projection
+    const int BASE_Y_OFFSET = -16;
+    const int GATE_X_OFFSET = 8;
+    const int ISO_Y_FACTOR = 2; // Adjust this factor for proper isometric scaling (typically 2-4)
+    const int GATE_Y_ADJUSTMENT = 20;
+
+    if (TransMode) {
+        for (int i = 0; i < NCells; i++) {
+            WallCell* WCL = Cells + i;
+            if (WCL->Visible) {
+                if (WCL->OIndex < ULIMIT) {
+                    CUR = Group[WCL->OIndex];
+                    if (!(CUR && (!CUR->Sdoxlo) && CUR->WallX == WCL->x && CUR->WallY == WCL->y))
+                        CUR = nullptr;
+                };
+
+                CurDrawNation = WCL->NI;
+                // Modified coordinate calculations for proper isometric projection
+                int xx = (WCL->x << 4) - x0;
+                int yy = ((WCL->y * ISO_Y_FACTOR) << 2) - y0 + BASE_Y_OFFSET;
+                int dz = GetHeight((WCL->x << 4) + 32, (WCL->y << 1) + 32) >> 2;
+                WallCharacter* WCR = &WChar[WCL->Type];
+
+                if (xx > -32 && xx < Lx + 32 && yy - dz > -32 && yy - dz < Ly + 32) {
+                    if (WCL->Sprite >= 32 && WCL->Sprite < 64) {
+                        // Gate rendering with adjusted positions
+                        int gate_x = xx - (WCR->GateDx >> 2) + GATE_X_OFFSET;
+                        int gate_y = yy - (WCR->GateDy >> 2) - dz + GATE_Y_ADJUSTMENT; // Apply door adjustment
+
+                        AddOptPoint(ZBF_LO, 0, 0, gate_x, gate_y, nullptr,
+                            WCR->GateFile, WCL->Sprite - 32, AV_TRANSPARENT | AV_SHADOWONLY);
+
+                        switch (WCL->Sprite) {
+                        case 32:
+                            AddOptPoint(ZBF_NORMAL, xx + GATE_X_OFFSET, gate_y + (BASE_Y_OFFSET >> 1),
+                                gate_x, gate_y, nullptr, WCR->GateFile,
+                                WCL->Sprite - 32, AV_TRANSPARENT | AV_WITHOUTSHADOW);
+                            break;
+                        case 33:
+                            AddOptLine((xx + 24), (yy - 12), (xx - 8), (yy + 8),
+                                gate_x, gate_y, nullptr, WCR->GateFile,
+                                WCL->Sprite - 32, AV_TRANSPARENT | AV_WITHOUTSHADOW);
+                            break;
+                        case 34:
+                            AddOptPoint(ZBF_NORMAL, xx + GATE_X_OFFSET, gate_y + (BASE_Y_OFFSET >> 1),
+                                gate_x, gate_y, nullptr, WCR->GateFile,
+                                WCL->Sprite - 32, AV_TRANSPARENT | AV_WITHOUTSHADOW);
+                            break;
+                        case 35:
+                            AddOptLine((xx - 8), (yy - 4), (xx + 24), (yy + 8),
+                                gate_x, gate_y, nullptr, WCR->GateFile,
+                                WCL->Sprite - 32, AV_TRANSPARENT | AV_WITHOUTSHADOW);
+                            break;
+                        }
+                    }
+                    else {
+                        // Regular wall rendering with adjusted positions
+                        int wall_x = xx - (WCR->dx >> 2);
+                        int wall_y = yy - (WCR->dy >> 2) - dz + (WCR->dy >> 3);
+
+                        AddOptPoint(ZBF_LO, 0, 0, wall_x, wall_y, nullptr,
+                            WCR->RIndex, WCL->SprBase + WCL->Sprite, AV_SHADOWONLY);
+                        AddOptPoint(ZBF_NORMAL, xx + GATE_X_OFFSET, wall_y + (BASE_Y_OFFSET >> 1),
+                            wall_x, wall_y, nullptr, WCR->RIndex,
+                            WCL->SprBase + WCL->Sprite, AV_TRANSPARENT | AV_WITHOUTSHADOW);
+                    }
+                }
+            }
+        }
+    }
+    else {
+        for (int i = 0; i < NCells; i++) {
+            WallCell* WCL = Cells + i;
+            if (WCL->Visible) {
+                if (WCL->OIndex < ULIMIT) {
+                    CUR = Group[WCL->OIndex];
+                    if (!(CUR && (!CUR->Sdoxlo) && CUR->WallX == WCL->x && CUR->WallY == WCL->y))
+                        CUR = nullptr;
+                }
+
+                CurDrawNation = WCL->NI;
+                // Modified coordinate calculations for proper isometric projection
+                int xx = (WCL->x << 4) - x0;
+                int yy = ((WCL->y * ISO_Y_FACTOR) << 2) - y0 + BASE_Y_OFFSET;
+                int dz = GetHeight((WCL->x << 6) + 32, (WCL->y << 6) + 32) >> 2;
+                WallCharacter* WCR = &WChar[WCL->Type];
+
+                if (xx > -32 && xx < Lx + 32 && yy - dz > -32 && yy - dz < Ly + 32) {
+                    if (CUR) {
+                        bool IsSel = (CUR->Selected & GM(MyNation));
+
+                        if (WCL->Sprite >= 32 && WCL->Sprite < 64) {
+                            // Gate rendering with owner and adjusted positions
+                            int gate_x = xx - (WCR->GateDx >> 2) + GATE_X_OFFSET;
+                            int gate_y = yy - (WCR->GateDy >> 2) - dz + GATE_Y_ADJUSTMENT; // Apply door adjustment
+                            int gs = Gates[WCL->GateIndex].State + (WCL->Sprite & 15) * NGOpen + 4;
+
+                            AddOptPoint(ZBF_LO, 0, 0, gate_x, gate_y, CUR,
+                                WCR->GateFile, WCL->Sprite - 32, AV_SHADOWONLY);
+                            RegisterVisibleGP(CUR->Index, WCR->GateFile, WCL->Sprite - 32,
+                                gate_x, gate_y + (BASE_Y_OFFSET >> 1));
+
+                            switch (WCL->Sprite) {
+                            case 32:
+                                if (IsSel) {
+                                    AddOptPoint(ZBF_NORMAL, xx + GATE_X_OFFSET, gate_y + (BASE_Y_OFFSET >> 1),
+                                        gate_x, gate_y, CUR, WCR->GateFile,
+                                        WCL->Sprite - 32, AV_PULSING | AV_WHITE | AV_WITHOUTSHADOW);
+                                }
+                                else {
+                                    AddOptPoint(ZBF_NORMAL, xx + GATE_X_OFFSET, gate_y + (BASE_Y_OFFSET >> 1),
+                                        gate_x, gate_y, CUR, WCR->GateFile,
+                                        WCL->Sprite - 32, AV_WITHOUTSHADOW);
+                                }
+                                AddOptPoint(ZBF_NORMAL, xx + GATE_X_OFFSET, gate_y + (BASE_Y_OFFSET >> 1),
+                                    gate_x, gate_y, CUR, WCR->GateFile,
+                                    gs, AV_WITHOUTSHADOW);
+                                AddOptPoint(ZBF_LO, 0, 0, gate_x, gate_y, CUR,
+                                    WCR->GateFile, gs, AV_SHADOWONLY);
+                                break;
+
+                            case 33:
+                                if (IsSel) {
+                                    AddOptLine((xx + 24), (yy - 4 + 4), (xx - 8), (yy + 8 + 4),
+                                        gate_x, gate_y, CUR, WCR->GateFile, WCL->Sprite - 32,
+                                        AV_PULSING | AV_WHITE | AV_WITHOUTSHADOW);
+                                }
+                                else {
+                                    AddOptLine((xx + 24), (yy - 4 + 4), (xx - 8), (yy + 8 + 4),
+                                        gate_x, gate_y, CUR, WCR->GateFile, WCL->Sprite - 32,
+                                        AV_WITHOUTSHADOW);
+                                }
+                                AddOptLine((xx + 24), (yy - 4 - 4), (xx - 8), (yy + 8 - 4),
+                                    gate_x, gate_y, CUR, WCR->GateFile, gs, AV_WITHOUTSHADOW);
+                                AddOptPoint(ZBF_LO, 0, 0, gate_x, gate_y,
+                                    CUR, WCR->GateFile, gs, AV_SHADOWONLY);
+                                break;
+
+                            case 34:
+                                if (IsSel) {
+                                    AddOptPoint(ZBF_NORMAL, xx + 8, yy + 4 + 3,
+                                        gate_x, gate_y, CUR, WCR->GateFile, WCL->Sprite - 32,
+                                        AV_PULSING | AV_WHITE | AV_WITHOUTSHADOW);
+                                }
+                                else {
+                                    AddOptPoint(ZBF_NORMAL, xx + 8, yy + 4 + 3,
+                                        gate_x, gate_y, CUR, WCR->GateFile, WCL->Sprite - 32,
+                                        AV_WITHOUTSHADOW);
+                                }
+                                AddOptPoint(ZBF_NORMAL, xx + 8, yy + 4 - 3,
+                                    gate_x, gate_y, CUR, WCR->GateFile, gs, AV_WITHOUTSHADOW);
+                                AddOptPoint(ZBF_LO, 0, 0, gate_x, gate_y,
+                                    CUR, WCR->GateFile, gs, AV_SHADOWONLY);
+                                break;
+
+                            case 35:
+                                if (IsSel) {
+                                    AddOptLine((xx - 8), (yy - 4 + 3), (xx + 24), (yy + 8 + 3),
+                                        gate_x, gate_y, CUR, WCR->GateFile, WCL->Sprite - 32,
+                                        AV_PULSING | AV_WHITE | AV_WITHOUTSHADOW);
+                                }
+                                else {
+                                    AddOptLine((xx - 8), (yy - 4 + 3), (xx + 24), (yy + 8 + 3),
+                                        gate_x, gate_y, CUR, WCR->GateFile, WCL->Sprite - 32,
+                                        AV_WITHOUTSHADOW);
+                                }
+                                AddOptLine((xx - 8), (yy - 4 - 3), (xx + 24), (yy + 8 - 3),
+                                    gate_x, gate_y, CUR, WCR->GateFile, gs, AV_WITHOUTSHADOW);
+                                AddOptPoint(ZBF_LO, 0, 0, gate_x, gate_y,
+                                    CUR, WCR->GateFile, gs, AV_SHADOWONLY);
+                                break;
+                            }
                         }
                         else {
-                            AddOptPoint(ZBF_LO, 0, 0, (xx - WCR->dx) >> 2, (yy - WCR->dy - dz), NULL, WCR->RIndex, WCL->SprBase + WCL->Sprite, AV_SHADOWONLY);
-                            AddOptPoint(ZBF_NORMAL, xx + 32, yy + 16, (xx - WCR->dx) >> 2, (yy - WCR->dy - dz), NULL, WCR->RIndex, WCL->SprBase + WCL->Sprite, AV_TRANSPARENT | AV_WITHOUTSHADOW);
-                        };
-                    };
-                };
-            };
-        }
-        else {
-            for (int i = 0; i < NCells; i++) {
-                WallCell* WCL = Cells + i;
-                if (Cells[i].Visible) {
-                    if (WCL->OIndex < ULIMIT) {
-                        CUR = Group[WCL->OIndex];
-                        if (!(CUR && (!CUR->Sdoxlo) && CUR->WallX == WCL->x && CUR->WallY == WCL->y))
-                            CUR = NULL;
-                    };
-                    CurDrawNation = WCL->NI;
-                    int xx = (WCL->x << 6) - x0;
-                    int yy = ((mul3(WCL->y) << 3) - y0 + 16);
-                    int dz = GetHeight((WCL->x << 6)<<2 + 32, (WCL->y << 6)<<2 + 32+16);
-                    WallCharacter* WCR = &WChar[WCL->Type];
-                    //OneObject* OB=Group[WCL->OIndex];
-                    if (xx > -128 && xx<Lx + 128 && yy - dz>-128 && yy - dz < Ly + 128) {
-                        if (CUR) {
-                            bool IsSel = false;
-                            if (CUR->Selected & GM(MyNation)) IsSel = true;
-                            if (WCL->Sprite >= 32) {
-                                if (WCL->Sprite < 64) {
-                                    AddOptPoint(ZBF_LO, 0, 0, (xx - WCR->GateDx + 32) >> 2, (yy - WCR->GateDy - dz), NULL, WCR->GateFile, WCL->Sprite - 32, AV_SHADOWONLY);
-                                    RegisterVisibleGP(CUR->Index, WCR->GateFile, WCL->Sprite - 32, (xx - WCR->GateDx + 32) >> 2, (yy - WCR->GateDy - dz + 16));
-                                    int gs = Gates[WCL->GateIndex].State + (WCL->Sprite & 15) * NGOpen + 4;
-                                    switch (WCL->Sprite) {
-                                    case 32:
-                                        if (IsSel) {
-                                            AddOptPoint(ZBF_NORMAL, xx + 32, yy + 48, (xx - WCR->GateDx + 32) >> 2, (yy - WCR->GateDy - dz + 16), CUR, WCR->GateFile, WCL->Sprite - 32, AV_PULSING | AV_WHITE | AV_WITHOUTSHADOW);
-                                        }
-                                        else {
-                                            AddOptPoint(ZBF_NORMAL, xx + 32, yy + 48, (xx - WCR->GateDx + 32) >> 2, (yy - WCR->GateDy - dz + 16), CUR, WCR->GateFile, WCL->Sprite - 32, AV_WITHOUTSHADOW);
-                                        };
-                                        AddOptPoint(ZBF_NORMAL, xx + 32, yy + 48, (xx - WCR->GateDx + 32) >> 2, (yy - WCR->GateDy - dz + 16), CUR, WCR->GateFile, gs, AV_WITHOUTSHADOW);
-                                        AddOptPoint(ZBF_LO, 0, 0, (xx - WCR->GateDx + 32) >> 2, (yy - WCR->GateDy - dz + 16), CUR, WCR->GateFile, gs, AV_SHADOWONLY);
-                                        break;
-                                    case 33:
-                                        if (IsSel)AddOptLine(xx + 95, yy - 15 + 14, (xx - 31) >> 2, (yy + 47 + 14), (xx - WCR->GateDx + 32) >> 2, (yy - WCR->GateDy - dz + 16) , CUR, WCR->GateFile, WCL->Sprite - 32, AV_PULSING | AV_WHITE | AV_WITHOUTSHADOW);
-                                        else AddOptLine(xx + 95, yy - 15 + 14, (xx - 31) >> 2, (yy + 47 + 14), (xx - WCR->GateDx + 32) >> 2, (yy - WCR->GateDy - dz + 16) , CUR, WCR->GateFile, WCL->Sprite - 32, AV_WITHOUTSHADOW);
-                                        AddOptLine(xx + 95, yy - 15 - 14, (xx - 31) >> 2, (yy + 47 - 14), (xx - WCR->GateDx + 32) >> 2, (yy - WCR->GateDy - dz + 16) , CUR, WCR->GateFile, gs, AV_WITHOUTSHADOW);
-                                        AddOptPoint(ZBF_LO, 0, 0, (xx - WCR->GateDx + 32) >> 2, (yy - WCR->GateDy - dz + 16), CUR, WCR->GateFile, gs, AV_SHADOWONLY);
-                                        break;
-                                    case 34:
-                                        if (IsSel)AddOptPoint(ZBF_NORMAL, xx + 32, yy + 16 + 12, (xx - WCR->GateDx + 32) >> 2, (yy - WCR->GateDy - dz + 16), CUR, WCR->GateFile, WCL->Sprite - 32, AV_PULSING | AV_WHITE | AV_WITHOUTSHADOW);
-                                        else AddOptPoint(ZBF_NORMAL, xx + 32, yy + 16 + 12, (xx - WCR->GateDx + 32) >> 2, (yy - WCR->GateDy - dz + 16), CUR, WCR->GateFile, WCL->Sprite - 32, AV_WITHOUTSHADOW);
-                                        AddOptPoint(ZBF_NORMAL, xx + 32, yy + 16 - 12, (xx - WCR->GateDx + 32) >> 2, (yy - WCR->GateDy - dz + 16), CUR, WCR->GateFile, gs, AV_WITHOUTSHADOW);
-                                        AddOptPoint(ZBF_LO, 0, 0, (xx - WCR->GateDx + 32), (yy - WCR->GateDy - dz + 16), CUR, WCR->GateFile, gs, AV_SHADOWONLY);
-                                        break;
-                                    case 35:
-                                        if (IsSel)AddOptLine(xx - 31, yy - 15 + 12, (xx + 95) >> 2, (yy + 47 + 12), (xx - WCR->GateDx + 32) >> 2, (yy - WCR->GateDy - dz + 16), CUR, WCR->GateFile, WCL->Sprite - 32, AV_PULSING | AV_WHITE | AV_WITHOUTSHADOW);
-                                        else AddOptLine(xx - 32, yy - 15 + 12, (xx + 95) >> 2, (yy + 47 + 12), (xx - WCR->GateDx + 32) >> 2, (yy - WCR->GateDy - dz + 16), CUR, WCR->GateFile, WCL->Sprite - 32, AV_WITHOUTSHADOW);
-                                        AddOptLine(xx - 32, yy - 15 - 12, (xx + 95) >> 2, (yy + 47 - 12), (xx - WCR->GateDx + 32) >> 2, (yy - WCR->GateDy - dz + 16), CUR, WCR->GateFile, gs, AV_WITHOUTSHADOW);
-                                        AddOptPoint(ZBF_LO, 0, 0, (xx - WCR->GateDx + 32) >> 2, (yy - WCR->GateDy - dz + 16), CUR, WCR->GateFile, gs, AV_SHADOWONLY);
-                                        break;
-                                    };
-                                };
+                            // Regular wall rendering with owner and adjusted positions
+                            int wall_x = xx - (WCR->dx >> 2);
+                            int wall_y = yy - (WCR->dy >> 2) - dz + (WCR->dy >> 3);
+
+                            AddOptPoint(ZBF_LO, 0, 0, wall_x, wall_y, CUR,
+                                WCR->RIndex, WCL->SprBase + WCL->Sprite, AV_SHADOWONLY);
+                            if (IsSel) {
+                                AddOptPoint(ZBF_NORMAL, xx + GATE_X_OFFSET, wall_y + (BASE_Y_OFFSET >> 1),
+                                    wall_x, wall_y, CUR, WCR->RIndex,
+                                    WCL->SprBase + WCL->Sprite, AV_PULSING | AV_WHITE | AV_WITHOUTSHADOW);
                             }
                             else {
-                                AddOptPoint(ZBF_LO, 0, 0, (xx - WCR->dx) >> 2, (yy - WCR->dy - dz), CUR, WCR->RIndex, WCL->SprBase + WCL->Sprite, AV_SHADOWONLY);
-                                if (IsSel)AddOptPoint(ZBF_NORMAL, xx + 32, yy + 16, (xx - WCR->dx) >> 2, (yy - WCR->dy - dz), CUR, WCR->RIndex, WCL->SprBase + WCL->Sprite, AV_PULSING | AV_WHITE | AV_WITHOUTSHADOW);
-                                else AddOptPoint(ZBF_NORMAL, xx + 32, yy + 16, (xx - WCR->dx) >> 2, (yy - WCR->dy - dz), CUR, WCR->RIndex, WCL->SprBase + WCL->Sprite, AV_WITHOUTSHADOW);
-                            };
-                        };
-                    };
-                };
-            };
-        };
-};
+                                AddOptPoint(ZBF_NORMAL, xx + GATE_X_OFFSET, wall_y + (BASE_Y_OFFSET >> 1),
+                                    wall_x, wall_y, CUR, WCR->RIndex,
+                                    WCL->SprBase + WCL->Sprite, AV_WITHOUTSHADOW);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 void WallCluster::View(){
     if (LMode) {
         WallCluster::ViewMiniWall();
