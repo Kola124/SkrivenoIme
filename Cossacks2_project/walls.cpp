@@ -1224,7 +1224,53 @@ void WallCluster::View(){
         };
     };
 };
+void WallCluster::MiniPreview() {
+    int x0 = mapx << 3;
+    int y0 = mapy << 2;  // Changed from mul3(mapy) to match ViewMiniWall
+    int Lx = RealLx - DD;
+    int Ly = RealLy;
+    const int BASE_Y_OFFSET = -16;
+    const int ISO_Y_FACTOR = 2;
+
+    for (int i = 0; i < NCells; i++) {
+        WallCell* WCL = Cells + i;
+        if (Cells[i].Visible) {
+            CurDrawNation = MyNation;
+            // Use the same coordinate calculations as ViewMiniWall
+            int xx = (WCL->x << 4) - x0;
+            int yy = ((WCL->y * ISO_Y_FACTOR) << 2) - y0 + BASE_Y_OFFSET;
+            int dz = GetHeight((WCL->x << 4) + 32, (WCL->y << 1) + 32) >> 2;
+
+            WallCharacter* WCR = &WChar[WCL->Type];
+            if (xx > -512 && xx < Lx + 512 && yy - dz > -512 && yy - dz < Ly + 512) {
+                // Adjusted wall position calculation
+                int wall_x = xx - (WCR->dx >> 2);
+                int wall_y = yy - (WCR->dy >> 2) - dz;
+
+                // Draw shadow
+                AddOptPoint(ZBF_LO, 0, 0, wall_x, wall_y, nullptr,
+                    WCR->RIndex, WCL->SprBase + WCL->Sprite, AV_SHADOWONLY);
+
+                // Draw wall with position feedback
+                if (Cells[i].CheckPosition()) {
+                    AddOptPoint(ZBF_NORMAL, xx, wall_y,
+                        wall_x, wall_y, nullptr, WCR->RIndex,
+                        WCL->SprBase + WCL->Sprite, AV_PULSING | AV_WHITE | AV_WITHOUTSHADOW);
+                }
+                else {
+                    AddOptPoint(ZBF_NORMAL, xx, wall_y,
+                        wall_x, wall_y, nullptr, WCR->RIndex,
+                        WCL->SprBase + WCL->Sprite, AV_PULSING | AV_RED | AV_WITHOUTSHADOW);
+                }
+            }
+        }
+    }
+}
 void WallCluster::Preview(){
+    if (LMode) {
+        WallCluster::MiniPreview();
+        return;
+    };
     int x0=mapx<<5;
 	int y0=mul3(mapy)<<3;
 	int Lx=smaplx<<5;
@@ -1281,6 +1327,9 @@ int ConvScrY(int x,int y);
 void CmdCreateWall(byte NI);
 extern byte SpecCmd;
 void WallHandleMouse(){
+    if (LMode) {
+        return;
+    }
     if(BuildWall){
         //TMPCluster.Type=WallType;
         if(Lpressed){

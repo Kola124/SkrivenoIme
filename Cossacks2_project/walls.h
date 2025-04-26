@@ -79,6 +79,7 @@ public:
     void CreateSprites();
     void AddPoint(short x,short y,bool Vis);
     void Preview();
+    void MiniPreview();
     void ViewMiniWall();
     void View();
 	int  CreateData(word* Data,word Health);
