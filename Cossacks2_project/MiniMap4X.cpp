@@ -1887,7 +1887,7 @@ void GenerateMiniMapSquare(int x0,int y0,int nx,int ny){
 							};
 							if(OS->SG==&TREES){
 								int sgi=OS->SGIndex;
-								ZB.Add((OS->y>>3)-DY,((OS->x-OS->SG->Dx[sgi])>>2)-DX,(((OS->y>>1)-OS->z-OS->SG->Dy[sgi])>>2)-DY,DerGP,OS->SG->ObjChar[sgi].SpriteIndex);
+								//ZB.Add((OS->y>>3)-DY,((OS->x-OS->SG->Dx[sgi])>>2)-DX,(((OS->y>>1)-OS->z-OS->SG->Dy[sgi])>>2)-DY,DerGP,OS->SG->ObjChar[sgi].SpriteIndex);
                             NT++;
 							};
 						};
