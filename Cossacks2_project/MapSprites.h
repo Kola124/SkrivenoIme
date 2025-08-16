@@ -55,6 +55,7 @@ public:
 	short* Dy;
 	short* Radius;
 	ObjCharacter* ObjChar;
+    unsigned int ObjCharCount;
 	int NSections;
 	char** SectNames;
 	int** SectContence;

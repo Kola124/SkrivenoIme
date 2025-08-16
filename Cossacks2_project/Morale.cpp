@@ -1575,23 +1575,25 @@ int Morale_BackDamageDec13			=SETM(1.0  );
 int Morale_BackDamageDec14			=SETM(1.0  );
 int Morale_BackDamageDec15			=SETM(1.0  );
 
-int Morale_FormationShield15		=50;
-int Morale_FormationShield196		=30;
-int Morale_IncDecCoefficient		=100;
+int Morale_FormationShield15        =SETM(1.0  );
+int Morale_FormationShield196       =SETM(1.0  );
+int Morale_IncDecCoefficient        =SETM(1.0  );
 
 int Morale_KillDec					=SETM(1.0  );
+int Morale_KillDec2                 =SETM(1.0  );
 int Morale_FearDec					=SETM(0.25 );
 int Morale_IncTime					=SETM(0.001);
 int MaxMorale_CenterInc				=SETM(100.0);
 int MaxMorale_FormIncPerUnit		=SETM(1.0  );
-int MaxMorale_CenterRadius			=2000;
+int MaxMorale_CenterRadius			=SETM(1.0  );
+int MaxMorale_CenterRadius2         =SETM(1.0  );
 int MaxMorale_FormIncOfficer		=SETM(50.0 );
 int MaxMorale_FormIncBaraban		=SETM(50.0 );
 int MaxMorale_FormIncFlag			=SETM(50.0 );
 int MaxMorale_FormIncPerFrag		=SETM(5.0  );
 int MaxMorale_DecWhen30Lost			=SETM(20.0 );
-int MaxMorale_LostCriticalPercent	=30;
-int Morale_DecWhen30Lost				=SETM(20.0 );
+int MaxMorale_LostCriticalPercent   =SETM(1.0  );
+int Morale_DecWhen30Lost			=SETM(20.0 );
 
 int Morale_MinDueToTired			=SETM(36.0 );
 int Morale_DecWhenTired				=SETM(0.05 );
@@ -1642,11 +1644,13 @@ void ReadMoraleData(){
 				READCONSTF(Morale_BackDamageDec14);
 				READCONSTF(Morale_BackDamageDec15);
 				READCONSTF(Morale_KillDec);
+                READCONSTF(Morale_KillDec2);
 				READCONSTF(Morale_FearDec);
 				READCONSTF(Morale_IncTime);
 				READCONSTF(MaxMorale_CenterInc);
 				READCONSTF(MaxMorale_FormIncPerUnit);
 				READCONSTI(MaxMorale_CenterRadius);
+                READCONSTI(MaxMorale_CenterRadius2);
 				READCONSTF(MaxMorale_FormIncOfficer);
 				READCONSTF(MaxMorale_FormIncBaraban);
 				READCONSTF(MaxMorale_FormIncFlag);
@@ -1708,7 +1712,11 @@ void AddMoraleInRadiusInCell(int x,int y,int cell,byte Mask,int R,int D,bool Thr
 							if(N>3&&BR->SN!=0xFFFF&&NBRIG<512){
 								//if(N>30)N=30;
 								N-=3;
-								D=D*(Morale_FormationShield15+((N-15)*(Morale_FormationShield196-Morale_FormationShield15))/(196-15))/100;
+#ifdef EW
+								D=D*(Morale_FormationShield15+((N-20)*(Morale_FormationShield196-Morale_FormationShield15))/(100-20))/100;
+#else
+                                D = D * (Morale_FormationShield15 + ((N - 15) * (Morale_FormationShield196 - Morale_FormationShield15)) / (196 - 15)) / 100;
+#endif
 								if(D<0&&!ThroughMin){
 									if(BR->Morale>34*10000)BR->Morale+=D;
 								}else BR->Morale+=D;
@@ -1794,6 +1802,17 @@ void OnUnitDeath(word MID,word Sender){
 		if(SOB)AddMoraleInRadius(SOB->RealX>>4,SOB->RealY>>4,SOB->NMask,256,Morale_KillDec,1);
 	};
 };
+
+void OnCommandDeath(word MID) {
+    OneObject* OB;
+    GETOB(OB, MID);
+    if (OB) {
+        if (OB->newMons->CommandCenter) {
+            AddMoraleInRadius(OB->RealX >> 4, OB->RealY >> 4, OB->NMask, MaxMorale_CenterRadius2, -Morale_KillDec2, 1);
+        };
+    }
+};
+
 int GetMaxMorale(OneObject* OB){
 	return int(OB->newMons->StartMorale)*MR_ONE;
 };

@@ -43,7 +43,7 @@ void AssignHintLo(char* s,int time);
 extern short WeaponIcn [32];
 extern short ProtectIcn[32];
 char* GetSprResourceName(OneObject* OB);
-#define MaxO 200
+#define MaxO 500
 void AssignHint1(char* s,int time);
 bool SelSoundDobe;
 bool SelSoundReady;

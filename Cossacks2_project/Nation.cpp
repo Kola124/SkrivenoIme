@@ -849,10 +849,18 @@ void DamageInside(OneObject* OB,int Dam,OneObject* Sender,byte AttType){
 	int N=OB->NInside;
 	int rp=(int(rando())*N)>>15;
 	word pp=OB->Inside[rp];
+#ifdef EW
+    int reducedDam = Dam *( 100-OB->newMons->BuildingShield)/100;
+    if (reducedDam < 1) reducedDam = 0;
+#endif
 	if(pp!=0xFFFF){
 		OneObject* IOB=Group[pp];
 		if(OB){
-			IOB->MakeDamage(Dam,Dam,Sender,AttType);
+#ifdef EW
+			IOB->MakeDamage(reducedDam, reducedDam,Sender,AttType);
+#else
+            IOB->MakeDamage(Dam, Dam, Sender, AttType);
+#endif
 		};
 	};
 };
@@ -999,6 +1007,10 @@ int OneObject::MakeDamage(int Fundam,int Persist,OneObject* Sender,byte AttType,
 #ifdef NEWMORALE
 					void OnUnitDeath(word MID,word Sender);
 					OnUnitDeath(Index,Sender->Index);
+#ifdef EW
+                    void OnCommandDeath(word MID);
+                    OnCommandDeath(Index);
+#endif
 #else //NEWMORALE
 					int Fear=Sender->newMons->FearType[AttType];
 #ifdef COSSACKS2
@@ -1019,9 +1031,11 @@ int OneObject::MakeDamage(int Fundam,int Persist,OneObject* Sender,byte AttType,
 				Die();
 				if(Sender){
 					Sender->Kills++;
-#ifdef COSSACKS2
+//#ifdef COSSACKS2
+#ifdef NEWMORALE
 					if(Sender->BrigadeID!=0xFFFF)CITY[Sender->NNUM].Brigs[Sender->BrigadeID].NKills++;
-#endif //COSSACKS2
+#endif
+//#endif //COSSACKS2
 #ifndef NEWMORALE
 #ifdef COSSACKS2
 					void IncreaseFaith(int x,int y,byte NI,int r);
@@ -1171,9 +1185,11 @@ int OneObject::MakeDamage(int Fundam,int Persist,OneObject* Sender,byte AttType,
 				Sender->Kills++;
 				City* CT=Sender->Nat->CITY;
 				CT->Account+=3*newMons->Ves;
-#ifdef COSSACKS2
+//#ifdef COSSACKS2
+#ifdef NEWMORALE
 				if(Sender->BrigadeID!=0xFFFF)CT->Brigs[Sender->BrigadeID].NKills++;
 #endif
+//#endif
 				FireOwner=0xFF;
 				if(NInside){
 					for(int j=0;j<NInside;j++){
@@ -1205,6 +1221,10 @@ int OneObject::MakeDamage(int Fundam,int Persist,OneObject* Sender,byte AttType,
 #ifdef NEWMORALE
 			void OnUnitDeath(word MID,word Sender);
 			OnUnitDeath(Index,Sender->Index);
+#ifdef EW
+            void OnCommandDeath(word MID);
+            OnCommandDeath(Index);
+#endif
 #else //NEWMORALE
 #ifdef COSSACKS2
 			int Fear=Sender->newMons->FearType[AttType];

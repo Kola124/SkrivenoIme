@@ -2931,7 +2931,16 @@ bool NewMonster::CreateFromFile(char* name){
 							if(p1<8&&p1>=0)PromaxPercent[p1]=p2;
 							NLine(f1);
 							Line++;
-						}else
+						}
+                        else
+                        if (!strcmp(gx, "PROMAXREDUCTION")) {
+                            z = Gscanf(f1, "%d", &p1);
+                            if (z != 2)IncPar(name, Line, gx);
+                            if (p1 <= 100 && p1 >= 0) BuildingShield=p1;
+                            NLine(f1);
+                            Line++;
+                        }
+                        else
 						if(!strcmp(gx,"PROMAXCTG")){
 							z=Gscanf(f1,"%d",&p1);
 							if(z!=1)IncPar(name,Line,gx);
@@ -6862,7 +6871,7 @@ void CalculateMotionX0(){
 						};
 					}else{
 						OB->Sdoxlo++;
-#ifdef EW
+#ifdef DEADTIMER
                         if (OB->Sdoxlo > 80000) {
 #else
                         if (OB->Sdoxlo > 200) {
@@ -6878,7 +6887,7 @@ void CalculateMotionX0(){
 								OB=NULL;//died.	
 							};
 						};
-#ifdef EW
+#ifdef DEADTIMER
                         if (OB && OB->Sdoxlo > 160000) {
 #else
                         if (OB && OB->Sdoxlo > 400) {
@@ -6894,7 +6903,7 @@ void CalculateMotionX0(){
 								OB=NULL;//died.	
 							};
 						};
-#ifdef EW
+#ifdef DEADTIMER
                         if (OB && OB->Sdoxlo > 240000) {
 #else
                         if (OB && OB->Sdoxlo > 600) {
@@ -8693,7 +8702,7 @@ void LongProcesses(){
 									if(OB->Sdoxlo>24000){
 #else									
 									OB->Sdoxlo+=32;
-#ifdef EW
+#ifdef DEADTIMER
 									if(OB->Sdoxlo>48000){
 #else
                                     if (OB->Sdoxlo > 1200) {
@@ -8712,7 +8721,7 @@ void LongProcesses(){
 										};
 									};
 #ifndef _USE3D
-#ifdef EW
+#ifdef DEADTIMER
                                     if (OB && OB->Sdoxlo > 64000) {
 #else
                                     if (OB && OB->Sdoxlo > 1600) {
@@ -8728,7 +8737,7 @@ void LongProcesses(){
 											OB=NULL;//died.	
 										};
 									};
-#ifdef EW
+#ifdef DEADTIMER
                                     if (OB && OB->Sdoxlo > 80000) {
 #else
                                     if (OB && OB->Sdoxlo > 2000) {
@@ -8818,7 +8827,7 @@ void CalculateMotionV2(){
 								free(OB);
 								OB=NULL;
 							}else{
-#ifdef EW
+#ifdef DEADTIMER
 								if(OB->Sdoxlo<40000)OB->NewAnm=&NMN->DeathLie1;
 								else if(OB->Sdoxlo<120000)OB->NewAnm=&NMN->DeathLie2;
 								else if(OB->Sdoxlo<240000)OB->NewAnm=&NMN->DeathLie3;

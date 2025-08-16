@@ -563,8 +563,8 @@ extern bool Page1HaveItems;
 bool CreateInsideList(IconSet* IS,byte NI){
 	if(PlayGameMode==1)return false;
 	bool P1H=Page1HaveItems;
-    word Nmons[1024];
-    memset(Nmons,0,2048);
+    word Nmons[2048];
+    memset(Nmons,0,4096);
     int Nsel=ImNSL[MyNation];
     word* SMon=ImSelm[NI];
     if(!Nsel)return false;
@@ -827,7 +827,7 @@ bool CreateInsideList(IconSet* IS,byte NI){
 		int cidx=-1;
 		IS->Page=0;
 		//if(OWNM->CurrPage==2){
-			for(int i=0;i<1024;i++){
+			for(int i=0;i<2048;i++){
 				if(Nmons[i]){
 					Page3HaveItems=1;
 					if(OWNM->CurrPage==2){
@@ -844,7 +844,7 @@ bool CreateInsideList(IconSet* IS,byte NI){
 			};
 		//};
 	}else{
-		for(int i=0;i<1024;i++){
+		for(int i=0;i<2048;i++){
 			if(Nmons[i]){
 				GeneralObject* GO=NT->Mon[i];
 				NewMonster* NM=GO->newMons;

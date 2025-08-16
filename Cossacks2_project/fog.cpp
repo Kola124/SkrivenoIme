@@ -1239,7 +1239,11 @@ __forceinline void FogSpot(int x,int y){
 	if(fy<1)fy=1;
 	if(fx>maxFX)fx=maxFX;
 	if(fy>maxFY)fy=maxFY;
-	fmap[FOGOFFS[fy]+fx]=8000;
+#ifdef EW
+    fmap[FOGOFFS[fy] + fx] = 12000;
+#else
+    fmap[FOGOFFS[fy] + fx] = 8000;
+#endif
 };
 int GetHeight(int x,int y);
 void UnitLight(OneObject* OB){

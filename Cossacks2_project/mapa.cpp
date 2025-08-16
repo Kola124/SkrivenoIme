@@ -774,6 +774,11 @@ void DrawImMarker(OneObject* OB){
 	};
 };
 void CBar(int x,int y,int Lx,int Ly,byte c);
+
+#ifdef EW
+extern City CITY[8];
+#endif
+
 void DrawHealth(OneObject* OB){
 	if(LMode)return;
 	if(OB->Sdoxlo)return;
@@ -792,6 +797,22 @@ void DrawHealth(OneObject* OB){
 	};
 	Hline(-2+x+c2+dc+1,y+ddy+1,x+c2+hs+dc+1,clrGreen);
 	Hline(-2+x+c2+dc+1,y+ddy,x+c2+hs+dc+1,clrGreen);
+#ifdef EW
+    if (OB->MaxMorale > 0) {
+
+        if (OB->BrigadeID != 0xFFFF) {
+            int M = CITY[OB->NNUM].Brigs[OB->BrigadeID].Morale;
+            int MaxM = CITY[OB->NNUM].Brigs[OB->BrigadeID].MaxMorale;
+            hs = div(mhs * (M - 330000), (MaxM - 330000)).quot;
+        }
+        else {
+            hs = div(mhs * (OB->Morale - 330000), (OB->MaxMorale - 330000)).quot;
+        }
+    };
+
+    Hline(-2 + x + c2 + dc + 1, y + ddy + 4, x + c2 + hs + dc + 1, clrBlue);
+    Hline(-2 + x + c2 + dc + 1, y + ddy + 5, x + c2 + hs + dc + 1, clrBlue);
+#endif
 	if(OB->newMons->ShowDelay){
 		int mxd=1;
 		if(OB->MaxDelay)mxd=OB->MaxDelay;
@@ -3709,7 +3730,8 @@ void HandleMouse(int x,int y)
 							};
 						};
 						if(UName){
-							sprintf(ggg,FormationStr,UName,NU);
+							//sprintf(ggg,FormationStr,UName,NU);
+                            sprintf(ggg, "Formation: %s (%s)", OBBE->newMons->Message, NatNames[OBBE->Ref.General->NatID]);
 							if(GetKeyState(VK_CONTROL)&0x8000){
 								sprintf(ggg+strlen(ggg)," [ID=%d]",ENMI);
 							};

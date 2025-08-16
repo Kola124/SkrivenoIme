@@ -2778,6 +2778,11 @@ void UnloadTransp(byte NI,byte x1,byte y1){
 		};
 	};
 };
+#ifdef EW
+extern int MaxMorale_CenterRadius2;
+extern int Morale_KillDec2;
+void AddMoraleInRadius(int x, int y, byte Mask, int R, int D, bool ThroughMin);
+#endif
 void DestructBuilding(OneObject* OB);
 void DieSelected(byte NI){
 	int RNSel=0;
@@ -2791,6 +2796,11 @@ void DieSelected(byte NI){
 			OneObject* OB=Group[MID];
 			if(OB){
 				//OB->InFire=true;
+#ifdef EW
+                if (OB->newMons->CommandCenter) {
+                    AddMoraleInRadius(OB->RealX >> 4, OB->RealY >> 4, OB->NMask, MaxMorale_CenterRadius2, -Morale_KillDec2, 1);
+                };
+#endif
 				DestructBuilding(OB);
 				//OB->MakeDamage(100,100,NULL,0);
 			};

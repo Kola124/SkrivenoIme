@@ -575,6 +575,7 @@ public:
 	short AddShotRadius;
 	byte  PromaxPercent[8];
 	byte  PromaxCategory;
+    short BuildingShield=0;
 
 	word NBuildPt;
 	char* BuildPtX;
