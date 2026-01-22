@@ -189,6 +189,7 @@ int GridLy=24;
 int GridNx=230/16;
 int GridNy=230/32;
 int GridMode=0;
+
 void SelectNextGridMode(){
 	switch(GridMode){
 	case 0:
@@ -333,9 +334,9 @@ void DrawGrids(){
 				if(x>=mapx&&x<=mapx+smaplx&&y>=mapy&&y<=mapy+smaply&&x0+ix<GridNx&&y0+iy<GridNy){
 					int N=ix+x0+(iy+y0)*GridNx;
 					char cc[5];
-					if(N<10)sprintf(cc,"00%d",N);
-					else if(N<100)sprintf(cc,"0%d",N);
-					else sprintf(cc,"%d",N);
+					if(N<10)sprintf_s( cc,sizeof(cc),"00%d",N);
+					else if(N<100)sprintf_s( cc,sizeof(cc),"0%d",N);
+					else sprintf_s( cc,sizeof(cc),"%d",N);
 					ShowString((smapx+(x-mapx)*32)>>scshf,(smapy+(y-mapy)*16)>>scshf,cc,&WhiteFont);
 				};
 			};
@@ -778,7 +779,6 @@ void CBar(int x,int y,int Lx,int Ly,byte c);
 #ifdef EW
 extern City CITY[8];
 #endif
-
 void DrawHealth(OneObject* OB){
 	if(LMode)return;
 	if(OB->Sdoxlo)return;
@@ -833,9 +833,9 @@ void DrawHealth(OneObject* OB){
 		CBar(x0,y0-12,8,8,0xD0+OB->NNUM*4);
 		char cc[128];
 		if(OB->NMask&NATIONS[NatRefTBL[MyNation]].NMask||OB->WatchNInside){
-			sprintf(cc,"%d/%d",OB->NInside,OB->Ref.General->MoreCharacter->MaxInside+OB->AddInside);
+			sprintf_s( cc,sizeof(cc),"%d/%d",OB->NInside,OB->Ref.General->MoreCharacter->MaxInside+OB->AddInside);
 		}else{
-			sprintf(cc,"?/%d",OB->Ref.General->MoreCharacter->MaxInside+OB->AddInside);
+			sprintf_s( cc,sizeof(cc),"?/%d",OB->Ref.General->MoreCharacter->MaxInside+OB->AddInside);
 		};
 		int H=GetRLCHeight(SmallWhiteFont.RLC,'C');
 		ShowString(x0+12,y0-12+8-H,cc,&SmallWhiteFont);
@@ -1400,7 +1400,7 @@ void ShowX1(){
 		for(int iy=0;iy<dy;iy++){
 			char cc[16];
 			int ddy=(mapy&1)*16;
-			sprintf(cc,"%d",GetTZValue(mapx+ix,(mapy>>1)+iy));
+			sprintf_s( cc,sizeof(cc),"%d",GetTZValue(mapx+ix,(mapy>>1)+iy));
 			ShowString(ix*32,(iy*32)-ddy,cc,&fn8);
 			Hline(ix*32,(iy*32)-ddy,ix*32+1,255);
 		};
@@ -2069,10 +2069,10 @@ void GFieldShow(){
 
 							switch(PINFO[0].VictCond){
 							case 1:
-								sprintf(cc,"%d",SumSquare[NatRefTBL[ord[q]]]);
+								sprintf_s( cc,sizeof(cc),"%d",SumSquare[NatRefTBL[ord[q]]]);
 								break;
 							default:
-								sprintf(cc,"%.2f",float(SumAccount[NatRefTBL[ord[q]]])/100);
+								sprintf_s( cc,sizeof(cc),"%.2f",float(SumAccount[NatRefTBL[ord[q]]])/100);
 							};
 							int xt=x-7-GetRLCStrWidth(cc,&SmallWhiteFont);
 							ShowString(xt,yc-5,cc,&SmallBlackFont);
@@ -2220,7 +2220,7 @@ void GFieldShow(){
 					char cc[16];
 					int nn=0;
 					while(OR1&&nn<20){
-						sprintf(cc," %d",OR1->OrderType);
+						sprintf_s( cc,sizeof(cc)," %d",OR1->OrderType);
 						strcat(OSTR,cc);
 						OR1=OR1->NextOrder;
 						nn++;
@@ -2459,6 +2459,7 @@ void GMiniShow16(){
 	return;
 };
 #endif //_USE3D
+
 void GMiniShow(){
 	//Inform=GetKeyState(VK_MENU);
 	if(NoText||PlayGameMode==1)return;

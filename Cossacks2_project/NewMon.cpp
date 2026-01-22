@@ -211,17 +211,17 @@ CEXPORT void ErrM(char* s)
 };
 void NEPar(char* name,int line,char* Sect,int Need){
 	char gx[128];
-	sprintf(gx,"%s,%d : %s : Not enough parameters. Need: %d",name,line,Sect,Need);
+	sprintf_s(gx,sizeof(gx),"%s,%d : %s : Not enough parameters. Need: %d",name,line,Sect,Need);
 	ErrM(gx);
 };
 void InvPar(char* name,int line,char* Sect,char* parm){
 	char gx[128];
-	sprintf(gx,"%s,%d : %s : Invalid parameter: %s",name,line,Sect,parm);
+	sprintf_s(gx,sizeof(gx),"%s,%d : %s : Invalid parameter: %s",name,line,Sect,parm);
 	ErrM(gx);
 };
 void IncPar(char* name,int line,char* Sect){
 	char gx[128];
-	sprintf(gx,"%s,%d : %s : Incorrect parameters",name,line,Sect);
+	sprintf_s(gx,sizeof(gx),"%s,%d : %s : Incorrect parameters",name,line,Sect);
 	ErrM(gx);
 };
 void UpConv(char* str){
@@ -454,14 +454,14 @@ void LoadNewAimations(){
 						p1=RLCRef[z2];
 						if(z3>=z4){
 							if(z3*z1>=GPS.GPNFrames(p1)){
-								sprintf(gy,"Weapon.ads,line %d : Reference to RLC sprite is beyond the end of RLC file.",Line);
+								sprintf_s(gy,sizeof(gy),"Weapon.ads,line %d : Reference to RLC sprite is beyond the end of RLC file.",Line);
 								ErrM(gy);
 							};
 							dz=-1;
 							nz=z3-z4+1;
 						}else{
 							if(z4*z1>=GPS.GPNFrames(p1)){
-								sprintf(gy,"Weapon.ads,line %d : Reference to RLC sprite is beyond the end of RLC file.",Line);
+								sprintf_s(gy,sizeof(gy),"Weapon.ads,line %d : Reference to RLC sprite is beyond the end of RLC file.",Line);
 								ErrM(gy);
 							};
 							dz=1;
@@ -485,7 +485,7 @@ void LoadNewAimations(){
 						Line++;
 					}else{
 						gx[0]='@';
-						sprintf(gy,"Weapon.ads,line %d : Unknown animation type: %s",Line,gx);
+						sprintf_s(gy,sizeof(gy),"Weapon.ads,line %d : Unknown animation type: %s",Line,gx);
 						ErrM(gy);
 					};
                 }else
@@ -519,14 +519,14 @@ void LoadNewAimations(){
 						p1=RLCRef[z2];
 						if(z3>=z4){
 							if(z3*z1>=GPS.GPNFrames(p1)){
-								sprintf(gy,"Weapon.ads,line %d : Reference to RLC sprite is beyond the end of RLC file.",Line);
+								sprintf_s(gy,sizeof(gy),"Weapon.ads,line %d : Reference to RLC sprite is beyond the end of RLC file.",Line);
 								ErrM(gy);
 							};
 							dz=-1;
 							nz=z3-z4+1;
 						}else{
 							if(z4*z1>=GPS.GPNFrames(p1)){
-								sprintf(gy,"Weapon.ads,line %d : Reference to RLC sprite is beyond the end of RLC file.",Line);
+								sprintf_s(gy,sizeof(gy),"Weapon.ads,line %d : Reference to RLC sprite is beyond the end of RLC file.",Line);
 								ErrM(gy);
 							};
 							dz=1;
@@ -550,7 +550,7 @@ void LoadNewAimations(){
 						Line++;
 					}else{
 						gx[0]='@';
-						sprintf(gy,"Weapon.ads,line %d : Unknown animation type: %s",Line,gx);
+						sprintf_s(gy,sizeof(gy),"Weapon.ads,line %d : Unknown animation type: %s",Line,gx);
 						ErrM(gy);
 					};
                 }else
@@ -579,14 +579,14 @@ void LoadNewAimations(){
 						z=Gscanf(f1,"%d%d",&z1,&z3);
 						if(z!=2)IncPar("weapon.ads",Line,gx);
 						if(z1>MaxRLC){
-							sprintf(gy,"Weapon.ads,line %d : Incorrect RLC reference: %d",Line,z1);
+							sprintf_s(gy,sizeof(gy),"Weapon.ads,line %d : Incorrect RLC reference: %d",Line,z1);
 							ErrM(gy);
 						};
 						NewFrame* NF=&NANM->Frames[i];
 						NF->FileID=RLCRef[z1];
 						if(z3>=GPS.GPNFrames(RLCRef[z1])){
 
-							sprintf(gy,"Weapon.ads,line %d : Reference to RLC sprite is beyond the end of file: %d",Line,z3);
+							sprintf_s(gy,sizeof(gy),"Weapon.ads,line %d : Reference to RLC sprite is beyond the end of file: %d",Line,z3);
 							ErrM(gy);
 						};
 						NF->SpriteID=z3;
@@ -625,13 +625,13 @@ void LoadNewAimations(){
 						z=Gscanf(f1,"%d%d",&z1,&z3);
 						if(z!=2)IncPar("weapon.ads",Line,gx);
 						if(z1>MaxRLC){
-							sprintf(gy,"Weapon.ads,line %d : Incorrect RLC reference: %d",Line,z1);
+							sprintf_s(gy,sizeof(gy),"Weapon.ads,line %d : Incorrect RLC reference: %d",Line,z1);
 							ErrM(gy);
 						};
 						NewFrame* NF=&NANM->Frames[i];
 						NF->FileID=RLCRef[z1];
 						if(z3>=GPS.GPNFrames(RLCRef[z1])){
-							sprintf(gy,"Weapon.ads,line %d : Reference to RLC sprite is beyond the end of file: %d",Line,z3);
+							sprintf_s(gy,sizeof(gy),"Weapon.ads,line %d : Reference to RLC sprite is beyond the end of file: %d",Line,z3);
 							ErrM(gy);
 						};
 						NF->SpriteID=z3;
@@ -671,7 +671,7 @@ void LoadNewAimations(){
 							ErrM(gz);
 						};
 					}else{
-						sprintf(gy,"Weapon.ads,line %d : Unknown command : %s",Line,gx);
+						sprintf_s(gy,sizeof(gy),"Weapon.ads,line %d : Unknown command : %s",Line,gx);
 						ErrM(gy);
 					};
 				};
@@ -1051,7 +1051,7 @@ bool NewMonster::CreateFromFile(char* name){
 	MD_File=znew(char,strlen(name)+1);
 	strcpy(MD_File,name);
 	ConvertToUp(name);
-	sprintf(gx,"%s.MD",name);
+	sprintf_s(gx,sizeof(gx),"%s.MD",name);
 	Message=GetTextByID(gx);
 	DstZPoint=30;
 	MeatTransformIndex=0xFF; 
@@ -1076,7 +1076,7 @@ bool NewMonster::CreateFromFile(char* name){
 	MoraleDecSpeed=100;
 #endif //NEWMORALE
 	if(Message==gx){
-		sprintf(gy,"Could not find name for monster %s",gx);
+		sprintf_s(gy,sizeof(gy),"Could not find name for monster %s",gx);
 		ErrM(gy);
 	};
 #ifndef NEWMORALE
@@ -1121,13 +1121,13 @@ bool NewMonster::CreateFromFile(char* name){
 							z=Gscanf(f1,"%d%d",&z1,&z3);
 							if(z!=2)IncPar(name,Line,gx);
 							if(z1>MaxRLC){
-								sprintf(gy,"%s,line %d : Incorrect RLC reference: %d",name,Line,z1);
+								sprintf_s(gy,sizeof(gy),"%s,line %d : Incorrect RLC reference: %d",name,Line,z1);
 								ErrM(gy);
 							};
 							NewFrame* NF=&NANM->Frames[i];
 							NF->FileID=RLCRef[z1];
 							if((z3+1)*nrot>GPS.GPNFrames(RLCRef[z1])){
-								sprintf(gy,"%s,line %d : Reference to RLC sprite is beyond the end of file: %d",name,Line,z3);
+								sprintf_s(gy,sizeof(gy),"%s,line %d : Reference to RLC sprite is beyond the end of file: %d",name,Line,z3);
 								ErrM(gy);
 							};
 							NF->SpriteID=z3;
@@ -1137,7 +1137,7 @@ bool NewMonster::CreateFromFile(char* name){
 						NLine(f1);
 						Line++;
 					}else{
-						sprintf(gy,"%s,line %d : Unknown animation type: %s",name,Line,gx);
+						sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown animation type: %s",name,Line,gx);
 						ErrM(gy);
 					};
 				}else
@@ -1191,14 +1191,14 @@ bool NewMonster::CreateFromFile(char* name){
 						p1=RLCRef[z2];
 						if(z3>=z4){
 							if((z3+1)*z1>GPS.GPNFrames(p1)){
-								sprintf(gy,"%s,line %d : Reference to RLC sprite is beyond the end of RLC file.",name,Line);
+								sprintf_s(gy,sizeof(gy),"%s,line %d : Reference to RLC sprite is beyond the end of RLC file.",name,Line);
 								ErrM(gy);
 							};
 							dz=-1;
 							nz=z3-z4+1;
 						}else{
 							if((z4+1)*z1>GPS.GPNFrames(p1)){
-								sprintf(gy,"%s,line %d : Reference to RLC sprite is beyond the end of RLC file.",name,Line);
+								sprintf_s(gy,sizeof(gy),"%s,line %d : Reference to RLC sprite is beyond the end of RLC file.",name,Line);
 								ErrM(gy);
 							};
 							dz=1;
@@ -1226,7 +1226,7 @@ bool NewMonster::CreateFromFile(char* name){
 
 					}else{
 						gx[0]='@';
-						sprintf(gy,"%s,line %d : Unknown animation type: %s",name,Line,gx);
+						sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown animation type: %s",name,Line,gx);
 						ErrM(gy);
 					};
 				}else
@@ -1289,7 +1289,7 @@ bool NewMonster::CreateFromFile(char* name){
 						Line++;
 					}else{
 						gx[0]='$';
-						sprintf(gy,"%s,line %d : Unknown animation type: %s",name,Line,gx);
+						sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown animation type: %s",name,Line,gx);
 						ErrM(gy);
 					};
 				}else{
@@ -1344,7 +1344,7 @@ bool NewMonster::CreateFromFile(char* name){
 									memset(CompxCraft,0,sizeof ComplexBuilding);
 								};
 								if(Idx>=MaxAStages){
-									sprintf(gy,"%s,line %d : ADDSECTION : Too large stage index",name,Line);
+									sprintf_s(gy,sizeof(gy),"%s,line %d : ADDSECTION : Too large stage index",name,Line);
 									ErrM(gy);
 								}else{
 									CompxCraft->Mask|=1<<Idx;
@@ -1369,7 +1369,7 @@ bool NewMonster::CreateFromFile(char* name){
 	
 								};
 							}else{
-								sprintf(gy,"%s,line %d : ADDSECTION : Not enough or wrong parameters",name,Line);
+								sprintf_s(gy,sizeof(gy),"%s,line %d : ADDSECTION : Not enough or wrong parameters",name,Line);
 								ErrM(gy);
 							};
 						}else
@@ -1377,7 +1377,7 @@ bool NewMonster::CreateFromFile(char* name){
 							z=Gscanf(f1,"%d%d",&p1,&p2);
 							if(z!=2)IncPar(name,Line,"ATTACK_PAUSE");
 							if(p1>=NAttTypes){
-								sprintf(gy,"%s,line %d : Attack type index in ATTACK_PAUSE is too big.",name,Line);
+								sprintf_s(gy,sizeof(gy),"%s,line %d : Attack type index in ATTACK_PAUSE is too big.",name,Line);
 							ErrM(gy);
 							};
 							AttackPause[p1]=p2;
@@ -1388,7 +1388,7 @@ bool NewMonster::CreateFromFile(char* name){
 							z=Gscanf(f1,"%d%d%d",&p1,&p2,&p3);
 							if(z!=3)IncPar(name,Line,"ATTACK_ANGLES");
 							if(p1>=NAttTypes){
-								sprintf(gy,"%s,line %d : Attack type index in SHOT_ANGLE is too big.",name,Line);
+								sprintf_s(gy,sizeof(gy),"%s,line %d : Attack type index in SHOT_ANGLE is too big.",name,Line);
 								ErrM(gy);
 							};
 							AngleUp[p1]=p3;
@@ -1400,7 +1400,7 @@ bool NewMonster::CreateFromFile(char* name){
 							z=Gscanf(f1,"%d%d",&p1,&p2);
 							if(z!=2)IncPar(name,Line,"ADD_ATTACK_RADIUS");
 							if(p1>=NAttTypes){
-								sprintf(gy,"%s,line %d : Attack type index in ADD_ATTACK_RADIUS is too big.",name,Line);
+								sprintf_s(gy,sizeof(gy),"%s,line %d : Attack type index in ADD_ATTACK_RADIUS is too big.",name,Line);
 								ErrM(gy);
 							};
 							AttackRadiusAdd[p1]=p2;
@@ -1411,7 +1411,7 @@ bool NewMonster::CreateFromFile(char* name){
 							z=Gscanf(f1,"%d%d%d",&p1,&p2,&p3);
 							if(z!=3)IncPar(name,Line,gx);
 							if(p1>=NAttTypes){
-								sprintf(gy,"%s,line %d : Attack type index in ATTACK_RADIUS is too big.",name,Line);
+								sprintf_s(gy,sizeof(gy),"%s,line %d : Attack type index in ATTACK_RADIUS is too big.",name,Line);
 								ErrM(gy);
 							};
 							AttackRadius1[p1]=p2;
@@ -1484,7 +1484,7 @@ bool NewMonster::CreateFromFile(char* name){
 							NLine(f1);
 							Line++;
 						}else{
-							sprintf(gy,"%s,line %d : Unknown command : %s",name,Line,gx);
+							sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown command : %s",name,Line,gx);
 							ErrM(gy);
 						};
 						break;
@@ -1511,7 +1511,7 @@ bool NewMonster::CreateFromFile(char* name){
 							if(NANM){
 								NANM->CanBeBroken=1;
 							}else{
-								sprintf(gy,"%s,line %d : Unknown animation type: %s",name,Line,gx);
+								sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown animation type: %s",name,Line,gx);
 								ErrM(gy);
 							};
 							NLine(f1);
@@ -1600,7 +1600,7 @@ bool NewMonster::CreateFromFile(char* name){
 							NLine(f1);
 							Line++;
 						}else{
-							sprintf(gy,"%s,line %d : Unknown command : %s",name,Line,gx);
+							sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown command : %s",name,Line,gx);
 							ErrM(gy);
 						};
 						break;
@@ -1776,7 +1776,7 @@ bool NewMonster::CreateFromFile(char* name){
 							NLine(f1);
 							Line++;
 						}else{
-							sprintf(gy,"%s,line %d : Unknown command : %s",name,Line,gx);
+							sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown command : %s",name,Line,gx);
 							ErrM(gy);
 						};
 						break;
@@ -1786,11 +1786,11 @@ bool NewMonster::CreateFromFile(char* name){
 							if(z!=1)IncPar(name,Line,gx);
 							NewAnimation* NA=LoadNewAnimationByName(gz);
 							if(!NA){
-								sprintf(gy,"%s,line %d : DOUBLE %s - Unknown animation",name,Line,gz);
+								sprintf_s(gy,sizeof(gy),"%s,line %d : DOUBLE %s - Unknown animation",name,Line,gz);
 								ErrM(gy);
 							}
 							if((!NA->NFrames)||(NA->NFrames&1)){
-								sprintf(gy,"%s,line %d : DOUBLE %s - Invalid amount of frames in animation (%d)!",name,Line,gz,NA->NFrames);
+								sprintf_s(gy,sizeof(gy),"%s,line %d : DOUBLE %s - Invalid amount of frames in animation (%d)!",name,Line,gz,NA->NFrames);
 								ErrM(gy);
 							};
 							NA->NFrames>>=1;
@@ -1823,7 +1823,7 @@ bool NewMonster::CreateFromFile(char* name){
 							z=Gscanf(f1,"%d%d%d",&p1,&p2,&p3);
 							if(z!=3)IncPar(name,Line,gx);
 							if(p1>=NAttTypes){
-								sprintf(gy,"%s,line %d : Attack type index in ATTACK_RADIUS is too big.",name,Line);
+								sprintf_s(gy,sizeof(gy),"%s,line %d : Attack type index in ATTACK_RADIUS is too big.",name,Line);
 								ErrM(gy);
 							};
 							DetRadius1[p1]=p2;
@@ -1851,7 +1851,7 @@ bool NewMonster::CreateFromFile(char* name){
 			                    if(z!=1)NEPar(name,Line,"DESTRUCT",2+p2);
 		                        p3=GetWeaponIndex(gz);
 							    if(p3==-1){
-									sprintf(gy,"%s,line %d :DESTRUCT: Unknown weapon ID: %s",name,Line,gz);
+									sprintf_s(gy,sizeof(gy),"%s,line %d :DESTRUCT: Unknown weapon ID: %s",name,Line,gz);
 							    	ErrM(gy);
 						        };
 					            Destruct.Weap[i]=p3;
@@ -1897,7 +1897,7 @@ bool NewMonster::CreateFromFile(char* name){
 							NLine(f1);
 							Line++;
 						}else{
-							sprintf(gy,"%s,line %d : Unknown command : %s",name,Line,gx);
+							sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown command : %s",name,Line,gx);
 							ErrM(gy);
 						};
 						break;
@@ -2047,7 +2047,7 @@ bool NewMonster::CreateFromFile(char* name){
 							NLine(f1);
 							Line++;
 						}else{
-							sprintf(gy,"%s,line %d : Unknown command : %s",name,Line,gx);
+							sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown command : %s",name,Line,gx);
 							ErrM(gy);
 						};
 						break;
@@ -2227,7 +2227,7 @@ bool NewMonster::CreateFromFile(char* name){
 			                    if(z!=1)NEPar(name,Line,"FOGGING",2+p2);
 		                        p3=GetWeaponIndex(gz);
 							    if(p3==-1){
-									sprintf(gy,"%s,line %d :FOGGING: Unknown weapon ID: %s",name,Line,gz);
+									sprintf_s(gy,sizeof(gy),"%s,line %d :FOGGING: Unknown weapon ID: %s",name,Line,gz);
 							    	ErrM(gy);
 						        };
 					            Fogging.Weap[i]=p3;
@@ -2246,7 +2246,7 @@ bool NewMonster::CreateFromFile(char* name){
 			                    if(z!=1)NEPar(name,Line,"FOGGING",2+p2);
 		                        p3=GetWeaponIndex(gz);
 							    if(p3==-1){
-									sprintf(gy,"%s,line %d :FOGGING: Unknown weapon ID: %s",name,Line,gz);
+									sprintf_s(gy,sizeof(gy),"%s,line %d :FOGGING: Unknown weapon ID: %s",name,Line,gz);
 							    	ErrM(gy);
 						        };
 					            Fire.Weap[i]=p3;
@@ -2289,7 +2289,7 @@ bool NewMonster::CreateFromFile(char* name){
 							NLine(f1);
 							Line++;
 						}else{
-							sprintf(gy,"%s,line %d : Unknown command : %s",name,Line,gx);
+							sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown command : %s",name,Line,gx);
 							ErrM(gy);
 						};
 						break;
@@ -2318,7 +2318,7 @@ bool NewMonster::CreateFromFile(char* name){
 							NLine(f1);
 							Line++;
 						}else{
-							sprintf(gy,"%s,line %d : Unknown command : %s",name,Line,gx);
+							sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown command : %s",name,Line,gx);
 							ErrM(gy);
 						};
 						break;
@@ -2333,7 +2333,7 @@ bool NewMonster::CreateFromFile(char* name){
 							Line++;
 							NLine(f1);
 						}else{
-							sprintf(gy,"%s,line %d : Unknown command : %s",name,Line,gx);
+							sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown command : %s",name,Line,gx);
 							ErrM(gy);
 						};
 						break;
@@ -2366,13 +2366,13 @@ bool NewMonster::CreateFromFile(char* name){
 							NLine(f1);
 							Line++;
 						}else{
-							sprintf(gy,"%s,line %d : Unknown command : %s",name,Line,gx);
+							sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown command : %s",name,Line,gx);
 							ErrM(gy);
 						};
 						break;
 					case 'J':
 						{
-							sprintf(gy,"%s,line %d : Unknown command : %s",name,Line,gx);
+							sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown command : %s",name,Line,gx);
 							ErrM(gy);
 						};
 						break;
@@ -2384,7 +2384,7 @@ bool NewMonster::CreateFromFile(char* name){
 							NLine(f1);
 							Line++;
 						}else{
-							sprintf(gy,"%s,line %d : Unknown command : %s",name,Line,gx);
+							sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown command : %s",name,Line,gx);
 							ErrM(gy);
 						};
 						break;
@@ -2469,7 +2469,7 @@ bool NewMonster::CreateFromFile(char* name){
 										LINF[p+2]=10000;
 										LINF[p+3]=10000;
 									}else{
-										sprintf(gy,"%s,line %d : Unknown sort type(LINE,POINT,GROUND or TOP expected): %s",name,Line,gy);
+										sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown sort type(LINE,POINT,GROUND or TOP expected): %s",name,Line,gy);
 										ErrM(gy);
 									};
 								};
@@ -2489,7 +2489,7 @@ bool NewMonster::CreateFromFile(char* name){
 									};
 								};
 							}else{
-								sprintf(gy,"%s,line %d : Unknown animation type: %s",name,Line,gz);
+								sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown animation type: %s",name,Line,gz);
 								ErrM(gy);
 							};
 							NLine(f1);
@@ -2528,7 +2528,7 @@ bool NewMonster::CreateFromFile(char* name){
 							NLine(f1);
 							Line++;
 						}else{
-							sprintf(gy,"%s,line %d : Unknown command : %s",name,Line,gx);
+							sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown command : %s",name,Line,gx);
 							ErrM(gy);
 						};
 						break;
@@ -2540,7 +2540,7 @@ bool NewMonster::CreateFromFile(char* name){
 							if(NANM){
 								NANM->MoveBreak=1;
 							}else{
-								sprintf(gy,"%s,line %d : Unknown animation type: %s",name,Line,gx);
+								sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown animation type: %s",name,Line,gx);
 								ErrM(gy);
 							};
 							NLine(f1);
@@ -2644,7 +2644,7 @@ bool NewMonster::CreateFromFile(char* name){
 							NLine(f1);
 							Line++;
 						}else{
-							sprintf(gy,"%s,line %d : Unknown command : %s",name,Line,gx);
+							sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown command : %s",name,Line,gx);
 							ErrM(gy);
 						};
 						break;
@@ -2694,7 +2694,7 @@ bool NewMonster::CreateFromFile(char* name){
 							NLine(f1);
 							Line++;
 						}else{
-							sprintf(gy,"%s,line %d : Unknown command : %s",name,Line,gx);
+							sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown command : %s",name,Line,gx);
 							ErrM(gy);
 						};
 						break;
@@ -2721,7 +2721,7 @@ bool NewMonster::CreateFromFile(char* name){
 							NLine(f1);
 							Line++;
 						}else{
-							sprintf(gy,"%s,line %d : Unknown command : %s",name,Line,gx);
+							sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown command : %s",name,Line,gx);
 							ErrM(gy);
 						};
 						break;
@@ -2948,13 +2948,13 @@ bool NewMonster::CreateFromFile(char* name){
 							NLine(f1);
 							Line++;
 						}else{
-							sprintf(gy,"%s,line %d : Unknown command : %s",name,Line,gx);
+							sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown command : %s",name,Line,gx);
 							ErrM(gy);
 						};
 						break;
 					case 'Q':
 						{
-							sprintf(gy,"%s,line %d : Unknown command : %s",name,Line,gx);
+							sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown command : %s",name,Line,gx);
 							ErrM(gy);
 						};
 						break;
@@ -2986,7 +2986,7 @@ bool NewMonster::CreateFromFile(char* name){
 							z=Gscanf(f1,"%d%d",&p1,&p2);
 							if(z!=2)IncPar(name,Line,"RATE");
 							if(p1>NAttTypes){
-								sprintf(gy,"%s,line %d : Attack type index in RATE must be less 4",name,Line);
+								sprintf_s(gy,sizeof(gy),"%s,line %d : Attack type index in RATE must be less 4",name,Line);
 								ErrM(gy);
 							};
 							Rate[p1]=p2;
@@ -3013,7 +3013,7 @@ bool NewMonster::CreateFromFile(char* name){
 						if(!strcmp(gx,"ROTATE")){
 							z=Gscanf(f1,"%d",&p1);
 							if(z!=1){
-								sprintf(gy,"%s, Line %d : Invalid %s value",name,Line,gx);
+								sprintf_s(gy,sizeof(gy),"%s, Line %d : Invalid %s value",name,Line,gx);
 								ErrM(gy);
 							};
 							MinRotator=p1;
@@ -3095,7 +3095,7 @@ bool NewMonster::CreateFromFile(char* name){
 							NLine(f1);
 							Line++;
 						}else{
-							sprintf(gy,"%s,line %d : Unknown command : %s",name,Line,gx);
+							sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown command : %s",name,Line,gx);
 							ErrM(gy);
 						};
 						break;
@@ -3182,7 +3182,7 @@ bool NewMonster::CreateFromFile(char* name){
 								for(int j=0;j<NANM->Rotations;j++){
 									z=Gscanf(f1,"%d%d",&xx,&yy);
 									if(z!=2){
-										sprintf(gy,"%s,line %d : Not enough active points. Must be : %d",name,Line,NANM->Rotations);
+										sprintf_s(gy,sizeof(gy),"%s,line %d : Not enough active points. Must be : %d",name,Line,NANM->Rotations);
 										ErrM(gy);
 									};
 									NANM->ActivePtX[j]=xx;
@@ -3190,7 +3190,7 @@ bool NewMonster::CreateFromFile(char* name){
 									NANM->ActiveFrame=p1;
 								};
 							}else{
-								sprintf(gy,"%s,line %d : Unknown animation type: %s",name,Line,gx);
+								sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown animation type: %s",name,Line,gx);
 								ErrM(gy);
 							};
 							NLine(f1);
@@ -3205,7 +3205,7 @@ bool NewMonster::CreateFromFile(char* name){
 								for(int j=0;j<N;j++){
 									z=Gscanf(f1,"%d%d",&xx,&yy);
 									if(z!=2){
-										sprintf(gy,"%s,line %d : Not enough active points. Must be : %d",name,Line,N);
+										sprintf_s(gy,sizeof(gy),"%s,line %d : Not enough active points. Must be : %d",name,Line,N);
 										ErrM(gy);
 									};
 									NANM->ActivePtX[j]=xx;
@@ -3214,7 +3214,7 @@ bool NewMonster::CreateFromFile(char* name){
 								};
 								NANM->DoubleShot=1;
 							}else{
-								sprintf(gy,"%s,line %d : Unknown animation type: %s",name,Line,gx);
+								sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown animation type: %s",name,Line,gx);
 								ErrM(gy);
 							};
 							NLine(f1);
@@ -3229,7 +3229,7 @@ bool NewMonster::CreateFromFile(char* name){
 								for(int j=0;j<N;j++){
 									z=Gscanf(f1,"%d%d",&xx,&yy);
 									if(z!=2){
-										sprintf(gy,"%s,line %d : Not enough active points. Must be : %d",name,Line,N);
+										sprintf_s(gy,sizeof(gy),"%s,line %d : Not enough active points. Must be : %d",name,Line,N);
 										ErrM(gy);
 									};
 									NANM->ActivePtX[j]=xx;
@@ -3238,7 +3238,7 @@ bool NewMonster::CreateFromFile(char* name){
 								};
 								NANM->DoubleShot=2;
 							}else{
-								sprintf(gy,"%s,line %d : Unknown animation type: %s",name,Line,gx);
+								sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown animation type: %s",name,Line,gx);
 								ErrM(gy);
 							};
 							NLine(f1);
@@ -3450,7 +3450,7 @@ bool NewMonster::CreateFromFile(char* name){
 							NLine(f1);
 							Line++;
 						}else{
-							sprintf(gy,"%s,line %d : Unknown command : %s",name,Line,gx);
+							sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown command : %s",name,Line,gx);
 							ErrM(gy);
 						};
 						break;
@@ -3528,7 +3528,7 @@ bool NewMonster::CreateFromFile(char* name){
 							NLine(f1);
 							Line++;
 						}else{
-							sprintf(gy,"%s,line %d : Unknown command : %s",name,Line,gx);
+							sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown command : %s",name,Line,gx);
 							ErrM(gy);
 						};
 						break;
@@ -3677,7 +3677,7 @@ bool NewMonster::CreateFromFile(char* name){
 							NLine(f1);
 							Line++;
 						}else{
-							sprintf(gy,"%s,line %d : Unknown command : %s",name,Line,gx);
+							sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown command : %s",name,Line,gx);
 							ErrM(gy);
 						};
 						break;
@@ -3700,7 +3700,7 @@ bool NewMonster::CreateFromFile(char* name){
 						if(!strcmp(gx,"VISION")){
 							z=Gscanf(f1,"%d",&p1);
 							if(p1<0||p1>12){
-								sprintf(gy,"%s, Line %d :%s: Argument must be 0..8",name,Line,gx);
+								sprintf_s(gy,sizeof(gy),"%s, Line %d :%s: Argument must be 0..8",name,Line,gx);
 								ErrM(gy);
 							};
 							if(z!=1)IncPar(name,Line,gx);
@@ -3731,7 +3731,7 @@ bool NewMonster::CreateFromFile(char* name){
 							NLine(f1);
 							Line++;
 						}else{
-							sprintf(gy,"%s,line %d : Unknown command : %s",name,Line,gx);
+							sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown command : %s",name,Line,gx);
 							ErrM(gy);
 						};
 						break;
@@ -3771,12 +3771,12 @@ bool NewMonster::CreateFromFile(char* name){
 							z=Gscanf(f1,"%d%s",&p1,gz);
 							if(z!=2)IncPar(name,Line,"WEAPON");
 							if(p1>=NAttTypes){
-								sprintf(gy,"%s,line %d :WEAPON: Index too big : %d",name,Line,p1);
+								sprintf_s(gy,sizeof(gy),"%s,line %d :WEAPON: Index too big : %d",name,Line,p1);
 								ErrM(gy);
 							};
 							p2=GetWeaponIndex(gz);
 							if(p2==-1){
-								sprintf(gy,"%s,line %d :WEAPON: Unknown weapon ID: %s",name,Line,gz);
+								sprintf_s(gy,sizeof(gy),"%s,line %d :WEAPON: Unknown weapon ID: %s",name,Line,gz);
 								ErrM(gy);
 							};
 							DamWeap[p1]=WPLIST[p2];
@@ -3820,19 +3820,19 @@ bool NewMonster::CreateFromFile(char* name){
 							NLine(f1);
 							Line++;
 						}else{
-							sprintf(gy,"%s,line %d : Unknown command : %s",name,Line,gx);
+							sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown command : %s",name,Line,gx);
 							ErrM(gy);
 						};
 						break;
 					case 'X':
 						{
-							sprintf(gy,"%s,line %d : Unknown command : %s",name,Line,gx);
+							sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown command : %s",name,Line,gx);
 							ErrM(gy);
 						};
 						break;
 					case 'Y':
 						{
-							sprintf(gy,"%s,line %d : Unknown command : %s",name,Line,gx);
+							sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown command : %s",name,Line,gx);
 							ErrM(gy);
 						};
 						break;
@@ -3853,7 +3853,7 @@ bool NewMonster::CreateFromFile(char* name){
 							NLine(f1);
 							Line++;
 						}else{
-							sprintf(gy,"%s,line %d : Unknown command : %s",name,Line,gx);
+							sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown command : %s",name,Line,gx);
 							ErrM(gy);
 						};
 						break;
@@ -3878,7 +3878,7 @@ bool NewMonster::CreateFromFile(char* name){
 							Line++;
 							NLine(f1);
 						}else{
-							sprintf(gy,"%s,line %d : Unknown command : %s",name,Line,gx);
+							sprintf_s(gy,sizeof(gy),"%s,line %d : Unknown command : %s",name,Line,gx);
 							ErrM(gy);
 						};
 					};
@@ -3892,7 +3892,7 @@ bool NewMonster::CreateFromFile(char* name){
 		Gclose(f1);
 		return true;
 	}else{
-		sprintf(gx,"Could not open new monster discription file %s.nm",name);
+		sprintf_s(gx,sizeof(gx),"Could not open new monster discription file %s.nm",name);
 		ErrM(gx);
 		return false;
 	};
@@ -4072,11 +4072,11 @@ void SprGroup::LoadSprites(char* fname){
                     if(OBC->Stand){
                         OBC->Frames=div(OBC->Stand->NFrames,p4).quot;
                         if(!OBC->Frames){
-                            sprintf(gx,"%s, Line %d : %s : Too many parts (more then sprites in animation) : %s",fname,Line,gy,str);
+                            sprintf_s(gx,sizeof(gx),"%s, Line %d : %s : Too many parts (more then sprites in animation) : %s",fname,Line,gy,str);
                             ErrM(gx);
                         };
                     }else{
-                        sprintf(gx,"%s, Line %d : %s : Unknown Animation : %s",fname,Line,gy,str);
+                        sprintf_s(gx,sizeof(gx),"%s, Line %d : %s : Unknown Animation : %s",fname,Line,gy,str);
                         ErrM(gx);
                     };
                     NLine(f1);
@@ -4413,7 +4413,7 @@ void SprGroup::LoadSprites(char* fname){
 				//---end---
 				if(!strcmp(gx,"[END]"))mode=255;
 				else{
-					sprintf(gy,"Unknown section in <%s.rsr> : %s",fname,gx);
+					sprintf_s(gy,sizeof(gy),"Unknown section in <%s.rsr> : %s",fname,gx);
 					ErrM(gy);
 				};
 			}else{
@@ -8391,7 +8391,7 @@ void CreateOrdersList(OneObject* OB,char* Str){
 	if(OB->LocalOrder){
 		Order1* OR1=OB->LocalOrder;
 		while(OR1){
-			sprintf(ccc," %d",OR1->OrderType);
+			sprintf_s(ccc,sizeof(ccc)," %d",OR1->OrderType);
 			strcat(Str,ccc);
 			rando();
 			OR1=OR1->NextOrder;
@@ -10725,13 +10725,13 @@ void TopShow(){
 				DWORD dat=InflMap[xx0+yy0*TopLx]&255;
 				if(dat){
 					char ccc[16];
-					sprintf(ccc,"%d",dat);
+					sprintf_s(ccc,sizeof(ccc),"%d",dat);
 					ShowString(xx+32-6,yy-((dz1+dz2+dz3+dz4)>>2)-6+16,ccc,&fn10);
 				};
 				SafeCellInfo* SCI=GetCellInfo(xx0,yy0);
 				if(SCI){
 					char ccc[16];
-					sprintf(ccc,"%d",SCI->Index);
+					sprintf_s(ccc,sizeof(ccc),"%d",SCI->Index);
 					ShowString(xx+32-6,yy-((dz1+dz2+dz3+dz4)>>2)-6+16,ccc,&fn8);
 				};
 				*/
@@ -10749,7 +10749,7 @@ void TopShow(){
 		int NA=GetNAreas(TopType);
 		for(int i=0;i<NA;i++){
 			char cc[64];
-			sprintf(cc,"Z%d:%d",i,DMap[i]);
+			sprintf_s( cc,sizeof(cc),"Z%d:%d",i,DMap[i]);
 			Area* AR=GetTopMap(i,TopType);
 			ShowString((AR->x<<6)-ox,(AR->y<<5)-oy,cc,&BigYellowFont);
 		};
@@ -11840,7 +11840,7 @@ void AttackObjLink(OneObject* OBJ){
 	if(((!OB)||(OB->Sdoxlo>8)||OSN!=OB->Serial)||OBJ->TurnOff){
 		if(OBJ->PrioryLevel>=16&&OBJ->NNUM==MyNation&&OBJ->TurnOff){
 			char ccc[128];
-			sprintf(ccc,GetTextByID("CSNOGL"),OBJ->Ref.General->Message);
+			sprintf_s(ccc,sizeof(ccc),GetTextByID("CSNOGL"),OBJ->Ref.General->Message);
 			AssignHint1(ccc,50);
 		};
 		OBJ->DeleteLastOrder();
@@ -11994,7 +11994,7 @@ void AttackObjLink(OneObject* OBJ){
 									}else{
 										if(OBJ->NNUM==MyNation&&OBJ->PrioryLevel>=16){
 											char ccc[150];
-											sprintf(ccc,GetTextByID("CSNORS"),OBJ->Ref.General->Message);
+											sprintf_s(ccc,sizeof(ccc),GetTextByID("CSNORS"),OBJ->Ref.General->Message);
 											AssignHint1(ccc,64);
 										};
 										OBJ->DeleteLastOrder();
@@ -12157,7 +12157,7 @@ void AttackObjLink(OneObject* OBJ){
 				}else{
 					if(OBJ->NNUM==MyNation&&OBJ->PrioryLevel>=16){
 						char ccc[150];
-						sprintf(ccc,GetTextByID("CSNORS"),OBJ->Ref.General->Message);
+						sprintf_s(ccc,sizeof(ccc),GetTextByID("CSNORS"),OBJ->Ref.General->Message);
 						AssignHint1(ccc,64);
 					};
 					OBJ->DeleteLastOrder();
@@ -12867,7 +12867,7 @@ DoShot1:;
 									//addname(OBJ->Index);
 									if(OBJ->NNUM==MyNation&&OBJ->PrioryLevel>=16){
 										char ccc[150];
-										sprintf(ccc,GetTextByID("CSNORS"),OBJ->Ref.General->Message);
+										sprintf_s(ccc,sizeof(ccc),GetTextByID("CSNORS"),OBJ->Ref.General->Message);
 										AssignHint1(ccc,64,32);
 									};
 									OBJ->DeleteLastOrder();
@@ -13159,7 +13159,7 @@ void WaterAttackLink(OneObject* OBJ){
 	if(!OB||OB->Sdoxlo||OBJ->TurnOff||OSN!=OB->Serial){
 		if(OBJ->PrioryLevel>=16&&OBJ->NNUM==MyNation&&OBJ->TurnOff){
 			char ccc[128];
-			sprintf(ccc,GetTextByID("CSNOGL"),OBJ->Ref.General->Message);
+			sprintf_s(ccc,sizeof(ccc),GetTextByID("CSNOGL"),OBJ->Ref.General->Message);
 			AssignHint1(ccc,50,32);
 		};
 		OBJ->DeleteLastOrder();
@@ -13227,7 +13227,7 @@ void WaterAttackLink(OneObject* OBJ){
 								}else{
 									if(OBJ->NNUM==MyNation&&OBJ->PrioryLevel>=16){
 										char ccc[150];
-										sprintf(ccc,GetTextByID("CSNORS"),OBJ->Ref.General->Message);
+										sprintf_s(ccc,sizeof(ccc),GetTextByID("CSNORS"),OBJ->Ref.General->Message);
 										AssignHint1(ccc,64,32);
 									};
 									OBJ->DeleteLastOrder();
@@ -13317,7 +13317,7 @@ void WaterAttackLink(OneObject* OBJ){
 								//OBJ->delay=20;
 								if(OBJ->NNUM==MyNation&&OBJ->PrioryLevel>=16){
 									char ccc[150];
-									sprintf(ccc,GetTextByID("CSNORS"),OBJ->Ref.General->Message);
+									sprintf_s(ccc,sizeof(ccc),GetTextByID("CSNORS"),OBJ->Ref.General->Message);
 									AssignHint1(ccc,64,32);
 								};
 								OBJ->DeleteLastOrder();
@@ -13868,7 +13868,7 @@ void OneObject::NextStage(){
 				int msgLen = strlen( Ref.General->Message );
 				if (msgLen < 100) 
 #endif // _USE3D
-				sprintf(ccc,BLDBLD,Ref.General->Message);
+				sprintf_s(ccc,sizeof(ccc),BLDBLD,Ref.General->Message);
 				AssignHint1(ccc,100);
 				LastActionX=RealX>>4;
 				LastActionY=RealY>>4;
@@ -15421,7 +15421,7 @@ void CheckCapture(OneObject* OBJ){
 		CITY[CapNation].Account+=OBJ->newMons->Ves*5;
 		if(OBJ->NNUM==MyNation&&OBJ->NewBuilding){
 			char ccc[200];
-			sprintf(ccc,CAPBLD,OBJ->Ref.General->Message);
+			sprintf_s(ccc,sizeof(ccc),CAPBLD,OBJ->Ref.General->Message);
 			AssignHint1(ccc,100,32);
 		};
 		if(OBJ->NNUM==MyNation){

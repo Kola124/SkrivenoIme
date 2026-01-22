@@ -180,7 +180,7 @@ int ShowUnitsList(int x,int y,int Lx,word* Value){
 		Hline(x-2,y0,x0+5,BarInfColor);
 		int N=UNITS.NHash;
 		for(int i=0;i<N;i++){
-			sprintf(cc,"%d",UNITS.HASH[i].Param1);
+			sprintf_s( cc,sizeof(cc),"%d",UNITS.HASH[i].Param1);
 			ShowString(x+5,y0+1+DDY,UNITS.HASH[i].Message,&SmallYellowFont);
 			ShowString(x0-GetRLCStrWidth(cc,&SmallYellowFont),y0+1+DDY,cc,&SmallYellowFont);
 			Hline(x-2,y0+DY,x0+5,BarInfColor);
@@ -197,7 +197,7 @@ int ShowUnitsList(int x,int y,int Lx,word* Value){
 		Hline(x-2,y0,x0+5,BarInfColor);
 		int N=BUILDINGS.NHash;
 		for(int i=0;i<N;i++){
-			sprintf(cc,"%d",BUILDINGS.HASH[i].Param1);
+			sprintf_s( cc,sizeof(cc),"%d",BUILDINGS.HASH[i].Param1);
 			ShowString(x+5,y0+1+DDY,BUILDINGS.HASH[i].Message,&SmallYellowFont);
 			ShowString(x0-GetRLCStrWidth(cc,&SmallYellowFont),y0+1+DDY,cc,&SmallYellowFont);
 			Hline(x-2,y0+DY,x0+5,BarInfColor);
@@ -237,10 +237,10 @@ int ShowEconomy(int x,int y,bool Header){
 			int yy=y0+20+iy*27;
 			if(ix!=iy){
 				int CCost=GetCurrentCost(EECO[ix],EECO[iy],1000);
-				sprintf(cc,"%d",CCost);
+				sprintf_s( cc,sizeof(cc),"%d",CCost);
 				ShowString(xx-(GetRLCStrWidth(cc,&SmallWhiteFont))/2,yy-5,cc,&SmallWhiteFont);
 				int NCost=GetNominalCost(EECO[ix],EECO[iy],1000);
-				sprintf(cc,"%d",NCost);
+				sprintf_s( cc,sizeof(cc),"%d",NCost);
 				ShowString(xx-(GetRLCStrWidth(cc,&SmallYellowFont))/2,yy+5,cc,&SmallYellowFont);
 				if(NCost<CCost){
 					Xbar(xx-15,yy-8,31,26,0x96);
@@ -288,7 +288,7 @@ int ShowDoxod(int x,int y,bool Header1){
 	int x0=x+208;
 	Hline(x-5,y0,x0+5,BarInfColor);
 	ShowString(x,y0+1+DDY,RDS[CoalID].Name,&SmallYellowFont);
-	sprintf(cc,"%d",NInCoal[NatRefTBL[MyNation]]);
+	sprintf_s( cc,sizeof(cc),"%d",NInCoal[NatRefTBL[MyNation]]);
 	ShowString(x+196-GetRLCStrWidth(cc,&SmallYellowFont)/2,y0+1+DDY,cc,&SmallYellowFont);
 	y0+=DY;
 	Vline(x-5,y0,y0-DY,BarInfColor);
@@ -297,7 +297,7 @@ int ShowDoxod(int x,int y,bool Header1){
 	Hline(x-5,y0,x0+5,BarInfColor);
 
 	ShowString(x,y0+1+DDY,RDS[IronID].Name,&SmallYellowFont);
-	sprintf(cc,"%d",NInIron[NatRefTBL[MyNation]]);
+	sprintf_s( cc,sizeof(cc),"%d",NInIron[NatRefTBL[MyNation]]);
 	ShowString(x+196-GetRLCStrWidth(cc,&SmallYellowFont)/2,y0+1+DDY,cc,&SmallYellowFont);
 	y0+=DY;
 	Vline(x-5,y0,y0-DY,BarInfColor);
@@ -306,7 +306,7 @@ int ShowDoxod(int x,int y,bool Header1){
 	Hline(x-5,y0,x0+5,BarInfColor);
 
 	ShowString(x,y0+1+DDY,RDS[GoldID].Name,&SmallYellowFont);
-	sprintf(cc,"%d",NInGold[NatRefTBL[MyNation]]);
+	sprintf_s( cc,sizeof(cc),"%d",NInGold[NatRefTBL[MyNation]]);
 	ShowString(x+196-GetRLCStrWidth(cc,&SmallYellowFont)/2,y0+1+DDY,cc,&SmallYellowFont);
 	y0+=DY;
 	Vline(x-5,y0,y0-DY,BarInfColor);
@@ -315,7 +315,7 @@ int ShowDoxod(int x,int y,bool Header1){
 	Hline(x-5,y0,x0+5,BarInfColor);
 
 	ShowString(x,y0+1+DDY,RDS[StoneID].Name,&SmallYellowFont);
-	sprintf(cc,"%d",NInStone[NatRefTBL[MyNation]]);
+	sprintf_s( cc,sizeof(cc),"%d",NInStone[NatRefTBL[MyNation]]);
 	ShowString(x+196-GetRLCStrWidth(cc,&SmallYellowFont)/2,y0+1+DDY,cc,&SmallYellowFont);
 	y0+=DY;
 	Vline(x-5,y0,y0-DY,BarInfColor);
@@ -328,7 +328,7 @@ int ShowDoxod(int x,int y,bool Header1){
 	y0+=DY+1;
 	Hline(x-5,y0,x0+5,BarInfColor);
 	ShowString(x,y0+1+DDY,RDS[TreeID].Name,&SmallYellowFont);
-	sprintf(cc,"%d",CITY[NatRefTBL[MyNation]].WoodSpeed);
+	sprintf_s( cc,sizeof(cc),"%d",CITY[NatRefTBL[MyNation]].WoodSpeed);
 	ShowString(x+196-GetRLCStrWidth(cc,&SmallYellowFont)/2,y0+1+DDY,cc,&SmallYellowFont);
 	y0+=DY;
 	Vline(x-5,y0,y0-DY,BarInfColor);
@@ -337,7 +337,7 @@ int ShowDoxod(int x,int y,bool Header1){
 	Hline(x-5,y0,x0+5,BarInfColor);
 
 	//ShowString(x,y0+1+DDY,RDS[StoneID].Name,&SmallYellowFont);
-	//sprintf(cc,"%d",CITY[NatRefTBL[MyNation]].StoneSpeed);
+	//sprintf_s( cc,sizeof(cc),"%d",CITY[NatRefTBL[MyNation]].StoneSpeed);
 	//ShowString(x+196-GetRLCStrWidth(cc,&SmallYellowFont)/2,y0+1+DDY,cc,&SmallYellowFont);
 	//y0+=DY;
 	//Vline(x-5,y0,y0-DY,BarInfColor);
@@ -346,7 +346,7 @@ int ShowDoxod(int x,int y,bool Header1){
 	//Hline(x-5,y0,x0+5,BarInfColor);
 
 	ShowString(x,y0+1+DDY,RDS[FoodID].Name,&SmallYellowFont);
-	sprintf(cc,"%d",CITY[NatRefTBL[MyNation]].FoodSpeed);
+	sprintf_s( cc,sizeof(cc),"%d",CITY[NatRefTBL[MyNation]].FoodSpeed);
 	ShowString(x+196-GetRLCStrWidth(cc,&SmallYellowFont)/2,y0+1+DDY,cc,&SmallYellowFont);
 	y0+=DY;
 	Vline(x-5,y0,y0-DY,BarInfColor);
@@ -402,11 +402,11 @@ int ShowDoxod(int x,int y,bool Header1){
 			Hline(x-5,y0,x0+5,BarInfColor);
 			for(int i=0;i<N;i++){
 				ShowString(x,y0+1+DDY,RASXODU.HASH[i].Message,&SmallYellowFont);
-				sprintf(cc,"%d",RASXODU.HASH[i].Param2);
+				sprintf_s( cc,sizeof(cc),"%d",RASXODU.HASH[i].Param2);
 				ShowString(x+160+1-GetRLCStrWidth(cc,&SmallYellowFont)/2,y0+1+DDY,cc,&SmallYellowFont);
 				int Np=RASXODU.HASH[i].Param1;
-				if(Np%10)sprintf(cc,"%d.%d",Np/10,Np%10);
-				else sprintf(cc,"%d",Np/10,Np%10);
+				if(Np%10)sprintf_s( cc,sizeof(cc),"%d.%d",Np/10,Np%10);
+				else sprintf_s( cc,sizeof(cc),"%d.%d",Np/10,Np%10);
 				ShowString(x+200-4-GetRLCStrWidth(cc,&SmallYellowFont)/2,y0+1+DDY,cc,&SmallYellowFont);
 				Hline(x-5,y0+15,x0+5,BarInfColor);
 				Vline(x0-45+15,y0,y0+DY,BarInfColor);
@@ -427,13 +427,13 @@ int ShowDoxod(int x,int y,bool Header1){
 			Hline(x-5,y0,x0+5,BarInfColor);
 			for(int i=0;i<N;i++){
 				ShowString(x,y0+1+DDY,RASXODB.HASH[i].Message,&SmallYellowFont);
-				sprintf(cc,"%d",RASXODB.HASH[i].Param2);
+				sprintf_s( cc,sizeof(cc),"%d",RASXODB.HASH[i].Param2);
 				ShowString(x+160+1-GetRLCStrWidth(cc,&SmallYellowFont)/2,y0+1+DDY,cc,&SmallYellowFont);
 				int Np=RASXODB.HASH[i].Param1;
 				if(Np%10){
-					if(Np<0)sprintf(cc,"-%d.%d",abs(Np)/10,abs(Np)%10);
-					else sprintf(cc,"%d.%d",Np/10,Np%10);
-				}else sprintf(cc,"%d",Np/10,Np%10);
+					if(Np<0)sprintf_s( cc,sizeof(cc),"-%d.%d",abs(Np)/10,abs(Np)%10);
+					else sprintf_s( cc,sizeof(cc),"%d.%d",Np/10,Np%10);
+				}else sprintf_s( cc,sizeof(cc),"%d.%d",Np/10,Np%10);
 				ShowString(x+200-4-GetRLCStrWidth(cc,&SmallYellowFont)/2,y0+1+DDY,cc,&SmallYellowFont);
 				Hline(x-5,y0+15,x0+5,BarInfColor);
 				Vline(x0-45+15,y0,y0+DY,BarInfColor);
@@ -452,7 +452,7 @@ int ShowDoxod(int x,int y,bool Header1){
 			if(Itog<0)sprintf(ccx,"-%d.%d",abs(Itog)/10,abs(Itog)%10);
 			else sprintf(ccx,"%d.%d",Itog/10,Itog%10);
 		}else sprintf(ccx,"%d",Itog/10);
-		//sprintf(cc,INFO_R8,ccx);
+		//sprintf_s( cc,sizeof(cc),INFO_R8,ccx);
 		ShowString(x+200-4-GetRLCStrWidth(ccx,&SmallYellowFont)/2,y0,ccx,&SmallWhiteFont);
 		ShowString(x,y0,INFO_R8,&SmallWhiteFont);
 		y0+=16;

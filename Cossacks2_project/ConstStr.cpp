@@ -11,7 +11,7 @@ void LOADSC(char* ID,char** str){
 	(*str)=GetTextByID(ID);
 	if(!strcmp(*str,ID)){
 		char cc[128];
-		sprintf(cc,"Unknown string: %s (see COMMENT.TXT)",ID);
+		sprintf_s( cc,sizeof(cc),"Unknown string: %s (see COMMENT.TXT)",ID);
 		MessageBox(NULL,cc,"String not found...",0);
 	};
 };

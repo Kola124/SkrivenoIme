@@ -1578,7 +1578,7 @@ void ProcessVotingKeys(){
 				if(GetTickCount()<LastVotingTime+60000*3-4000){
 					LastVotingTime=GetTickCount()-60000*3+3000;
 					char ccc[200];
-					sprintf(ccc,GetTextByID("PSR_DENY"),PINFO[i].name);
+					sprintf_s(ccc,sizeof(ccc),GetTextByID("PSR_DENY"),PINFO[i].name);
 					AssignHint1(ccc,150,32);
 				};
 			};
@@ -1586,7 +1586,7 @@ void ProcessVotingKeys(){
 		if(ALLYES&&GetTickCount()<LastVotingTime+60000*3-4000){
 			LastVotingTime=GetTickCount()-60000*3+3000;
 			char ccc[200];
-			sprintf(ccc,GetTextByID("PSR_ACCEPT"));
+			sprintf_s(ccc,sizeof(ccc),GetTextByID("PSR_ACCEPT"));
 			AssignHint1(ccc,150,32);
 			DontMakeRaiting();
 			if(UseGSC_Login)DisableRatedGame();

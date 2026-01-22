@@ -467,7 +467,7 @@ void ProduceObjLink(OneObject* OBJ){
 		};
 		if(OBJ->NNUM==MyNation&&!OBJ->LocalOrder){
 			char ccc[200];
-			sprintf(ccc,FINBLD,OBJ->Ref.General->Message);
+			sprintf_s(ccc,sizeof(ccc),FINBLD,OBJ->Ref.General->Message);
 			AssignHint1(ccc,100);
 			LastActionX=OBJ->RealX>>4;
 			LastActionY=OBJ->RealY>>4;
@@ -597,7 +597,7 @@ void ProduceObjLink(OneObject* OBJ){
 	};
 	if(OBJ->NNUM==MyNation&&!OBJ->LocalOrder){
 		char ccc[200];
-		sprintf(ccc,FINBLD,OBJ->Ref.General->Message);
+		sprintf_s(ccc,sizeof(ccc),FINBLD,OBJ->Ref.General->Message);
 		AssignHint1(ccc,100);
 		LastActionX=OBJ->RealX>>4;
 		LastActionY=OBJ->RealY>>4;

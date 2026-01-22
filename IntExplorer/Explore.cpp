@@ -75,7 +75,7 @@ void OneSicWindow::Process(){
 			}else{
 				TimeLimit[V]=0;
 				char CC[256];
-				sprintf(CC,"Internet\\Cash\\%s",TimeLimitRequest[V]);
+				sprintf_s(CC,sizeof(CC),"Internet\\Cash\\%s",TimeLimitRequest[V]);
 				ParsedRQ P1;
 				strcpy(P1.DevName,"LF");
 				P1.AddComm("LW_file");
@@ -1628,7 +1628,7 @@ void OneSicWindow::SaveCookies(){
 		char* var=VARS[i].Name;
 		if(var[0]=='%'&&var[1]=='G'&&var[2]=='V'&&var[3]=='_'){
 			char ccc[256];
-			sprintf(ccc,"Internet\\Cash\\Cookies\\%s",var);
+			sprintf_s(ccc,sizeof(ccc),"Internet\\Cash\\Cookies\\%s",var);
 			ResFile F=RRewrite(ccc);
 			if(F!=INVALID_HANDLE_VALUE){
 				RBlockWrite(F,VARS[i].Value,VARS[i].MaxLen);
@@ -1642,7 +1642,7 @@ void OneSicWindow::LoadCookies(){
 		char* var=VARS[i].Name;
 		if(var[0]=='%'&&var[1]=='G'&&var[2]=='V'&&var[3]=='_'){
 			char ccc[256];
-			sprintf(ccc,"Internet\\Cash\\Cookies\\%s",var);
+			sprintf_s(ccc,sizeof(ccc),"Internet\\Cash\\Cookies\\%s",var);
 			ResFile F=RReset(ccc);
 			if(F!=INVALID_HANDLE_VALUE){
 				RBlockRead(F,VARS[i].Value,VARS[i].MaxLen);
@@ -1722,7 +1722,7 @@ void sicExplorer::SendTableRefresh(char* Name,char* server){
 		P1.AddComm("GETTBL");
 		P1.AddParam(TB->ID,strlen(TB->ID)+1);
 		char ccc[512];
-		sprintf(ccc,"%d",TB->NLines);
+		sprintf_s(ccc,sizeof(ccc),"%d",TB->NLines);
 		P1.AddParam(ccc,strlen(ccc)+1);
 		DWORD* HSET=(DWORD*)malloc((TB->NLines+1)<<2);
 		for(int j=0;j<TB->NLines;j++)HSET[j]=GetTableHash(TB,j);

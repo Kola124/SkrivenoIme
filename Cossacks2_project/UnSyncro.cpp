@@ -148,7 +148,7 @@ int RandNew(char* File,int Line){
 	};
 #ifdef RECDEBUG
 	char cc[128];
-	sprintf(cc,"%s %d %d 1\n",File,Line,rpos);
+	sprintf_s( cc,sizeof(cc),"%s %d %d 1\n",File,Line,rpos);
 	WriteRec(cc);
 #endif
 	return r;
@@ -169,7 +169,7 @@ void AddRandNew(char* File,int Line,int Param){
 	};
 #ifdef RECDEBUG
 	char cc[128];
-	sprintf(cc,"%s %d %d %d\n",File,Line,rpos,Param);
+	sprintf_s( cc,sizeof(cc),"%s %d %d %d\n",File,Line,rpos,Param);
 	WriteRec(cc);
 #endif
 };
@@ -189,7 +189,7 @@ void AddUN(char* File,int Line,int Param,int Type){
 	};
 #ifdef RECDEBUG
 	char cc[128];
-	sprintf(cc,"%s %d %d %d\n",File,Line,rpos,Param);
+	sprintf_s( cc,sizeof(cc),"%s %d %d %d\n",File,Line,rpos,Param);
 	WriteRec(cc);
 #endif
 };

@@ -687,7 +687,7 @@ bool CreateInsideList(IconSet* IS,byte NI){
 				GPS.ShowGP(AblX+44,AblY-4,BordGP,84,0);
 				PopWindow(&TW);
 				char cc[20];
-				sprintf(cc,"%d%%",(OB->Ustage*100)/OB->NUstages);
+				sprintf_s( cc,sizeof(cc),"%d%%",(OB->Ustage*100)/OB->NUstages);
 				ShowString(AblX+60+44-GetRLCStrWidth(cc,&SmallYellowFont)/2,y0+4,cc,&SmallYellowFont);
 			};
 			//for officer

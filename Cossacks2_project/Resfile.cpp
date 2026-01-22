@@ -212,7 +212,7 @@ void FilesInit(){
 	GetCurrentDirectory(256,CDR);
 	if(CDR[strlen(CDR)-1]=='\\')CDR[strlen(CDR)-1]=0;
 	char ccc[290];
-	sprintf(ccc,"%s\\unrar.dll",CDR);
+	sprintf_s(ccc,sizeof(ccc),"%s\\unrar.dll",CDR);
 	FILE* F=fopen(ccc,"r");
 	if(F){
 		fclose(F);
@@ -220,7 +220,7 @@ void FilesInit(){
 		int L=strlen(CDR);
 		while(L&&CDR[L]!='\\')L--;
 		CDR[L]=0;
-		sprintf(ccc,"%s\\unrar.dll",CDR);
+		sprintf_s(ccc,sizeof(ccc),"%s\\unrar.dll",CDR);
 		F=fopen(ccc,"r");
 		if(F){
 			fclose(F);

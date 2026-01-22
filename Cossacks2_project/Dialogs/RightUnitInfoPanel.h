@@ -115,7 +115,7 @@ void UnitInfo::Create(int ID){
 		Ly=151;
 		break;
 	case 3://Buildings
-		sprintf(ccc,"%s_BLD.bmp",NatsIDS[GO->NatID]);
+		sprintf_s(ccc,sizeof(ccc),"%s_BLD.bmp",NatsIDS[GO->NatID]);
 		File=ccc;
 		Lx=240;
 		Ly=151;
@@ -544,7 +544,7 @@ int CreateUNITINF_UNIT(int ID,bool refresh){
 		SD=UNITINF.addGPPicture(NULL,xx,yy,BordGP,35);
 		UINF.AddSD(SD,0);
 		for( i=0;i<6;i++)if(UINF.Cost[i]){
-			sprintf(cc,"%d",UINF.Cost[i]);
+			sprintf_s( cc,sizeof(cc),"%d",UINF.Cost[i]);
 			SD=UNITINF.addTextButton(NULL,xx+17+34*i,yy+3,cc,FN5,FN5,FN5,1);
 			UINF.AddSD(SD,0);
 		};
@@ -554,37 +554,37 @@ int CreateUNITINF_UNIT(int ID,bool refresh){
 			UINF.AddSD(SD,0);
 			yy+=DY;
 			if(UINF.GoldUpkeep){
-				sprintf(cc,GetTextByID("UI_UGold"),UINF.GoldUpkeep);
+				sprintf_s( cc,sizeof(cc),GetTextByID("UI_UGold"),UINF.GoldUpkeep);
 				SD=UNITINF.addTextButton(NULL,xx+3,yy,cc,FN4,FN4,FN4,0);
 				UINF.AddSD(SD,0);
 				yy+=DY;
 			};
 			if(UINF.WoodUpkeep){
-				sprintf(cc,GetTextByID("UI_UWood"),UINF.WoodUpkeep);
+				sprintf_s( cc,sizeof(cc),GetTextByID("UI_UWood"),UINF.WoodUpkeep);
 				SD=UNITINF.addTextButton(NULL,xx+3,yy,cc,FN4,FN4,FN4,0);
 				UINF.AddSD(SD,0);
 				yy+=DY;
 			};
 			if(UINF.StoneUpkeep){
-				sprintf(cc,GetTextByID("UI_UStone"),UINF.StoneUpkeep);
+				sprintf_s( cc,sizeof(cc),GetTextByID("UI_UStone"),UINF.StoneUpkeep);
 				SD=UNITINF.addTextButton(NULL,xx+3,yy,cc,FN4,FN4,FN4,0);
 				UINF.AddSD(SD,0);
 				yy+=DY;
 			};
 			if(UINF.IronUpkeep){
-				sprintf(cc,GetTextByID("UI_UIron"),UINF.IronUpkeep);
+				sprintf_s( cc,sizeof(cc),GetTextByID("UI_UIron"),UINF.IronUpkeep);
 				SD=UNITINF.addTextButton(NULL,xx+3,yy,cc,FN4,FN4,FN4,0);
 				UINF.AddSD(SD,0);
 				yy+=DY;
 			};
 			if(UINF.CoalUpkeep){
-				sprintf(cc,GetTextByID("UI_UCoal"),UINF.CoalUpkeep);
+				sprintf_s( cc,sizeof(cc),GetTextByID("UI_UCoal"),UINF.CoalUpkeep);
 				SD=UNITINF.addTextButton(NULL,xx+3,yy,cc,FN4,FN4,FN4,0);
 				UINF.AddSD(SD,0);
 				yy+=DY;
 			};
 		};
-		sprintf(cc,GetTextByID("UI_STAGE"),UINF.BuildStages);
+		sprintf_s( cc,sizeof(cc),GetTextByID("UI_STAGE"),UINF.BuildStages);
 		SD=UNITINF.addTextButton(NULL,xx,yy,cc,FN3,FN3,FN3,0);
 		UINF.AddSD(SD,0);
 		yy+=DY;
@@ -598,15 +598,15 @@ int CreateUNITINF_UNIT(int ID,bool refresh){
 			yy+=DY;
 			UINF.AddSD(SD,0);
 		};
-		sprintf(cc,GetTextByID("UI_ACCNT"),float(NM->Ves)/100);
+		sprintf_s( cc,sizeof(cc),GetTextByID("UI_ACCNT"),float(NM->Ves)/100);
 		SD=UNITINF.addTextButton(NULL,xx,yy,cc,FN3,FN3,FN3,0);
 		UINF.AddSD(SD,0);
 		yy+=DY;
 		if(NM->Capture){
-			sprintf(cc,"%s %s",GetTextByID("UI_ACHINT"),GetTextByID("UI_ACHCAP"));
+			sprintf_s( cc,sizeof(cc),"%s %s",GetTextByID("UI_ACHINT"),GetTextByID("UI_ACHCAP"));
 			SD->Hint=UINF.AddHint(cc);
 		}else SD->Hint=GetTextByID("UI_ACHINT");
-		sprintf(cc,GetTextByID("STORM_I"),NM->StormForce);
+		sprintf_s( cc,sizeof(cc),GetTextByID("STORM_I"),NM->StormForce);
 		SD=UNITINF.addTextButton(NULL,xx,yy,cc,FN3,FN3,FN3,0);
 		SD->Hint=GetTextByID("STORM_I_HINT");
 		UINF.AddSD(SD,0);
@@ -624,7 +624,7 @@ int CreateUNITINF_UNIT(int ID,bool refresh){
 		SD=UNITINF.addGPPicture(NULL,xx,yy,BordGP,35);
 		UINF.AddSD(SD,3);
 		for( i=0;i<6;i++)if(UINF.Cost[i]){
-			sprintf(cc,"%d",UINF.Cost[i]);
+			sprintf_s( cc,sizeof(cc),"%d",UINF.Cost[i]);
 			SD=UNITINF.addTextButton(NULL,xx+17+34*i,yy+3,cc,FN5,FN5,FN5,1);
 			UINF.AddSD(SD,3);
 		};
@@ -634,37 +634,37 @@ int CreateUNITINF_UNIT(int ID,bool refresh){
 			UINF.AddSD(SD,3);
 			yy+=DY;
 			if(UINF.GoldUpkeep){
-				sprintf(cc,GetTextByID("UI_UGold"),UINF.GoldUpkeep);
+				sprintf_s( cc,sizeof(cc),GetTextByID("UI_UGold"),UINF.GoldUpkeep);
 				SD=UNITINF.addTextButton(NULL,xx+3,yy,cc,FN4,FN4,FN4,0);
 				UINF.AddSD(SD,3);
 				yy+=DY;
 			};
 			if(UINF.WoodUpkeep){
-				sprintf(cc,GetTextByID("UI_UWood"),UINF.WoodUpkeep);
+				sprintf_s( cc,sizeof(cc),GetTextByID("UI_UWood"),UINF.WoodUpkeep);
 				SD=UNITINF.addTextButton(NULL,xx+3,yy,cc,FN4,FN4,FN4,0);
 				UINF.AddSD(SD,3);
 				yy+=DY;
 			};
 			if(UINF.StoneUpkeep){
-				sprintf(cc,GetTextByID("UI_UStone"),UINF.StoneUpkeep);
+				sprintf_s( cc,sizeof(cc),GetTextByID("UI_UStone"),UINF.StoneUpkeep);
 				SD=UNITINF.addTextButton(NULL,xx+3,yy,cc,FN4,FN4,FN4,0);
 				UINF.AddSD(SD,3);
 				yy+=DY;
 			};
 			if(UINF.IronUpkeep){
-				sprintf(cc,GetTextByID("UI_UIron"),UINF.IronUpkeep);
+				sprintf_s( cc,sizeof(cc),GetTextByID("UI_UIron"),UINF.IronUpkeep);
 				SD=UNITINF.addTextButton(NULL,xx+3,yy,cc,FN4,FN4,FN4,0);
 				UINF.AddSD(SD,3);
 				yy+=DY;
 			};
 			if(UINF.CoalUpkeep){
-				sprintf(cc,GetTextByID("UI_UCoal"),UINF.CoalUpkeep);
+				sprintf_s( cc,sizeof(cc),GetTextByID("UI_UCoal"),UINF.CoalUpkeep);
 				SD=UNITINF.addTextButton(NULL,xx+3,yy,cc,FN4,FN4,FN4,0);
 				UINF.AddSD(SD,3);
 				yy+=DY;
 			};
 		};
-		sprintf(cc,GetTextByID("UI_STAGE"),UINF.BuildStages);
+		sprintf_s( cc,sizeof(cc),GetTextByID("UI_STAGE"),UINF.BuildStages);
 		SD=UNITINF.addTextButton(NULL,xx,yy,cc,FN3,FN3,FN3,0);
 		UINF.AddSD(SD,3);
 		yy+=DY;
@@ -678,12 +678,12 @@ int CreateUNITINF_UNIT(int ID,bool refresh){
 			yy+=DY;
 			UINF.AddSD(SD,3);
 		};
-		sprintf(cc,GetTextByID("UI_ACCNT"),float(NM->Ves)/100);
+		sprintf_s( cc,sizeof(cc),GetTextByID("UI_ACCNT"),float(NM->Ves)/100);
 		SD=UNITINF.addTextButton(NULL,xx,yy,cc,FN3,FN3,FN3,0);
 		UINF.AddSD(SD,3);
 		yy+=DY;
 		if(NM->Capture){
-			sprintf(cc,"%s %s",GetTextByID("UI_ACHINT"),GetTextByID("UI_ACHCAP"));
+			sprintf_s( cc,sizeof(cc),"%s %s",GetTextByID("UI_ACHINT"),GetTextByID("UI_ACHCAP"));
 			SD->Hint=UINF.AddHint(cc);
 		}else SD->Hint=GetTextByID("UI_ACHINT");
 		if(UINF.NMoreUpg){
@@ -720,7 +720,7 @@ int CreateUNITINF_UNIT(int ID,bool refresh){
 			for(int i=0;i<UINF.N_SD;i++)if(UINF.SDS[i].Page==3)UINF.SDS[i].SD->ParentSB=GLSB;
 			UINF.AddSD(GLSB,3);
 		};
-		sprintf(cc,GetTextByID("OPPOSIT_I"),NM->MinOposit,NM->MaxOposit);
+		sprintf_s( cc,sizeof(cc),GetTextByID("OPPOSIT_I"),NM->MinOposit,NM->MaxOposit);
 		SD=UNITINF.addTextButton(NULL,xx,yy,cc,FN3,FN3,FN3,0);
 		SD->Hint=GetTextByID("OPPOSIT_I_HINT");
 		UINF.AddSD(SD,3);
@@ -770,17 +770,17 @@ int CreateUNITINF_UNIT(int ID,bool refresh){
 					UINF.AddSD(SD,2);
 					SD=UNITINF.addGPPicture(NULL,xx+1,yy-1,4,WeaponIcn[j]);
 					UINF.AddSD(SD,2);
-					sprintf(cc,"UI_SATT%d",j);
+					sprintf_s( cc,sizeof(cc),"UI_SATT%d",j);
 					SD=UNITINF.addViewPort(xx+14,yy,35,19);
 					UINF.AddSD(SD,2);
 					SD->Hint=GetTextByID(cc);
-					sprintf(cc,"UI_ATT%d",j);
+					sprintf_s( cc,sizeof(cc),"UI_ATT%d",j);
 					SD=UNITINF.addViewPort(xx,yy,19,19);
 					UINF.AddSD(SD,2);
 					SD->Hint=GetTextByID(cc);
 					for(int k=0;k<UINF.NATT;k++){
 						if(UINF.ATTACK[k].AddValue[j]){
-							sprintf(cc,"+%d",UINF.ATTACK[k].AddValue[j]);
+							sprintf_s( cc,sizeof(cc),"+%d",UINF.ATTACK[k].AddValue[j]);
 							SD=UNITINF.addTextButton(NULL,xx+62+26*k,yy+ady,cc,FN5,FN5,FN5,1);
 							UINF.AddSD(SD,2);
 							SD=UNITINF.addViewPort(xx+49+26*k,yy,26,19);
@@ -788,7 +788,7 @@ int CreateUNITINF_UNIT(int ID,bool refresh){
 							char* hnt=cc;
 							char cc1[32];
 							sprintf(cc1,"UI_ATT%d",j);
-							sprintf(cc,"%s/%s%d/%s",GetTextByID(cc1),GetTextByID("UI_AttTo"),UINF.ATTACK[k].AttValue[j],GetTextByID("UI_Cost"));
+							sprintf_s( cc,sizeof(cc),"%s/%s%d/%s",GetTextByID(cc1),GetTextByID("UI_AttTo"),UINF.ATTACK[k].AttValue[j],GetTextByID("UI_Cost"));
 							hnt+=strlen(hnt);
 							GetCostString(UINF.ATTACK[k].Cost,hnt);
 							hnt+=strlen(hnt);
@@ -798,7 +798,7 @@ int CreateUNITINF_UNIT(int ID,bool refresh){
 							SD->Hint=UINF.AddHint(cc);
 						};
 					};
-					sprintf(cc,"%d",UINF.CurATT[j]);
+					sprintf_s( cc,sizeof(cc),"%d",UINF.CurATT[j]);
 					SD=UNITINF.addTextButton(NULL,xx+31,yy+ady,cc,FN5,FN5,FN5,1);
 					UINF.AddSD(SD,2);
 					yy+=19;
@@ -825,17 +825,17 @@ int CreateUNITINF_UNIT(int ID,bool refresh){
 					UINF.AddSD(SD,2);
 					SD=UNITINF.addGPPicture(NULL,xx+1,yy-1,4,ProtectIcn[j]);
 					UINF.AddSD(SD,2);
-					sprintf(cc,"UI_SSHL%d",j);
+					sprintf_s( cc,sizeof(cc),"UI_SSHL%d",j);
 					SD=UNITINF.addViewPort(xx+14,yy,35,19);
 					UINF.AddSD(SD,2);
 					SD->Hint=GetTextByID(cc);
-					sprintf(cc,"UI_SHL%d",j);
+					sprintf_s( cc,sizeof(cc),"UI_SHL%d",j);
 					SD=UNITINF.addViewPort(xx,yy,19,19);
 					UINF.AddSD(SD,2);
 					SD->Hint=GetTextByID(cc);
 					for(int k=0;k<UINF.NSHL;k++){
 						if(UINF.SHIELD[k].AddValue[j]){
-							sprintf(cc,"+%d",UINF.SHIELD[k].AddValue[j]);
+							sprintf_s( cc,sizeof(cc),"+%d",UINF.SHIELD[k].AddValue[j]);
 							SD=UNITINF.addTextButton(NULL,xx+62+26*k,yy+ady,cc,FN5,FN5,FN5,1);
 							UINF.AddSD(SD,2);
 							SD=UNITINF.addViewPort(xx+49+26*k,yy,26,19);
@@ -843,7 +843,7 @@ int CreateUNITINF_UNIT(int ID,bool refresh){
 							char* hnt=cc;
 							char cc1[32];
 							sprintf(cc1,"UI_SHL%d",j);
-							sprintf(cc,"%s/%s%d/%s",GetTextByID(cc1),GetTextByID("UI_ShlTo"),UINF.SHIELD[k].AttValue[j],GetTextByID("UI_Cost"));
+							sprintf_s( cc,sizeof(cc),"%s/%s%d/%s",GetTextByID(cc1),GetTextByID("UI_ShlTo"),UINF.SHIELD[k].AttValue[j],GetTextByID("UI_Cost"));
 							hnt+=strlen(hnt);
 							GetCostString(UINF.SHIELD[k].Cost,hnt);
 							hnt+=strlen(hnt);
@@ -853,7 +853,7 @@ int CreateUNITINF_UNIT(int ID,bool refresh){
 							SD->Hint=UINF.AddHint(cc);
 						};
 					};
-					sprintf(cc,"%d",UINF.CurSHL[j+1]);
+					sprintf_s( cc,sizeof(cc),"%d",UINF.CurSHL[j+1]);
 					SD=UNITINF.addTextButton(NULL,xx+31,yy+ady,cc,FN5,FN5,FN5,1);
 					UINF.AddSD(SD,2);
 					yy+=19;
@@ -878,7 +878,7 @@ int CreateUNITINF_UNIT(int ID,bool refresh){
 	if(Description){
 		SD=UNITINF.addTextButton(NULL,xx-4,yy-3,GetTextByID("BTN_Descr"),&SmallWhiteFont,&SmallWhiteFont,&SmallWhiteFont,0);
 		UINF.AddSD(SD,1);
-		sprintf(cc,"Description\\%s.md",NATIONS->Mon[UINF.UnitID]->newMons->MD_File);
+		sprintf_s( cc,sizeof(cc),"Description\\%s.md",NATIONS->Mon[UINF.UnitID]->newMons->MD_File);
 		TextViewer* TV=UNITINF.addTextViewer(NULL,xx-4,yy-3+16,205,InfY1-UINF.Y1Line-16-16,cc,&SmallYellowFont);
 		TV->SymSize+=2;
 		TV->PageSize=(TV->y1-TV->y)/TV->SymSize;

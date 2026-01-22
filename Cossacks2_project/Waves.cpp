@@ -62,7 +62,7 @@ void LoadWaveAnimations(){
 			Gscanf(f1,"%s",ann);
 			WaveAnm[j]=GetNewAnimationByName(ann);
 			if(!WaveAnm[j]){
-				sprintf(gx," WaveList.lst : Unknown animation (%d) : %s",j,ann);
+				sprintf_s(gx,sizeof(gx)," WaveList.lst : Unknown animation (%d) : %s",j,ann);
 				ErrM(gx);
 			}
 		};

@@ -1972,7 +1972,7 @@ void Loadtextures(){
 					};
 					int temed=GetExMedia(gy);
 					if(temed==-1){
-						sprintf(gx,"textures.lst : Unknown media type : %s",gy);
+						sprintf_s(gx,sizeof(gx),"textures.lst : Unknown media type : %s",gy);
 						ErrM(gx);
 					};
 					TexMedia[nte]=temed;

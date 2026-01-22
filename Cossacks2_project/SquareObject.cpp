@@ -1050,7 +1050,7 @@ GW4_2:
 		
 		IRS->UnlockTexBits(WaterTexSys);
 		char cc[128];
-		sprintf(cc,"000.dds");
+		sprintf_s( cc,sizeof(cc),"000.dds");
 		tidx++;
 		//IRS->SaveTexture(WaterTexSys,cc);
 		//IRS->CopyTexture(WaterTexDef,WaterTexSys);
@@ -1232,7 +1232,7 @@ GW4_2:
 		
 		IRS->UnlockTexBits(WaterTexSysPS);
 		char cc[128];
-		sprintf(cc,"0wtex1.dds",tidx);
+		sprintf_s( cc,sizeof(cc),"0wtex1.dds",tidx);
 		tidx++;
 		//IRS->SaveTexture(WaterTexSys,cc);
 		//IRS->CopyTexture(WaterTexDefPS,WaterTexSysPS);

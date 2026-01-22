@@ -52,7 +52,7 @@ int GetSound(char* Name){
 	int ID=SearchStr(SoundID,Name,NSounds);
 	if(ID==-1){
 		char cc[128];
-		sprintf(cc,"Unknown sound ID: %s",Name);
+		sprintf_s( cc,sizeof(cc),"Unknown sound ID: %s",Name);
 		MessageBox(NULL,cc,"ERROR!",0);
 		ErrM(cc);
 		return -1;
@@ -3242,14 +3242,14 @@ bool ComboBox_OnDraw(SimpleDialog* SD){
 		//CBar(CB->x,CB->y,CB->x1-CB->x+1,CB->y1-CB->y+1,CB->BackColor);
 		if(CB->rulermode){
 			char ccc[32];
-			sprintf(ccc,"%d->%d",CB->MinDeal+CB->CurLine,CB->MinDeal+CB->LightIndex);
+			sprintf_s(ccc,sizeof(ccc),"%d->%d",CB->MinDeal+CB->CurLine,CB->MinDeal+CB->LightIndex);
 			ShowString(CB->x+CB->OneDx+center*((CB->x1-CB->x-GetRLCStrWidth(ccc,CB->ActiveFont))>>1),CB->y+CB->OneDy,ccc,CB->ActiveFont);
 		}else ShowString(CB->x+CB->OneDx+center*((CB->x1-CB->x-GetRLCStrWidth(CB->Lines[CB->CurLine],CB->ActiveFont))>>1),CB->y+CB->OneDy,CB->Lines[CB->CurLine],CB->ActiveFont);
 	}else{
 		//CBar(CB->x,CB->y,CB->x1-CB->x+1,CB->y1-CB->y+1,CB->BackColor);
 		if(CB->rulermode){
 			char ccc[32];
-			sprintf(ccc,"%d",CB->MinDeal+CB->CurLine);
+			sprintf_s(ccc,sizeof(ccc),"%d",CB->MinDeal+CB->CurLine);
 			ShowString(CB->x+CB->OneDx+center*((CB->x1-CB->x-GetRLCStrWidth(ccc,CB->PassiveFont))>>1),CB->y+CB->OneDy,ccc,CB->PassiveFont);
 		}else ShowString(CB->x+CB->OneDx+center*((CB->x1-CB->x-GetRLCStrWidth(CB->Lines[CB->CurLine],CB->PassiveFont))>>1),CB->y+CB->OneDy,CB->Lines[CB->CurLine],CB->PassiveFont);
 	};
@@ -3326,12 +3326,12 @@ bool ComboBox_OnDrawActiveRuler(SimpleDialog* SD){
 				int yy=(i-CB->YPos-CB->MinDeal)*PTPERDEAL+CB->DropY+CB->UpLy+realots;
 				if((i%50)==0){
 					xLine(x0,yy,x0+32,yy,RULCOLOR);
-					sprintf(cc,"%d",i);
+					sprintf_s( cc,sizeof(cc),"%d",i);
 					ShowString(x0+40,yy-10,cc,&YellowFont);
 				}else
 				if((i%10)==0){
 					xLine(x0,yy,x0+24,yy,RULCOLOR);
-					sprintf(cc,"%d",i);
+					sprintf_s( cc,sizeof(cc),"%d",i);
 					ShowString(x0+40,yy-10,cc,&YellowFont);
 				}else{
 					xLine(x0,yy,x0+20,yy,RULCOLOR);
@@ -4125,7 +4125,7 @@ void SimpleDialog::AssignSound(char* Name,int Usage){
 	int ID=SearchStr(SoundID,Name,NSounds);
 	if(ID==-1){
 		char cc[128];
-		sprintf(cc,"Unknown sound ID: %s",Name);
+		sprintf_s( cc,sizeof(cc),"Unknown sound ID: %s",Name);
 		ErrM(cc);
 		return;
 	};

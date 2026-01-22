@@ -656,7 +656,7 @@ void ShowProp(){
 					AssignHint(OBJ->Ref.General->Message,5);
 				}else{
 					char ccc[130];
-					sprintf(ccc,"%s (%s)",OBJ->Ref.General->Message,NatNames[OBJ->Ref.General->NatID]);
+					sprintf_s(ccc,sizeof(ccc),"%s (%s)",OBJ->Ref.General->Message,NatNames[OBJ->Ref.General->NatID]);
 					AssignHint(ccc,5);
 				};
 			}else{
@@ -2353,13 +2353,13 @@ void LoadMessages(){
 	TGSCFindInfo* FD=GSFILES.gFindFirst("Missions\\miss_*.txt");
 	if(FD){
 		char cc[128];
-		sprintf(cc,"Missions\\%s",FD->m_FileName);
+		sprintf_s( cc,sizeof(cc),"Missions\\%s",FD->m_FileName);
 		LoadMessagesFromFile(cc);
 		bool good=false;
 		do{
 			good=GSFILES.gFindNext(FD);
 			if(good){
-				sprintf(cc,"Missions\\%s",FD->m_FileName);
+				sprintf_s( cc,sizeof(cc),"Missions\\%s",FD->m_FileName);
 				LoadMessagesFromFile(cc);
 			};
 		}while(good);
@@ -2367,13 +2367,13 @@ void LoadMessages(){
 	FD=GSFILES.gFindFirst("Text\\*.txt");
 	if(FD){
 		char cc[128];
-		sprintf(cc,"Text\\%s",FD->m_FileName);
+		sprintf_s( cc,sizeof(cc),"Text\\%s",FD->m_FileName);
 		LoadMessagesFromFile(cc);
 		bool good=false;
 		do{
 			good=GSFILES.gFindNext(FD);
 			if(good){
-				sprintf(cc,"Text\\%s",FD->m_FileName);
+				sprintf_s( cc,sizeof(cc),"Text\\%s",FD->m_FileName);
 				LoadMessagesFromFile(cc);
 			};
 		}while(good);

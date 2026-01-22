@@ -2760,7 +2760,7 @@ void SaveGame(char* Name,char* Messtr,int ID){
 		RClose(f1);
 	}else{
 		char cc[100];
-		sprintf(cc,"Failed to create %s",ccc);
+		sprintf_s( cc,sizeof(cc),"Failed to create %s",ccc);
 		AssignHint1(cc,50);
 	};
 };
@@ -2904,7 +2904,7 @@ SFLB_DLLEXPORT SFLB_LoadGame(char* fnm,bool LoadNation){
 	SaveBuf SB;
 	char ccc[128];
 	if(!strstr(fnm,"Save\\")){
-		sprintf(ccc,"Save\\%s",fnm);
+		sprintf_s(ccc,sizeof(ccc),"Save\\%s",fnm);
 		ResFile f1=RReset(ccc);
 		if(f1!=INVALID_HANDLE_VALUE){
 			SB.LoadFromFile(f1);

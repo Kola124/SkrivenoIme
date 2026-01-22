@@ -144,7 +144,7 @@ bool ProcessGameOptions(){
 	VMode->CurLine=100;
 	for(int i=0;i<NModes;i++){
 		char cc[30];
-		sprintf(cc,"%dx%d",ModeLX[i],ModeLY[i]);
+		sprintf_s( cc,sizeof(cc),"%dx%d",ModeLX[i],ModeLY[i]);
 		VMode->AddLine(cc);
 		if(RealLx==ModeLX[i]&&RealLy==ModeLY[i])VMode->CurLine=i;
 	};

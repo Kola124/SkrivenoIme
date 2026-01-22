@@ -749,7 +749,7 @@ HHB1:
 				*/
 			}else{
 				char ccc[200];
-				sprintf(ccc,"Maps2\\Battle%d.bmp",LB->CurItem+1);
+				sprintf_s(ccc,sizeof(ccc),"Maps2\\Battle%d.bmp",LB->CurItem+1);
 				ResFile ff1=RReset(ccc);
 				if(ff1!=INVALID_HANDLE_VALUE){
 					PRV.LoadPicture(ccc);

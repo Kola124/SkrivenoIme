@@ -1063,7 +1063,7 @@ extern int  ReliefBrush;
 int TX_SCROLL=0;
 void CreateTOOL_PARAM_TEXTURE(){
 	char ccc[128];
-	sprintf(ccc,"Data\\TEXSET%d.DAT",CurrTexSet);
+	sprintf_s(ccc,sizeof(ccc),"Data\\TEXSET%d.DAT",CurrTexSet);
 	FILE* F=fopen(ccc,"r");
 	if(F){
 		int v;
@@ -1199,7 +1199,7 @@ void ProcessTOOL_PARAM_TEXTURE(){
 	if(TP_GPB->CurLine!=CurrTexSet){
 		CurrTexSet=TP_GPB->CurLine;
 		char ccc[128];
-		sprintf(ccc,"Data\\TEXSET%d.DAT",CurrTexSet);
+		sprintf_s(ccc,sizeof(ccc),"Data\\TEXSET%d.DAT",CurrTexSet);
 		FILE* F=fopen(ccc,"r");
 		if(F){
 			int v;
@@ -1268,7 +1268,7 @@ void ProcessTOOL_PARAM_TEXTURE(){
 	};
 	if(Change){
 		char ccc[128];
-		sprintf(ccc,"Data\\TEXSET%d.DAT",CurrTexSet);
+		sprintf_s(ccc,sizeof(ccc),"Data\\TEXSET%d.DAT",CurrTexSet);
 		FILE* F=fopen(ccc,"w");
 		if(F){
 			fprintf(F,"%d %d %d %d %d ",TM_Height0,TM_Height1,TM_Angle0,TM_Angle1,NTextures);
@@ -1653,7 +1653,7 @@ void CreateTOOL_PARAM_GROUND(){
 	Y0+=22;
 	BMPformat BM;
 	char cc[128];
-	sprintf(cc,"Ground\\tex%d.bmp",CurGroundTexture+1);
+	sprintf_s( cc,sizeof(cc),"Ground\\tex%d.bmp",CurGroundTexture+1);
 	if(GRPTR)free(GRPTR);
 	GRPTR=NULL;
 	TP_Scroll=TOOL_PARAM.addNewGP_VScrollBar(NULL,InfDX-21-16,Y0+22,207,38,CurGroundTexture,ScrollGP,0);
@@ -1689,7 +1689,7 @@ void ProcessTOOL_PARAM_GROUND(){
 	if(CurGroundTexture!=TP_Scroll->SPos){
 		BMPformat BM;
 		char cc[128];
-		sprintf(cc,"Ground\\tex%d.bmp",TP_Scroll->SPos+1);
+		sprintf_s( cc,sizeof(cc),"Ground\\tex%d.bmp",TP_Scroll->SPos+1);
 		if(GRPTR)free(GRPTR);
 		GRPTR=NULL;
 		if(ReadBMP8(cc,&BM,&GRPTR)){
@@ -2330,7 +2330,7 @@ void ProcessLoadBitmap(){
 	char BMPS[128];
 	if(ProcessLoadingFile("UserTerrain\\*.bmp",BMPS,3)){
 		char ccc[128];
-		sprintf(ccc,"UserTerrain\\%s",BMPS);
+		sprintf_s(ccc,sizeof(ccc),"UserTerrain\\%s",BMPS);
 		if(!LoadTerrainBitmap(ccc)){
 			WaitWithError("INCRBMFORM",BOR2.GPID);
 		};
@@ -2348,7 +2348,7 @@ void ProcessSaveBitmap(){
 		char ccc[128];
 		_strupr(BMPS);
 		if(!strstr(BMPS,".BMP"))strcat(BMPS,".BMP");
-		sprintf(ccc,"UserTerrain\\%s",BMPS);
+		sprintf_s(ccc,sizeof(ccc),"UserTerrain\\%s",BMPS);
 		SaveTerrainBitmap(ccc);
 	};
 	RenderToResult(0,0,255,255);

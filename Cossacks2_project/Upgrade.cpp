@@ -122,7 +122,7 @@ void PerformUpgradeLink(OneObject* OBJ){
 		OBJ->Nat->AddUpgrade(OI,tmtmt+StartTmtmt);
 		if(NI==MyNation){
 			char ccc[200];
-			sprintf(ccc,UPGMADE,NUP->Message);
+			sprintf_s(ccc,sizeof(ccc),UPGMADE,NUP->Message);
 			AssignHint1(ccc,100);
 			LastActionX=OBJ->RealX>>4;
 			LastActionY=OBJ->RealY>>4;

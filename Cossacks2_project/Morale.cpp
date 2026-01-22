@@ -1089,10 +1089,10 @@ int CreateMoraleInterface(DialogsSystem* DSS,int LX,int y0,OneObject* OB){
 	if(!FEAR_TXWIDE[0]){
 		for(int i=0;i<NFEARSUBJ;i++){
 			char cc[128];
-			sprintf(cc,"FEAR_TXWIDE%d",i);
+			sprintf_s( cc,sizeof(cc),"FEAR_TXWIDE%d",i);
 			FEAR_TXWIDE[i]=GetTextByID(cc);
 			if(!strcmp(FEAR_TXWIDE[i],cc))FEAR_TXWIDE[i]=NONSTR;
-			sprintf(cc,"FEAR_TXWIDE%dH",i);
+			sprintf_s( cc,sizeof(cc),"FEAR_TXWIDE%dH",i);
 			FEAR_TXWIDEH[i]=GetTextByID(cc);
 			if(!strcmp(FEAR_TXWIDEH[i],cc))FEAR_TXWIDEH[i]=NONSTR;
 		};
@@ -1900,8 +1900,8 @@ void RemakeMaxMorale(){
 						BR->GetCenter(&xc,&yc);
 						char cc[32];
 						int D=-(M0-BM1);
-						if(D<0)sprintf(cc,"-%d (%d)",-D,BM1);
-						else sprintf(cc,"+%d (%d)",D,BM1);
+						if(D<0)sprintf_s( cc,sizeof(cc),"-%d (%d)",-D,BM1);
+						else sprintf_s( cc,sizeof(cc),"+%d (%d)",D,BM1);
 						ILSTR.Add(xc,yc/2-GetHeight(xc,yc)-100,cc,&SmallYellowFont,255);
 					};
 				};
@@ -1960,7 +1960,7 @@ void DrawNewMoraleInterface(int x,int y,OneObject* OB){
 			};
 			ShowString(bx0+4,by0-13,cc,&BigWhiteFont);
 
-			sprintf(cc,"%d/%d",M,MaxM);
+			sprintf_s( cc,sizeof(cc),"%d/%d",M,MaxM);
 			ShowString(bx0+(blx-GetRLCStrWidth(cc,&SmallWhiteFont))/2,by0-14,cc,&SmallWhiteFont);
 		};
 	};

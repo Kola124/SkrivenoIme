@@ -52,10 +52,10 @@ public:
 
 	void LoadTexture(int idx,int dest,byte opt){
 		char cc[64];
-		sprintf(cc,"Ground\\tex%d.bmp",idx);
+		sprintf_s( cc,sizeof(cc),"Ground\\tex%d.bmp",idx);
 		GTex[dest].TextureID=IRS->GetTextureID(cc);
 		GTex[dest].Usage=opt;
-		//sprintf(cc,"Ground\\tex%dbump.bmp",idx);
+		//sprintf_s( cc,sizeof(cc),"Ground\\tex%dbump.bmp",idx);
 		//GTex[dest].BumpID=IRS->GetTextureID(cc);
 		GTex[dest].BumpID=0;
 	};
@@ -3269,7 +3269,7 @@ char* GetRoadsNames(){
 	int N=ROADSSYS.RDesc->NGrps;
 	for(int i=0;i<N;i++){
 		char cc[32];
-		sprintf(cc,"%s",GetTextByID(ROADSSYS.RDesc->Roads[ROADSSYS.RDesc->GrpsElements[i]].RoadName));
+		sprintf_s( cc,sizeof(cc),"%s",GetTextByID(ROADSSYS.RDesc->Roads[ROADSSYS.RDesc->GrpsElements[i]].RoadName));
 		strcat(stemp,cc);
 		if(i<N-1)strcat(stemp,"|");
 	};
@@ -3472,10 +3472,10 @@ void EnumGS_Types(char* dest){
 	dest[0]=0;
 	if(GSDESC){
 		for(int i=0;i<GSDESC->NDesc;i++){
-			if(dest[0])strcat(dest,"|");
+			if(dest[0])strcat_s( dest,sizeof(dest),"|");
 			char cc[64];
-			sprintf(cc,"GSPR_%d",i);
-			strcat(dest,GetTextByID(cc));
+			sprintf_s( cc,sizeof(cc),"GSPR_%d",i);
+			strcat_s( dest,sizeof(dest),GetTextByID(cc));
 		};
 	};
 };

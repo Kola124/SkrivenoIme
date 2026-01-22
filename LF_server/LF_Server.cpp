@@ -91,8 +91,8 @@ void LF_Requests::LF_Process(){
 					char dst[256];
 					int nn=(npr-2)>>1;
 					for(int j=0;j<nn;j++){
-						sprintf(src,"Internet\\Res\\%s",params[j+j]);
-						sprintf(dst,"Internet\\Cash\\%s",params[j+j+1]);
+						sprintf_s(src,sizeof(src),"Internet\\Res\\%s",params[j+j]);
+						sprintf_s(dst,sizeof(dst),"Internet\\Cash\\%s",params[j+j+1]);
 						ResFile F=RReset(src);
 						if(F!=INVALID_HANDLE_VALUE){
 							int sz=RFileSize(F);
@@ -120,8 +120,8 @@ void LF_Requests::LF_Process(){
 					char dst[256];
 					int nn=(npr-2)>>1;
 					for(int j=0;j<nn;j++){
-						sprintf(src,"Internet\\Res\\%s",params[j+j]);
-						sprintf(dst,"Internet\\Cash\\%s",params[j+j+1]);
+						sprintf_s(src,sizeof(src),"Internet\\Res\\%s",params[j+j]);
+						sprintf_s(dst,sizeof(dst),"Internet\\Cash\\%s",params[j+j+1]);
 						ResFile F=RReset(src);
 						if(F!=INVALID_HANDLE_VALUE){
 							int sz=RFileSize(F);

@@ -547,7 +547,7 @@ void EnterPersonalMessage(char* Nick,bool Active){
 	if(ItemChoose==mcmOk){
 		chatSendUserMessage(CSYS.chat,Nick,MESSAGE,0);
 		char ccc[512];
-		sprintf(ccc,"%s-->%s",CSYS.chatNick,nick);
+		sprintf_s(ccc,sizeof(ccc),"%s-->%s",CSYS.chatNick,nick);
 		CSYS.Common[CSYS.CurChannel].Add(ccc,MESSAGE);
 		CSYS.Private.Add(ccc,MESSAGE);
 	};
@@ -559,7 +559,7 @@ void SendPrivateMessage(char* Nick,char* MESSAGE){
 	if(CSYS.Connected){
 		chatSendUserMessage(CSYS.chat,Nick,MESSAGE,0);
 		char ccc[512];
-		sprintf(ccc,"%s-->%s",CSYS.chatNick,Nick);
+		sprintf_s(ccc,sizeof(ccc),"%s-->%s",CSYS.chatNick,Nick);
 		CSYS.Common[CSYS.CurChannel].Add(ccc,MESSAGE);
 		CSYS.Private.Add(ccc,MESSAGE);
 	};
@@ -922,7 +922,7 @@ int Process_GSC_ChatWindow(bool Active,RoomInfo* RIF){
 	do{
 		if(GetTickCount()-T0>2000){
 			char CC[32];
-			sprintf(CC,"LW_gvar&%%ASTATE&%d",Active);
+			sprintf_s(CC,sizeof(CC),"LW_gvar&%%ASTATE&%d",Active);
 			ExplorerOpenRef(0,CC);
 			T0=GetTickCount();
 		};
@@ -1084,7 +1084,7 @@ int Process_GSC_ChatWindow(bool Active,RoomInfo* RIF){
 		ProcessExplorerDSS(0,&DSS);
 		if(CurPalette!=pal){
 			char cc[128];
-			sprintf(cc,"%d\\agew_1.pal",pal);
+			sprintf_s( cc,sizeof(cc),"%d\\agew_1.pal",pal);
 			LoadPalette(cc);
 			LoadFog(pal);
 			CurPalette=pal;
@@ -1253,7 +1253,7 @@ int Process_GSC_ChatWindow(bool Active,RoomInfo* RIF){
 					RBlockRead(F,buf,sz);
 					buf[sz]=0;
 					char ccc[512];
-					sprintf(ccc,buf,CURRPR+9);
+					sprintf_s(ccc,sizeof(ccc),buf,CURRPR+9);
 					ExplorerOpenRef(0,ccc);
 					free(buf);
 					RClose(F);
@@ -1271,7 +1271,7 @@ int Process_GSC_ChatWindow(bool Active,RoomInfo* RIF){
 					RBlockRead(F,buf,sz);
 					buf[sz]=0;
 					char ccc[512];
-					sprintf(ccc,buf,CURRPR+9);
+					sprintf_s(ccc,sizeof(ccc),buf,CURRPR+9);
 					ExplorerOpenRef(0,ccc);
 					free(buf);
 					RClose(F);
@@ -1486,7 +1486,7 @@ void StartGSCGame(char* Options,char* Map,int NPlayers,int* Profiles,char** Nati
 		//P1.AddParam(Options,strlen(Options)+1);
 		cc[0]=0;
 		if(PREID[0]){
-			sprintf(cc,"sav:[%s]",PREID);
+			sprintf_s( cc,sizeof(cc),"sav:[%s]",PREID);
 		};
 		if(CheckUsingAI()){
 			strcat(cc,"<AI>");
@@ -1581,7 +1581,7 @@ CEXPORT
 void DisableRatedGame(){
 	if(GRIF&&GRIF->GameID[0]){
 		char ccc[512];
-		sprintf(ccc,"GW|dontrate&%s",GRIF->GameID);
+		sprintf_s(ccc,sizeof(ccc),"GW|dontrate&%s",GRIF->GameID);
 		ExplorerOpenRef(0,ccc);
 		GRIF->GameID[0]=0;
 	};

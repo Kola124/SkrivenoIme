@@ -122,7 +122,7 @@ void DrawDangerMap(){
 					char cc[64];
 					int v=GetDangValue(x,y);
 					if(v){
-						sprintf(cc,"%d",v);
+						sprintf_s( cc,sizeof(cc),"%d",v);
 						ShowString(xx,yy,cc,&fn8);
 					};
 				};

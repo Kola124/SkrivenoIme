@@ -267,7 +267,7 @@ void MPL_CheckExistingPlayers(){
 					AssignHint1(GetTextByID("PLALONE"),300,32);
 				}else{
 					char ccc[200];
-					sprintf(ccc,GetTextByID("PLEXIT"),GetPName(i));
+					sprintf_s(ccc,sizeof(ccc),GetTextByID("PLEXIT"),GetPName(i));
 					AssignHint1(ccc,300,32);
 				};
 			};
@@ -605,7 +605,7 @@ STAGENEXT:
 				if(lp[0]==PlExitID){
 					EBufs[ii].Enabled=false;
 					char ccc[200];
-					sprintf(ccc,GetTextByID("PLEXIT"),PINFO[ii].name);
+					sprintf_s(ccc,sizeof(ccc),GetTextByID("PLEXIT"),PINFO[ii].name);
 					AssignHint1(ccc,300,32);
 					for(int i=0;i<NPlayers;i++)if(PINFO[i].PlayerID==idFrom){
 						int ni=PINFO[i].ColorID;
@@ -2162,7 +2162,7 @@ extern int NeedAddTime;
 void CmdDoItSlow(word DT);
 void SHOWDUMP(char* Message,int x,int y,int L,byte* Data,int Lx){
 	char ccc[2048];
-	sprintf(ccc,"%s : %d",Message,L);
+	sprintf_s(ccc,sizeof(ccc),"%s : %d",Message,L);
 	ShowString(x,y,ccc,&WhiteFont);
 	ccc[0]=0;
 	if(L>200)L=200;
@@ -2374,7 +2374,7 @@ void HandleMultiplayer(){
 				for(int i=0;i<NPlayers;i++){
 					char ccc[128];
 					if(GetRealTime()-LastAccess[i]>6000)PlState[i]=-1;
-					sprintf(ccc,"%s:",PINFO[i].name);
+					sprintf_s(ccc,sizeof(ccc),"%s:",PINFO[i].name);
 					if(EBufs[i].Enabled){
 						if(EBufs[i].RealTime!=NON)strcat(ccc,READYTX);
 						else{
@@ -2733,10 +2733,10 @@ bool ProcessSyncroMain(SaveBuf* SB){
 		/*
 		CBar(0,0,512,512,0x62);
 		ShowString(1,10,"Waiting IRDY",&fn10);
-		sprintf(ccc,"MyDPID=%d",MyDPID);
+		sprintf_s(ccc,sizeof(ccc),"MyDPID=%d",MyDPID);
 		ShowString(1,30,ccc,&fn10);
 		for(int p=0;p<NPlayers;p++){
-			sprintf(ccc,"%d : %d",PlayersID[p],PlReady[p]);
+			sprintf_s(ccc,sizeof(ccc),"%d : %d",PlayersID[p],PlReady[p]);
 			ShowString(1,50+p*20,ccc,&fn10);
 		};
 		*/
@@ -2805,12 +2805,12 @@ bool ProcessSyncroMain(SaveBuf* SB){
 			//ShowProgressBar("Connecting...",0,100);
 			/*
 			CBar(0,0,512,512,0x62);
-			sprintf(ccc,"Sending SYNC %d/%d Attempt:%d",CurPart,NParts,Attempt);
+			sprintf_s(ccc,sizeof(ccc),"Sending SYNC %d/%d Attempt:%d",CurPart,NParts,Attempt);
 			ShowString(1,10,ccc,&fn10);
-			sprintf(ccc,"MyDPID=%d",MyDPID);
+			sprintf_s(ccc,sizeof(ccc),"MyDPID=%d",MyDPID);
 			ShowString(1,30,ccc,&fn10);
 			for(int p=0;p<NPlayers;p++){
-			sprintf(ccc,"%d : %d",PlayersID[p],PlReady[p]);
+			sprintf_s(ccc,sizeof(ccc),"%d : %d",PlayersID[p],PlReady[p]);
 			ShowString(1,50+p*20,ccc,&fn10);
 			*/
 			ShowProgressBar("Loading...",CurPart,NParts);
@@ -2844,11 +2844,11 @@ bool ProcessSyncroChild(SaveBuf* SB){
 		CBar(0,0,512,64,0x62);
 		int yy=10;
 		char ccc[128];
-		sprintf(ccc,"MyDPID:%d",MyDPID);
+		sprintf_s(ccc,sizeof(ccc),"MyDPID:%d",MyDPID);
 		ShowString(1,yy,ccc,&fn10);
 		yy+=16;
 		for(int j=0;j<NPlayers;j++){
-			sprintf(ccc,"ID%d:%d",j,PlayersID[j]);
+			sprintf_s(ccc,sizeof(ccc),"ID%d:%d",j,PlayersID[j]);
 			ShowString(1,yy,ccc,&fn10);
 			yy+=16;
 		};
@@ -2929,7 +2929,7 @@ bool ProcessSyncroChild(SaveBuf* SB){
 		/*
 		CBar(0,0,512,64,0x62);
 		char ccc[128];
-		sprintf(ccc,"Loading SYNC:%d/%d Attampt: %d SUMM: MEED: %d BUT %d (%d %d)",CurPart,NParts,Attempt,NeedSumm,LastSumm,s1,s2);
+		sprintf_s(ccc,sizeof(ccc),"Loading SYNC:%d/%d Attampt: %d SUMM: MEED: %d BUT %d (%d %d)",CurPart,NParts,Attempt,NeedSumm,LastSumm,s1,s2);
 		ShowString(1,10,ccc,&fn10);
 		*/
 		ShowProgressBar("Loading...",CurPart,NParts);
@@ -3639,7 +3639,7 @@ void ShowTMT(){
 		LastTMT=TT;
 	};
 	char cc[64];
-	sprintf(cc,"Tx:%d Nx:%d Rx:%d ALL:%d",CUTR_Tx,CUTR_Nx,CUTR_Rx,CUTR_Tx+CUTR_Nx);
+	sprintf_s( cc,sizeof(cc),"Tx:%d Nx:%d Rx:%d ALL:%d",CUTR_Tx,CUTR_Nx,CUTR_Rx,CUTR_Tx+CUTR_Nx);
 	ShowString(400,20,cc,&SmallWhiteFont);
 };
 void ClearLPACK(){

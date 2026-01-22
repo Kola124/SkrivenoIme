@@ -620,14 +620,14 @@ bool MPL_WaitingGame(bool Host,bool SINGLE){
 		FAO--;
 	}else{
 		char cc[128];
-		sprintf(cc, "GMTP_TP%d", a+1);
+		sprintf_s( cc,sizeof(cc), "GMTP_TP%d", a+1);
 		TGRP1[a+FAO]=MENU.addTextButton(NULL,Tx2,0,GetTextByID(cc),FYellow,FYellow,FYellow,0);
 		CMGRP1[a+FAO]=MENU.addGP_ComboBoxDLX(NULL,x2,0,w2,CMB.GPID,0,9,0,FASmCmb,FPSmCmb,NULL);
 #ifdef LIMITOPTIONS
 		int N=a<3?1:10;
 		for(int i=0;i<N;i++){
 			char ccc[128];
-			sprintf(ccc,"@GMTP_TP%d_0%d",a+1,i);
+			sprintf_s(ccc,sizeof(ccc),"@GMTP_TP%d_0%d",a+1,i);
 			char* text=GetTextByID(ccc);
 			if(text[0]!='@')CMGRP1[a+FAO]->AddLine(text);
 		};
@@ -635,7 +635,7 @@ bool MPL_WaitingGame(bool Host,bool SINGLE){
 #else
 		for(int i=0;i<10;i++){
 			char ccc[128];
-			sprintf(ccc,"@GMTP_TP%d_0%d",a+1,i);
+			sprintf_s(ccc,sizeof(ccc),"@GMTP_TP%d_0%d",a+1,i);
 			char* text=GetTextByID(ccc);
 			if(text[0]!='@')CMGRP1[a+FAO]->AddLine(text);
 		};
@@ -1010,7 +1010,7 @@ ffe2:;
 			ADD_OPT->Clear();
 			for(int i=0;i<NOPTV;i++){
 				char ccc[100];
-				sprintf(ccc,"GMTP_TP%d",i+1);
+				sprintf_s(ccc,sizeof(ccc),"GMTP_TP%d",i+1);
 				char cc1[128];
 				char cc2[256];
 				sprintf(cc1,"@GMTP_TP%d_0%d",i+1,CUROPTVAL[i]);
@@ -1023,7 +1023,7 @@ ffe2:;
 			ADD_OPT_VAL->Clear();
 			for(int i=0;i<10;i++){
 				char ccc[128];
-				sprintf(ccc,"@GMTP_TP%d_0%d",aocl+1,i);
+				sprintf_s(ccc,sizeof(ccc),"@GMTP_TP%d_0%d",aocl+1,i);
 				char* text=GetTextByID(ccc);
 				if(text[0]!='@')ADD_OPT_VAL->AddLine(text);
 			};
@@ -1299,7 +1299,7 @@ ffe2:;
 			if(MaxPingTime)MaxPingTime+=500;
 			char cc2[300];
 			CreateDiffStr(cc2);
-			sprintf(ccc,"max ping: %d  (%s)",png,cc2);
+			sprintf_s(ccc,sizeof(ccc),"max ping: %d  (%s)",png,cc2);
 			//ShowString(10,768-24,ccc,&SmallYellowFont);
 			strcpy(MENU.DefaultHint,ccc);
 		}else{
@@ -1308,7 +1308,7 @@ ffe2:;
 		/*
 		if(NPings){
 			char cc2[200];
-			sprintf(ccc,"Npings: %d",NPings);
+			sprintf_s(ccc,sizeof(ccc),"Npings: %d",NPings);
 			ShowString(10,768-48,ccc,&SmallYellowFont);
 
 		};
@@ -1524,7 +1524,7 @@ ffe2:;
 				Nats[7-Color]=NTCHAR[Nat+1];
 			};
 			int r=(r0)&65535;
-			//sprintf(ccc,"%d",&r);
+			//sprintf_s(ccc,sizeof(ccc),"%d",&r);
 			//int NP=NPlayers;
 			//for(q=NPlayers;q<7;q++)if(PINFO[HostID].COMPINFO[q]){
 			//	NP++;
@@ -1624,7 +1624,7 @@ ffe2:;
 						};
 						if(KICK[i]->CurLine==1){
 							char cc[32];
-							sprintf(cc,"@@@0002KICK %d",PINFO[i].PlayerID);
+							sprintf_s( cc,sizeof(cc),"@@@0002KICK %d",PINFO[i].PlayerID);
 							SendChat(cc,0);
 							KICK[i]->CurLine=0;
 							if(DoNewInet){

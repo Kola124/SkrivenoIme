@@ -662,7 +662,7 @@ void SaveBMP8(char* Name,int lx,int ly,byte* Data){
 	memset(PAL,0,1024);
 	char ccc[128];
     int i;
-	sprintf(ccc,"%d\\agew_1.pal",CurPalette);
+	sprintf_s(ccc,sizeof(ccc),"%d\\agew_1.pal",CurPalette);
 	ResFile f=RReset(ccc);
 	for(i =0;i<256;i++){
 		int ofs=i<<2;
@@ -749,7 +749,7 @@ void SaveScreen(){
 	char ccc[128];
 	CreateDirectory("Screenshots",0);
 	for(i=0;i<1000;i++){
-		sprintf(ccc,"Screenshots\\screen%d.bmp",i);
+		sprintf_s(ccc,sizeof(ccc),"Screenshots\\screen%d.bmp",i);
 		ResFile f=RReset(ccc);
 		if(f==INVALID_HANDLE_VALUE){
 			RClose(f);
@@ -758,7 +758,7 @@ void SaveScreen(){
 		RClose(f);
 	};
 zzz:
-	sprintf(ccc,"Screenshots\\screen%d.bmp",i);
+	sprintf_s(ccc,sizeof(ccc),"Screenshots\\screen%d.bmp",i);
 	SaveScreenShot(ccc);
 };
 extern bool NoText;
@@ -780,9 +780,9 @@ void MiniRenderAllMap(){
 			GFieldShow();
 			FlipPages();
 			int p=x+y*nx;
-			if(p<10)sprintf(ccc,"scr00%d.bmp",p);
-			else if(p<100)sprintf(ccc,"scr0%d.bmp",p);
-			else sprintf(ccc,"scr%d.bmp",p);
+			if(p<10)sprintf_s(ccc,sizeof(ccc),"scr00%d.bmp",p);
+			else if(p<100)sprintf_s(ccc,sizeof(ccc),"scr0%d.bmp",p);
+			else sprintf_s(ccc,sizeof(ccc),"scr%d.bmp",p);
 			SaveMiniScreenShot(ccc);
 		};
 	};
@@ -807,9 +807,9 @@ void RenderAllMap(){
 			GFieldShow();
 			FlipPages();
 			int p=x+y*nx;
-			if(p<10)sprintf(ccc,"scr00%d.bmp",p);
-			else if(p<100)sprintf(ccc,"scr0%d.bmp",p);
-			else sprintf(ccc,"scr%d.bmp",p);
+			if(p<10)sprintf_s(ccc,sizeof(ccc),"scr00%d.bmp",p);
+			else if(p<100)sprintf_s(ccc,sizeof(ccc),"scr0%d.bmp",p);
+			else sprintf_s(ccc,sizeof(ccc),"scr%d.bmp",p);
 			SaveScreenShot(ccc);
 		};
 	};
@@ -1093,7 +1093,7 @@ long FAR PASCAL WindowProc( HWND hWnd, UINT message,
 				UnlockSurface();
 				LoadFog(CurPalette);
 				char cc[64];
-				sprintf(cc,"%d\\agew_1.pal",CurPalette);
+				sprintf_s( cc,sizeof(cc),"%d\\agew_1.pal",CurPalette);
 				PalDone=0;
 				LoadPalette(cc);
 			};
@@ -1764,7 +1764,7 @@ void STBRR(char c){
 	if(GetKeyState(VK_CONTROL)&0x8000)PEN_BRIGHTNESS=v*25;
 	else{
 		char ccc[64];
-		sprintf(ccc,"DrawTextures\\tex%d.bmp",v);
+		sprintf_s(ccc,sizeof(ccc),"DrawTextures\\tex%d.bmp",v);
 		LoadCurPixTexture(ccc);
 		//PEN_RADIUS=4+v*4;
 	};

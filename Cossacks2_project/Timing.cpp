@@ -85,7 +85,7 @@ void ShowPF(){
 		if(!PF_Average[i])PF_Average[i]=dt/100;
 		int TT=PF_Average[i]=(PF_Average[i]*30+dt)/31;
 		TT/=10000;
-		sprintf(cc,"%d :  %d.%d",i,TT/10,TT%10);
+		sprintf_s( cc,sizeof(cc),"%d :  %d.%d",i,TT/10,TT%10);
 		/*
 		TT/=100;
 		int exp=6;
@@ -94,8 +94,8 @@ void ShowPF(){
 			exp--;
 		};
 
-		if(TT<10)sprintf(cc,"%d :  %d E-%d",i,TT,exp);
-		else sprintf(cc,"%d : %d E-%d",i,TT,exp);
+		if(TT<10)sprintf_s( cc,sizeof(cc),"%d :  %d E-%d",i,TT,exp);
+		else sprintf_s( cc,sizeof(cc),"%d : %d E-%d",i,TT,exp);
 		*/
 		if(PF_Prev[i]>=PF_Average[i])ShowString(RealLx-300,200+i*15,cc,&SmallWhiteFont);
 		else ShowString(RealLx-300,200+i*15,cc,&SmallYellowFont);

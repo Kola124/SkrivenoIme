@@ -228,13 +228,13 @@ void Economy::CreateInterface(IconSet* ISET){
 	P10000->CreateHint(ECONOMA);//"+10000 units"
 	char cc[128];
 	if(ResSell!=-1){
-		sprintf(cc,"%d",NeedToSell);
+		sprintf_s( cc,sizeof(cc),"%d",NeedToSell);
 		int L=GetRLCStrWidth(cc,&WhiteFont);
 		ShowString(PrpX+(IconLx+2)*3-(L>>1),PrpY+IconLy+16,cc,&WhiteFont);
 	};
 	if(ResSell!=-1&&ResBuy!=-1){
 		NeedToBuy=int(double(NeedToSell)*ResCostSell[ResSell]/ResCostBuy[ResBuy]);
-		sprintf(cc,"%d",NeedToBuy);
+		sprintf_s( cc,sizeof(cc),"%d",NeedToBuy);
 		int L=GetRLCStrWidth(cc,&WhiteFont);
 		ShowString(PrpX+(IconLx+2)*6-(L>>1),PrpY+IconLy+16,cc,&WhiteFont);
 	};

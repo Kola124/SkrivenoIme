@@ -105,7 +105,7 @@ void OneMap::LoadMapData(sicExplorer* SXP){
 	//loading colors
 	char ccc[64];
 	int i;
-	sprintf(ccc,"Internet\\Cash\\%s.colors",Title);
+	sprintf_s(ccc,sizeof(ccc),"Internet\\Cash\\%s.colors",Title);
 	FILE* F=fopen(ccc,"r");
 	if(F){
 		int z;
@@ -114,7 +114,7 @@ void OneMap::LoadMapData(sicExplorer* SXP){
 			int r0,g0,b0;
 			z=fscanf(F,"%d%d%d",&r0,&g0,&b0);
 			if(z==3){
-				sprintf(ccc,"Internet\\Cash\\colors_%d_%d_%d.dat",r0,g0,b0);
+				sprintf_s(ccc,sizeof(ccc),"Internet\\Cash\\colors_%d_%d_%d.dat",r0,g0,b0);
 				ResFile F=RReset(ccc);
 				COLORS[idx].r=r0;
 				COLORS[idx].g=g0;
@@ -148,7 +148,7 @@ void OneMap::LoadMapData(sicExplorer* SXP){
 	};
 	//loading set of maps
 	for(i=0;i<=100;i++){
-		sprintf(ccc,"Internet\\Cash\\%s_%d.bmp",Title,i);
+		sprintf_s(ccc,sizeof(ccc),"Internet\\Cash\\%s_%d.bmp",Title,i);
 		BMPformat BM;
 		byte* Data;
 		if(ReadBMP8(ccc,&BM,&Data)){
@@ -164,7 +164,7 @@ void OneMap::LoadMapData(sicExplorer* SXP){
 			NScales++;
 		};
 	};
-	sprintf(ccc,"Internet\\Cash\\%s.fonts",Title);
+	sprintf_s(ccc,sizeof(ccc),"Internet\\Cash\\%s.fonts",Title);
 	F=fopen(ccc,"r");
 	if(F){
 		for(i=0;i<NScales;i++){
@@ -176,7 +176,7 @@ void OneMap::LoadMapData(sicExplorer* SXP){
 		};
 	};
 	//loading base countries distribution
-	sprintf(ccc,"Internet\\Cash\\%s_nations.bmp",Title,i);
+	sprintf_s(ccc,sizeof(ccc), "Internet\\Cash\\%s%d_nations.bmp",Title,i);
 	BMPformat BM;
 	byte* Data;
 	memset(XSumm,0,sizeof XSumm);
@@ -233,15 +233,15 @@ void OneMap::LoadMapData(sicExplorer* SXP){
 		};
 	};
 	UpdateData=0;
-	sprintf(ccc,"Internet\\Cash\\%s.date",Title,i);
+    sprintf_s(ccc,sizeof(ccc), "Internet\\Cash\\%s%d.date", Title, i);
 	F=fopen(ccc,"r");
 	if(F){
 		fscanf(F,"%u",&UpdateData);
 		fclose(F);
-		sprintf(ccc,"GW|mupdate&%s\\00&%d\\00",Title,UpdateData);
+		sprintf_s(ccc,sizeof(ccc),"GW|mupdate&%s\\00&%d\\00",Title,UpdateData);
 		SendSmartRequest(SXP,ccc);
 	};
-	sprintf(ccc,"Internet\\Cash\\%s.nations",Title,i);
+	sprintf_s(ccc,sizeof(ccc),"Internet\\Cash\\%s%d.nations",Title,i);
 	F=fopen(ccc,"r");
 	memset(Names,0,sizeof Names);
 	if(F){
@@ -526,7 +526,7 @@ void OneMap::UpdateMapData(byte* Date){
 	//fprintf(F1,"UPDATE: %d->%d (TOTAL: pts: %d  upd: %d)\n",StartDate,CurrentDate,NPT,NUP);
 	if(UpdateData==StartDate){
 		char ccc[256];   
-		sprintf(ccc,"Internet\\Cash\\%s.date",Title);
+		sprintf_s(ccc,sizeof(ccc),"Internet\\Cash\\%s.date",Title);
 		FILE* F=fopen(ccc,"w");
 		if(F){
 			fprintf(F,"%u",CurrentDate);
@@ -547,7 +547,7 @@ void OneMap::UpdateMapData(byte* Date){
 				NPT++;
 				//fprintf(F1,"x=%4d y=%4d c=%4d\n",x,y,c);
 			};
-			sprintf(ccc,"Internet\\Cash\\%s_nations.bmp",Title,i);
+			sprintf_s(ccc,sizeof(ccc),"Internet\\Cash\\%s%d_nations.bmp",Title,i);
 			SaveToBMP8(ccc,CountryLx,CountryLy,CountryMap,COLORS);
 		};
 		//fclose(F1);
@@ -573,13 +573,13 @@ void OneMap::AddMapPicture(char* Name,int x,int y,int dx,int dy,int Sprite){
 	OMP->Sprite=Sprite;
 	int NF=0;
 	char cc[128];
-	sprintf(cc,"Internet\\Cash\\%s_*.gp",Name);
+	sprintf_s( cc,sizeof(cc),"Internet\\Cash\\%s_*.gp",Name);
 	int L=strlen(Name);
 	WIN32_FIND_DATA FD;
 	HANDLE H=FindFirstFile(cc,&FD);
 	if(H!=INVALID_HANDLE_VALUE){
 		do{
-			sprintf(cc,"Internet\\Cash\\%s",FD.cFileName);
+			sprintf_s( cc,sizeof(cc),"Internet\\Cash\\%s",FD.cFileName);
 			cc[strlen(cc)-3]=0;
 			int scale=atoi(FD.cFileName+L+1);
 			int GPI=GPS.PreLoadGPImage(cc);

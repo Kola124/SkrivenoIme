@@ -44,7 +44,7 @@ void Blob::Load(char* Name){
 	ResFile f=RReset(Name);
 	if(f==INVALID_HANDLE_VALUE){
 		char ccc[128];
-		sprintf(ccc,"Could not load: %s",Name);
+		sprintf_s(ccc,sizeof(ccc),"Could not load: %s",Name);
 		ErrM(ccc);
 		return;
 	};

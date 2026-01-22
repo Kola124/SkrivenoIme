@@ -19,7 +19,7 @@ void* LoadF(char* Name){
 	void* fn=GetProcAddress(hLib,Name);
 	if(!fn){
 		char ccc[256];
-		sprintf(ccc,"UNRAR.DLL does not contain function: %s",Name);
+		sprintf_s(ccc,sizeof(ccc),"UNRAR.DLL does not contain function: %s",Name);
 		MessageBox(NULL,ccc,"DLL init error.",0);
 	};
 	return fn;

@@ -5411,7 +5411,7 @@ void DrawNum(int x,int y,byte v){
 	int yy=(y>>1)-(mapy<<4)-GetHeight(x,y);
 	if(xx>-20&&yy>-20&&xx<RealLx+20&&yy<RealLy+20){
 		char cc[16];
-		sprintf(cc,"%d",v);
+		sprintf_s( cc,sizeof(cc),"%d",v);
 		ShowString(xx-10,yy-5,cc,&WhiteFont);
 	};
 };

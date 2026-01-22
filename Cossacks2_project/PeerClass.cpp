@@ -70,7 +70,7 @@ void TotalPeerEngine::SendGlobalChat(char* Message){
 	if(!Connected)return;
 	if(!strcmp(Message,"@@@GETID")){
 		char ccc[128];
-		sprintf(ccc,"PROFILE# %d",GetMyProfile());
+		sprintf_s(ccc,sizeof(ccc),"PROFILE# %d",GetMyProfile());
 		GlobalChat.Add(MyNick,ccc);
 	}else peerMessageRoom(Peer,TitleRoom,Message);
 };

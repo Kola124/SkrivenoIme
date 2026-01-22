@@ -1,6 +1,6 @@
 void AC_InstallName(ListBox* LB,ListBox* DT,WIN32_FIND_DATA* FD,char* StartDir){
 	char CCC[256];
-	sprintf(CCC,"%s%s",StartDir,FD->cFileName);
+	sprintf_s(CCC,sizeof(CCC),"%s%s",StartDir,FD->cFileName);
 	ResFile ff1=RReset(CCC);	
 	if(ff1!=INVALID_HANDLE_VALUE){
 		int sig,lap;

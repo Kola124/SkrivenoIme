@@ -377,7 +377,7 @@ int EnterAccountPassword(char* Password,bool First,char* mail){
 		DSS.RefreshView();
 		if(ItemChoose==85){
 			char ccc[256];
-			sprintf(ccc,"http://gamespyarcade.com/software/reqemail.asp?email=%s",mail);
+			sprintf_s(ccc,sizeof(ccc),"http://gamespyarcade.com/software/reqemail.asp?email=%s",mail);
 			ClearScreen();
 			FlipPages();
 			ShellExecute(NULL,NULL,ccc,"","",SW_SHOWMAXIMIZED);
@@ -591,7 +591,7 @@ bool ProcessPlayerForm(GPGetInfoResponseArg* INFO){
 	DAY->AssignScroll(&DSS,&VS2,SCROL.GPID,0,12);
 	for(int i=1;i<32;i++){
 		char cc[12];
-		sprintf(cc,"%d",i);
+		sprintf_s( cc,sizeof(cc),"%d",i);
 		DAY->AddLine(cc);
 	};
 	ComboBox* MONTH=DSS.addGP_ComboBoxDLX(NULL,328,320,96,BTNS.GPID,0,9,0,&WhiteFont,&YellowFont,NULL);
@@ -599,7 +599,7 @@ bool ProcessPlayerForm(GPGetInfoResponseArg* INFO){
 	MONTH->AssignScroll(&DSS,&VS3,SCROL.GPID,0,12);
 	for(int i=0;i<12;i++){
 		char cc[12];
-		sprintf(cc,"MONTH_%d",i);
+		sprintf_s( cc,sizeof(cc),"MONTH_%d",i);
 		MONTH->AddLine(GetTextByID(cc));
 	};
 	ComboBox* YEAR=DSS.addGP_ComboBoxDLX(NULL,429,320,77,BTNS.GPID,0,9,0,&WhiteFont,&YellowFont,NULL);
@@ -607,7 +607,7 @@ bool ProcessPlayerForm(GPGetInfoResponseArg* INFO){
 	YEAR->AssignScroll(&DSS,&VS4,SCROL.GPID,0,12);
 	for(int i=1900;i<2100;i++){
 		char cc[12];
-		sprintf(cc,"%d",i);
+		sprintf_s( cc,sizeof(cc),"%d",i);
 		YEAR->AddLine(cc);
 	};
 	if(INFO->birthyear<1900)INFO->birthyear=1900;
@@ -1999,7 +1999,7 @@ void SendPHPString(CurrentGame* CGM){
 			AddStrIdxToURL(ccc,"STS",cc6,&HASH,i);
 		};
 	};
-	sprintf(ccc+strlen(ccc),"SEQ=%d",HASH);
+	sprintf_s(ccc+strlen(ccc), sizeof(ccc + strlen(ccc)), "SEQ=%d",HASH);
 	//TestHash1(ccc);
 	FILE* F1=fopen("Internet\\upload.dat","a");
 	if(F1){
@@ -2238,7 +2238,7 @@ DWORD SERV_HANDLES[6];
 int NSERV=0;
 DWORD SendOneRequest(char* serv,char* param){
 	char ccc[512];
-	sprintf(ccc,"%s?%s",serv,param);
+	sprintf_s(ccc,sizeof(ccc),"%s?%s",serv,param);
 	return SendHTTPRequest(ccc);
 };
 int GetStrHASH1(char* s){
@@ -2267,7 +2267,7 @@ int GetStrHASH1(char* s){
 void SendAllRequests(char* clan,char* nick,char* mail){
 	RejectThisPlayer=0;
 	char ccc[512];
-	sprintf(ccc,"com=check&clan=%s&user=%s&mail=%s&code=%d",clan,nick,mail,GetTickCount()&65535);
+	sprintf_s(ccc,sizeof(ccc),"com=check&clan=%s&user=%s&mail=%s&code=%d",clan,nick,mail,GetTickCount()&65535);
 	NSERV=0;
 	GFILE* F=Gopen("Internet\\serv.dat","r");
 	if(F){

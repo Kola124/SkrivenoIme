@@ -390,7 +390,7 @@ void CBB_Process(sicExplorer* SXP,void* Data,int size){
 	char* var=SXP->GetVar(ADCD->VarName);
 	if(var){
 		char CC[128];
-		sprintf(CC,"%d",ADCD->CBB->CurLine);
+		sprintf_s(CC,sizeof(CC),"%d",ADCD->CBB->CurLine);
 		if(strcmp(CC,var)){
 			sprintf(var,"%d",ADCD->CBB->CurLine);
 			if(ADCD->URL[0])SendGlobalRequest(SXP,ADCD->URL,1);
@@ -1677,7 +1677,7 @@ bool MapClick(SimpleDialog* SD){
 	int x=(PT.x-SD->x+BIGMAP.CurX)*BIGMAP.CountryLx/CUR->Lx;
 	int y=(PT.y-SD->y+BIGMAP.CurY)*BIGMAP.CountryLy/CUR->Ly;
 	char cc[256];
-	sprintf(cc,SD->AllocPtr,BIGMAP.Title,x,y);
+	sprintf_s( cc,sizeof(cc),SD->AllocPtr,BIGMAP.Title,x,y);
 	SendSmartRequest((sicExplorer*)SD->UserParam,cc);
 	return true;
 };
@@ -1728,10 +1728,10 @@ bool ADI_uurl(sicExplorer* SXP,DialogsSystem* DSS,int* x,int* y,int* x1,int* y1,
 extern bool NOXCFILE;
 void sgetFile(sicExplorer* SXP,char* URL){
 	char ccc[256];
-	sprintf(ccc,"Internet/cash/%s",URL);
+	sprintf_s(ccc,sizeof(ccc),"Internet/cash/%s",URL);
 	struct _stat ST;
 	_stat(ccc,&ST);
-	sprintf(ccc,"GW|file&%s\\00&%u\\00",URL,ST.st_mtime);
+	sprintf_s(ccc,sizeof(ccc),"GW|file&%s\\00&%I64u\\00",URL,ST.st_mtime);
 	SendSmartRequest(SXP,ccc);
 };
 bool ADI_getf(sicExplorer* SXP,DialogsSystem* DSS,int* x,int* y,int* x1,int* y1,
@@ -1748,7 +1748,7 @@ bool ADI_ftxt(sicExplorer* SXP,DialogsSystem* DSS,int* x,int* y,int* x1,int* y1,
 	RLCFont* PFONT=SXP->GetFontByName(SXP->FONT1);
 	if(NParam<1)return false;
 	char ccc[256];
-	sprintf(ccc,"Internet/Cash/%s",Param[0]);
+	sprintf_s(ccc,sizeof(ccc),"Internet/Cash/%s",Param[0]);
 	ResFile F=RReset(ccc);
 	if(F!=INVALID_HANDLE_VALUE){
 		RClose(F);
@@ -1888,7 +1888,7 @@ void EnumFilesInDirectory(char* Dir,char** Mask,int NMasks,char* FrameID,char* B
 		char cd[256];
 		sprintf(cd,"chdir&%s",Dirs[i]);
 		char cc[256];
-		sprintf(cc,"|Internet/Cash/folder.gp,0,0,0,0|%s",Dirs[i]);
+		sprintf_s( cc,sizeof(cc),"|Internet/Cash/folder.gp,0,0,0,0|%s",Dirs[i]);
 		ADDFL(cc,cd);
 		cstr++;
 	};
@@ -1901,7 +1901,7 @@ void EnumFilesInDirectory(char* Dir,char** Mask,int NMasks,char* FrameID,char* B
 	fprintf(F,"<%s>\n",FrameID);
 	fclose(F);
 	char CCC[256];
-	sprintf(CCC,"LW_file&Internet/Cash/tempcml_files.cml\00");
+	sprintf_s(CCC,sizeof(CCC),"LW_file&Internet/Cash/tempcml_files.cml\00");
 	GREQUEST=(char*)realloc(GREQUEST,strlen(CCC)+1);
 	strcpy(GREQUEST,CCC);
 	REQSXP=LastBrowse->SXP;
@@ -2051,7 +2051,7 @@ bool ADI_Label(sicExplorer* SXP,DialogsSystem* DSS,int* x,int* y,int* x1,int* y1
 	int s=-1;
 	for(int i=0;i<MAXDLG&&s==-1;i++)if(!DSS->DSS)s=i;
 	char cc[16];
-	sprintf(cc,"LV_01ED67_%d",s);
+	sprintf_s( cc,sizeof(cc),"LV_01ED67_%d",s);
 	char* VAR=SXP->CreateVar(cc,512);
 	LabelVar* LV=(LabelVar*)SXP->CreateSXProcess(&ShowVar,NULL,sizeof LabelVar);
 	strcpy(LV->Mask,Param[0]);

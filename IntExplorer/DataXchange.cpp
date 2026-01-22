@@ -231,7 +231,7 @@ void EraseTempFiles(){
 	if(H&&H!=INVALID_HANDLE_VALUE){
 		do{
 			char cc[64];
-			sprintf(cc,"Internet\\Cash\\%s",FD.cFileName);
+			sprintf_s( cc,sizeof(cc),"Internet\\Cash\\%s",FD.cFileName);
 			DeleteFile(cc);
 		}while(FindNextFile(H,&FD));
 		FindClose(H);
@@ -565,7 +565,7 @@ void exec_LW_show(int Np,char** par){
 					};
 					if(res&&OSW->Result){
 						char ccc[128];
-						sprintf(ccc,"LW_pfile&%s",res);
+						sprintf_s(ccc,sizeof(ccc),"LW_pfile&%s",res);
 						int L=strlen(OSW->Result);
 						Replace(&OSW->Result,"<!goback!>",ccc,L);
 						strcpy(OSW->CurrTempCml,res);
@@ -666,7 +666,7 @@ void exec_LW_file(int Np,char** par){
 						};
 						if(res&&OSW->Result){
 							char ccc[128];
-							sprintf(ccc,"LW_pfile&%s",res);
+							sprintf_s(ccc,sizeof(ccc),"LW_pfile&%s",res);
 							int L=strlen(OSW->Result);
 							Replace(&OSW->Result,"<!goback!>",ccc,L);
 							strcpy(OSW->CurrTempCml,res);
@@ -733,7 +733,7 @@ void exec_LW_cfile(int Np,char** par,int* size){
 				OSW->UPHANDLE=0;
 				for(int i=0;i<Np-1;i+=2)if(size[i+1]<64){
 					char cc[256];
-					sprintf(cc,"Internet\\cash\\%s",par[i+1]);
+					sprintf_s( cc,sizeof(cc),"Internet\\cash\\%s",par[i+1]);
 					ResFile F=RRewrite(cc);
 					if(F!=INVALID_HANDLE_VALUE){
 						RBlockWrite(F,par[i],size[i]);
@@ -782,12 +782,12 @@ void exec_LW_mupdate(int Np,char** par,int* size){
 		sicExplorer* SX=SXP+widx-'0';
 		//BIGMAP.UpdateData=0;
 		char ccc[256];
-		sprintf(ccc,"Internet\\Cash\\%s.date",BIGMAP.Title);
+		sprintf_s(ccc,sizeof(ccc),"Internet\\Cash\\%s.date",BIGMAP.Title);
 		FILE* F=fopen(ccc,"r");
 		if(F){
 			fscanf(F,"%u",&BIGMAP.UpdateData);
 			fclose(F);
-			sprintf(ccc,"GW|mupdate&%s\\00&%d\\00",BIGMAP.Title,BIGMAP.UpdateData);
+			sprintf_s(ccc,sizeof(ccc),"GW|mupdate&%s\\00&%d\\00",BIGMAP.Title,BIGMAP.UpdateData);
 			SendSmartRequest(SXP,ccc);
 		};
 	};
@@ -1151,7 +1151,7 @@ void FilterRQ2Send(sicExplorer* SXP,ParsedRQ* RQ,bool AllowNew){
 				del=1;
 				if(AllowNew&&SXP->NWindows==0){
 					char cc[16];
-					sprintf(cc,"%d%d",SXP->ID,LAST_GID);
+					sprintf_s( cc,sizeof(cc),"%d%d",SXP->ID,LAST_GID);
 					strcpy(GID,cc);
 					LAST_GID++;
 					SXP->NewWindow(str,cc);
@@ -1338,14 +1338,14 @@ void StartDownloadInternetFile(char* Name,char* Server,char* DestName){
 	
 	//check if already downloaded
 	char CC[1024];
-	sprintf(CC,"Internet\\dnl\\%s.ready",DestName);
+	sprintf_s(CC,sizeof(CC),"Internet\\dnl\\%s.ready",DestName);
 	ResFile F=RReset(CC);
 	if(F!=INVALID_HANDLE_VALUE){
 		RClose(F);
 		return;
 	};
 	memset(DNPR+N_DNPR,0,sizeof OneDnProcess);
-	sprintf(CC,"Internet\\dnl\\%s.open",DestName);
+	sprintf_s(CC,sizeof(CC),"Internet\\dnl\\%s.open",DestName);
 	F=RReset(CC);
 	if(F!=INVALID_HANDLE_VALUE){
 		DNPR[N_DNPR].DownloadedSize=RFileSize(F);
@@ -1423,7 +1423,7 @@ void exec_LW_dfp(int Np,char** par,int* size){
 		int ofs=DD[0];
 		int sz=DD[1];
 		char cc[128];
-		sprintf(cc,"Internet\\dnl\\%s.open",par[0]);
+		sprintf_s( cc,sizeof(cc),"Internet\\dnl\\%s.open",par[0]);
 		ResFile F=RReset(cc);
 		int CSize=0;
 		if(F!=INVALID_HANDLE_VALUE){
@@ -1450,7 +1450,7 @@ void exec_LW_dff(int Np,char** par,int* size){
 		int ofs=DD[0];
 		int sz=DD[1];
 		char cc[128];
-		sprintf(cc,"Internet\\dnl\\%s.open",par[0]);
+		sprintf_s( cc,sizeof(cc),"Internet\\dnl\\%s.open",par[0]);
 		ResFile F=RReset(cc);
 		int CSize=0;
 		if(F!=INVALID_HANDLE_VALUE){
@@ -1498,7 +1498,7 @@ void exec_LW_showrec(int Np,char** par,int* size){
 		SetCurPtr(0);
 		if(Np<1)return;
 		char cc[128];
-		sprintf(cc,"GW|%s",par[0]);
+		sprintf_s( cc,sizeof(cc),"GW|%s",par[0]);
 		PlayRecfile(cc);
 		SetCurPtr(0);
 	}catch(...){

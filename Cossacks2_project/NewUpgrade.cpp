@@ -109,7 +109,7 @@ void GetWeaponKind(GFILE* f,NewUpgrade* NU,Nation* NT,char* Name,int Line){
 		int ngrp;
 		z=Gscanf(f,"%d",&ngrp);
 		if(z!=1){
-            sprintf(gx,"%s,Line %d :%s:Invalid GRP directive format for the list of weapon.",Name,Line,Sect);
+            sprintf_s(gx,sizeof(gx),"%s,Line %d :%s:Invalid GRP directive format for the list of weapon.",Name,Line,Sect);
 			ErrM(gx);
 		};
 		NU->CtgGroup=znew(word,ngrp);
@@ -119,7 +119,7 @@ void GetWeaponKind(GFILE* f,NewUpgrade* NU,Nation* NT,char* Name,int Line){
 			if(z!=1)IncPar(Name,Line,Sect);
 			int zz1=GetWeaponType(gx);
 			if(zz1==-1){
-                sprintf(gy,"%s,Line %d :%s: Unknown weapon type:%s",Name,Line,Sect,gx);
+                sprintf_s(gy,sizeof(gy),"%s,Line %d :%s: Unknown weapon type:%s",Name,Line,Sect,gx);
 				ErrM(gy);
 			};
 			NU->CtgGroup[i]=zz1;
@@ -127,7 +127,7 @@ void GetWeaponKind(GFILE* f,NewUpgrade* NU,Nation* NT,char* Name,int Line){
 	}else{
 		int zz1=GetWeaponType(gx);
 		if(zz1==-1){
-            sprintf(gy,"%s,Line %d :%s: Unknown Monster ID:%s",Name,Line,Sect,gx);
+            sprintf_s(gy,sizeof(gy),"%s,Line %d :%s: Unknown Monster ID:%s",Name,Line,Sect,gx);
 			ErrM(gy);
 		};
 		NU->CtgValue=zz1;
@@ -176,7 +176,7 @@ void GetCtgParam01(GFILE* f,NewUpgrade* NU,Nation* NT,char* Name,int Line){
 		NU->CtgGroup=NULL;
 		NU->CtgValue=0;
 	}else{
-        sprintf(gy,"%s, Line %d :%s: ATTINDEX or WEAPONKIND or ALL expected instead of %s",Name,Line,Sect,gx);
+        sprintf_s(gy,sizeof(gy),"%s, Line %d :%s: ATTINDEX or WEAPONKIND or ALL expected instead of %s",Name,Line,Sect,gx);
 		ErrM(gy);
 	};
 };
@@ -189,7 +189,7 @@ void GetUnits(GFILE* f,NewUpgrade* NU,Nation* NT,char* Name,int Line){
 		int ngrp;
 		z=Gscanf(f,"%d",&ngrp);
 		if(z!=1){
-            sprintf(gx,"%s,Line %d :%s:Invalid GRP directive format for the list of units.",Name,Line,Sect);
+            sprintf_s(gx,sizeof(gx),"%s,Line %d :%s:Invalid GRP directive format for the list of units.",Name,Line,Sect);
 			ErrM(gx);
 		};
 		NU->UnitGroup=znew(word,ngrp);
@@ -200,7 +200,7 @@ void GetUnits(GFILE* f,NewUpgrade* NU,Nation* NT,char* Name,int Line){
 			if(z!=1)IncPar(Name,Line,Sect);
 			int zz1=GetNTUnit(NT,gx);
 			if(zz1==-1){
-                sprintf(gy,"%s,Line %d :%s: Unknown Monster ID:%s",Name,Line,Sect,gx);
+                sprintf_s(gy,sizeof(gy),"%s,Line %d :%s: Unknown Monster ID:%s",Name,Line,Sect,gx);
 				ErrM(gy);
 			};
 			NU->UnitGroup[i]=zz1;
@@ -213,7 +213,7 @@ void GetUnits(GFILE* f,NewUpgrade* NU,Nation* NT,char* Name,int Line){
 			int ngrp;
 			z=Gscanf(f,"%d",&ngrp);
 			if(z!=1){
-                sprintf(gx,"%s,Line %d :%s:Invalid GRP directive format for UNITKIND.",Name,Line,Sect);
+                sprintf_s(gx,sizeof(gx),"%s,Line %d :%s:Invalid GRP directive format for UNITKIND.",Name,Line,Sect);
 				ErrM(gx);
 			};
 			NU->UnitGroup=znew(word,ngrp);
@@ -224,7 +224,7 @@ void GetUnits(GFILE* f,NewUpgrade* NU,Nation* NT,char* Name,int Line){
 				if(z!=1)IncPar(Name,Line,Sect);
 				int zz1=GetUnitKind(gx);
 				if(zz1==-1){
-                    sprintf(gy,"%s,Line %d :%s: Unknown unit kind:%s",Name,Line,Sect,gx);
+                    sprintf_s(gy,sizeof(gy),"%s,Line %d :%s: Unknown unit kind:%s",Name,Line,Sect,gx);
 					ErrM(gy);
 				};
 				NU->UnitGroup[i]=zz1;
@@ -232,7 +232,7 @@ void GetUnits(GFILE* f,NewUpgrade* NU,Nation* NT,char* Name,int Line){
 		}else{
 			int zz1=GetUnitKind(gx);
 			if(zz1==-1){
-                sprintf(gy,"%s,Line %d :%s: Unknown unit kind:%s",Name,Line,Sect,gx);
+                sprintf_s(gy,sizeof(gy),"%s,Line %d :%s: Unknown unit kind:%s",Name,Line,Sect,gx);
 				ErrM(gy);
 			};
 			NU->UnitValue=zz1;
@@ -242,7 +242,7 @@ void GetUnits(GFILE* f,NewUpgrade* NU,Nation* NT,char* Name,int Line){
 	}else{
 		int zz1=GetNTUnit(NT,gx);
 		if(zz1==-1){
-            sprintf(gy,"%s,Line %d :%s: Unknown Monster ID:%s",Name,Line,Sect,gx);
+            sprintf_s(gy,sizeof(gy),"%s,Line %d :%s: Unknown Monster ID:%s",Name,Line,Sect,gx);
 			ErrM(gy);
 		};
 		NU->UnitValue=zz1;
@@ -260,7 +260,7 @@ void GetUnitsAndUpgrades(GFILE* f,NewUpgrade* NU,Nation* NT,char* Name,int Line,
 		int ngrp;
 		z=Gscanf(f,"%d",&ngrp);
 		if(z!=1){
-            sprintf(gx,"%s,Line %d :%s:Invalid GRP directive format for the list of units.",Name,Line,Sect);
+            sprintf_s(gx,sizeof(gx),"%s,Line %d :%s:Invalid GRP directive format for the list of units.",Name,Line,Sect);
 			ErrM(gx);
 		};
 		NU->UnitGroup=znew(word,ngrp);
@@ -270,7 +270,7 @@ void GetUnitsAndUpgrades(GFILE* f,NewUpgrade* NU,Nation* NT,char* Name,int Line,
 			if(z!=1)IncPar(Name,Line,Sect);
 			int zz1=GetNTElement(NT,gx,UseUnits,UseUpgrades);
 			if(zz1==-1){
-                sprintf(gy,"%s,Line %d :%s: Unknown Monster/Upgrade ID:%s",Name,Line,Sect,gx);
+                sprintf_s(gy,sizeof(gy),"%s,Line %d :%s: Unknown Monster/Upgrade ID:%s",Name,Line,Sect,gx);
 				ErrM(gy);
 			};
 			NU->UnitGroup[i]=zz1;
@@ -278,7 +278,7 @@ void GetUnitsAndUpgrades(GFILE* f,NewUpgrade* NU,Nation* NT,char* Name,int Line,
 	}else{
 		int zz1=GetNTElement(NT,gx,UseUnits,UseUpgrades);
 		if(zz1==-1){
-            sprintf(gy,"%s,Line %d :%s: Unknown Monster/Upgrade ID:%s",Name,Line,Sect,gx);
+            sprintf_s(gy,sizeof(gy),"%s,Line %d :%s: Unknown Monster/Upgrade ID:%s",Name,Line,Sect,gx);
 			ErrM(gy);
 		};
 		NU->UnitValue=zz1;
@@ -312,7 +312,7 @@ void GetValue(GFILE* f,NewUpgrade* NU,Nation* NT,char* Name,int Line){
 		NU->ValGroup=NULL;
 		NU->ValueType=ValType;
 	}else{
-        sprintf(gy,"%s, Line %d :%s: Invalid value",Name,Line,Sect);
+        sprintf_s(gy, sizeof(gy),"%s, Line %d :%s: Invalid value",Name,Line,Sect);
 		ErrM(gy);
 	};
 };
@@ -333,12 +333,12 @@ void GetCostValue(GFILE* f,NewUpgrade* NU,Nation* NT,char* Name,int Line){
 			if(z!=1)IncPar(Name,Line,Sect);
 			p2=GetResID(gx);
 			if(p2==-1){
-                sprintf(gy,"%s, Line %d :%s: Invalid resource ID:%s",Name,Line,Sect,gx);
+                sprintf_s(gy, sizeof(gy), "%s, Line %d :%s: Invalid resource ID:%s", Name, Line, Sect, gx);
 				ErrM(gy);
 			};
 			int value,ValType;
 			if(!ReadValue(f,&value,&ValType)){
-                sprintf(gy,"%s, Line &d :%s: Invalid amount of resource %d.",Name,Line,Sect,gx);
+                sprintf_s(gy, sizeof(gy), "%s, Line %d :%s: Invalid amount of resource %d.", Name, Line, Sect, gx);
 				ErrM(gy);
 			};
 			NU->ValGroup[i]=((ValType+(p2<<3))<<26)+value;
@@ -346,12 +346,12 @@ void GetCostValue(GFILE* f,NewUpgrade* NU,Nation* NT,char* Name,int Line){
 	}else{
 		p2=GetResID(gx);
 		if(p2==-1){
-            sprintf(gy,"%s, Line %d :%s: Invalid resource ID:%s",Name,Line,Sect,gx);
+            sprintf_s(gy, sizeof(gy), "%s, Line %d :%s: Invalid resource ID:%s", Name, Line, Sect, gx);
 			ErrM(gy);
 		};
 		int value,ValType;
 		if(!ReadValue(f,&value,&ValType)){
-            sprintf(gy,"%s, Line &d :%s: Invalid amount of resource %d.",Name,Line,Sect,gx);
+            sprintf_s(gy, sizeof(gy), "%s, Line %d :%s: Invalid amount of resource %s.", Name, Line, Sect, gx);
 			ErrM(gy);
 		};
 		NU->Value=((ValType+(p2<<3))<<26)+value;
@@ -364,7 +364,7 @@ void GetUpgradeCost(GFILE* f,NewUpgrade* NU,Nation* NT,char* Name,int Line){
 	int p1,p2,p3;
 	int z=Gscanf(f,"%s",gy);
 	if(strcmp(gy,"#COST")){
-        sprintf(gx,"%s, Line %d :%s: #COST expected but %s is found.",Name,Line,Sect,gy);
+        sprintf_s(gx, sizeof(gx), "%s, Line %d :%s: #COST expected but %s is found.",Name,Line,Sect,gy);
 		ErrM(gx);
 	};
 	memset(NU->Cost,0,sizeof NU->Cost);
@@ -375,12 +375,12 @@ void GetUpgradeCost(GFILE* f,NewUpgrade* NU,Nation* NT,char* Name,int Line){
 		if(z!=1)IncPar(Name,Line,Sect);
 		p2=GetResID(gx);
 		if(p2==-1){
-            sprintf(gy,"%s, Line %d :%s: Invalid resource ID:%s",Name,Line,Sect,gx);
+            sprintf_s(gy, sizeof(gy), "%s, Line %d :%s: Invalid resource ID:%s", Name, Line, Sect, gx);
 			ErrM(gy);
 		};
 		z=Gscanf(f,"%d",&p3);
 		if(z!=1){
-            sprintf(gy,"%s, Line &d :%s: Invalid amount of resource %d.",Name,Line,Sect,gx);
+            sprintf_s(gy, sizeof(gy), "%s, Line %d :%s: Invalid amount of resource %s.", Name, Line, Sect, gx);
 			ErrM(gy);
 		};
 		NU->Cost[p2]=p3;
@@ -392,12 +392,12 @@ void GetUpgradeTime(GFILE* f,NewUpgrade* NU,Nation* NT,char* Name,int Line){
 	int p1;
 	int z=Gscanf(f,"%s",gy);
 	if(strcmp(gy,"#TIME")){
-        sprintf(gx,"%s, Line %d :%s: #TIME expected but %s is found.",Name,Line,Sect,gy);
+        sprintf_s(gx,sizeof(gx),"%s, Line %d :%s: #TIME expected but %s is found.",Name,Line,Sect,gy);
 		ErrM(gx);
 	};
 	z=Gscanf(f,"%d",&p1);
 	if(z!=1){
-        sprintf(gx,"%s, Line %d :%s: Invalid #TIME value.",Name,Line,Sect);
+        sprintf_s(gx,sizeof(gx),"%s, Line %d :%s: Invalid #TIME value.",Name,Line,Sect);
 		ErrM(gx);
 	};
 	NU->NStages=p1;
@@ -410,12 +410,12 @@ void GetWeapon(GFILE* f,NewUpgrade* NU,Nation* NT,char* Name,int Line){
 	int z=Gscanf(f,"%s%s",gx,gz);
 	int zzk=GetWeaponType(gx);
 	if(zzk==-1){
-        sprintf(gy,"%s, Line %d :%s: Unknown weapon kind ID: %s",Name,Line,Sect,gx);
+        sprintf_s(gy,sizeof(gy),"%s, Line %d :%s: Unknown weapon kind ID: %s",Name,Line,Sect,gx);
 		ErrM(gy);
 	};
 	int zz=GetWeaponIndex(gz);
 	if(zz==-1){
-        sprintf(gy,"%s, Line %d :%s: Unknown weapon ID: %s",Name,Line,Sect,gz);
+        sprintf_s(gy,sizeof(gy),"%s, Line %d :%s: Unknown weapon ID: %s",Name,Line,Sect,gz);
 		ErrM(gy);
 	};
 	NU->ValueType=0;
@@ -459,12 +459,12 @@ bool UnderstandUpgrade(GFILE* f,char* UpgName,Nation* NT,char* name,int* lpLine,
 	if(!strcmp(gg,"NONE"))p4=-1;else{
 		p4=GetIconByName(gg);
 		if(p4==-1){
-            sprintf(gy,"%s,Line %d :%s: Invalid icon ID:%s",name,line,Sect,gx,gg);
+            sprintf_s(gy,sizeof(gy),"%s,Line %d :%s: Invalid icon ID:%s",name,line,Sect,gx,gg);
 			ErrM(gy);
 		};
 	};
 	if(!((icx>=0&&icx<12&&icy>=0&&icy<9)||(icx==-1&&icy==-1))){
-        sprintf(gy,"%s,Line %d :%s: Invalid icon coordinates:(%d,%d)",name,line,Sect,icx,icy);
+        sprintf_s(gy,sizeof(gy),"%s,Line %d :%s: Invalid icon coordinates:(%d,%d)",name,line,Sect,icx,icy);
 		ErrM(gy);
 	};
 	NewUpg->IconFileID=0;
@@ -577,7 +577,7 @@ bool UnderstandUpgrade(GFILE* f,char* UpgName,Nation* NT,char* name,int* lpLine,
 		}else if(!strcmp(gg,"UNITS&UPGRADES")){
 			GetUnitsAndUpgrades(f,NewUpg,NT,name,line+1,true,true);
 		}else{
-            sprintf(gy,"%s, Line %d :%s: UNITS or UPGRADES or UNITS&UPGRADES expected after ENABLED",name,line+1,Sect);
+            sprintf_s(gy,sizeof(gy),"%s, Line %d :%s: UNITS or UPGRADES or UNITS&UPGRADES expected after ENABLED",name,line+1,Sect);
 			ErrM(gy);
 		};
 		NewUpg->ValGroup=NULL;
@@ -740,8 +740,24 @@ bool UnderstandUpgrade(GFILE* f,char* UpgName,Nation* NT,char* name,int* lpLine,
 	if(!strcmp(gz,"UNCONSTRUCT")){
 		NewUpg->CtgUpgrade=31;
 		line+=2;
+	}else
+	if(!strcmp(gz,"DISABLE")){
+		NewUpg->CtgUpgrade=42;
+		z=Gscanf(f,"%s",gg);
+		if(!strcmp(gg,"UNITS")){
+			GetUnitsAndUpgrades(f,NewUpg,NT,name,line+1,true,false);
+		}else if(!strcmp(gg,"UPGRADES")){
+			GetUnitsAndUpgrades(f,NewUpg,NT,name,line+1,false,true);
+		}else if(!strcmp(gg,"UNITS&UPGRADES")){
+			GetUnitsAndUpgrades(f,NewUpg,NT,name,line+1,true,true);
+		}else{
+            sprintf_s(gy,sizeof(gy),"%s, Line %d :%s: UNITS or UPGRADES or UNITS&UPGRADES expected after DISBALED",name,line+1,Sect);
+			ErrM(gy);
+		};
+		NewUpg->ValGroup=NULL;
+		line+=2;
 	}else{
-        sprintf(gy,"%s, Line %d :%s: Unknown category of upgrade:%s",name,line+1,Sect,gz);
+        sprintf_s(gy,sizeof(gy),"%s, Line %d :%s: Unknown category of upgrade:%s",name,line+1,Sect,gz);
 		ErrM(gy);
 	};
 	*lpLine=line;

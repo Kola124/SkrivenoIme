@@ -80,7 +80,7 @@ int GameConstants::GetValue(char* Name){
 		if(!strcmp(names[i],Name))return Values[i];
 	};
 	char gx[128];
-	sprintf(gx,"Unknown external integer value ID: %s \n(It does not present in Const.lst)",Name);
+	sprintf_s(gx,sizeof(gx),"Unknown external integer value ID: %s \n(It does not present in Const.lst)",Name);
 	ErrM(gx);
 	return 0;
 };
@@ -98,7 +98,7 @@ char* GameConstants::GetString(char* Name){
 		if(!strcmp(Snames[i],Name))return Strings[i];
 	};
 	char gx[128];
-	sprintf(gx,"Unknown external string value ID: %s \n(It does not present in Const.lst)",Name);
+	sprintf_s(gx,sizeof(gx),"Unknown external string value ID: %s \n(It does not present in Const.lst)",Name);
 	ErrM(gx);
 	return NULL;
 };

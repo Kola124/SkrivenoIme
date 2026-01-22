@@ -156,9 +156,9 @@ void Graph::Draw(int x0,int y0,int Lx,int Ly){
 		};
 		Xbar(x0,y0-1,Lx,Ly+2,255);
 		char cc[32];
-		sprintf(cc,"%d",MaxV);
+		sprintf_s( cc,sizeof(cc),"%d",MaxV);
 		ShowString(x0+2,y0+2,cc,&SmallWhiteFont);
-		sprintf(cc,"%d",MinV);
+		sprintf_s( cc,sizeof(cc),"%d",MinV);
 		ShowString(x0+2,y0+Ly-12,cc,&SmallWhiteFont);
 		if(Header)
 			ShowString(x0+(Lx-GetRLCStrWidth(Header,&SmallWhiteFont))/2,y0+2,Header,&SmallWhiteFont);

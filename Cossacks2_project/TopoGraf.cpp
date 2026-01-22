@@ -1626,7 +1626,7 @@ void DrawForces(int xs,int ys,int x0,int y0,int Lx,int Ly){
 	int NA=GetNAreas();
 	for(int i=0;i<NA;i++){
 		char cc[10];
-		sprintf(cc,"%d",TopIslands[i]);
+		sprintf_s( cc,sizeof(cc),"%d",TopIslands[i]);
 		ShowString(GetTopMap(i)->x+xs-3,GetTopMap(i)->y+ys-3,cc,&fn10);
 		int w=NearWater[i];
 		if(w!=0xFFFF){
@@ -1646,7 +1646,7 @@ void DrawForces(int xs,int ys,int x0,int y0,int Lx,int Ly){
 	for(int i=0;i<WNAreas;i++){
 		if(TopAreasDanger[i]){
 			char cc[20];
-			sprintf(cc,"%d",TopAreasDanger[i]);
+			sprintf_s( cc,sizeof(cc),"%d",TopAreasDanger[i]);
 			ShowString(WTopMap[i].x+xs-4,WTopMap[i].y+ys-5,cc,&fn8);
 		};
 	};

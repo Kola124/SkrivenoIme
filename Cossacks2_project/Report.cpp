@@ -23,8 +23,8 @@ void sprintAttack(AdvCharacter* ADC,char* cc){
 	int Nn=0;
 	for(int i=0;i<4;i++)if(ADC->MaxDamage[i]){
 		Nn++;
-		if(Nn!=Na)sprintf(cc,"%s:%d (радиус действия %d-%d), ",WPK[ADC->WeaponKind[i]],ADC->MaxDamage[i],ADC->AttackRadius1[i],ADC->AttackRadius2[i]);
-		else sprintf(cc,"%s:%d (радиус действия %d-%d)",WPK[ADC->WeaponKind[i]],ADC->MaxDamage[i],ADC->AttackRadius1[i],ADC->AttackRadius2[i]);
+		if(Nn!=Na)sprintf_s( cc,sizeof(cc),"%s:%d (радиус действия %d-%d), ",WPK[ADC->WeaponKind[i]],ADC->MaxDamage[i],ADC->AttackRadius1[i],ADC->AttackRadius2[i]);
+		else sprintf_s( cc,sizeof(cc),"%s:%d (радиус действия %d-%d)",WPK[ADC->WeaponKind[i]],ADC->MaxDamage[i],ADC->AttackRadius1[i],ADC->AttackRadius2[i]);
 		cc+=strlen(cc);
 	};
 };
@@ -35,8 +35,8 @@ void sprintAttackInComparison(AdvCharacter* ADC,AdvCharacter* MODIF,char* cc){
 	int Nn=0;
 	for(int i=0;i<4;i++)if(ADC->MaxDamage[i]!=MODIF->MaxDamage[i]){
 		Nn++;
-		if(Nn!=Na)sprintf(cc,"%s:%d, ",WPK[MODIF->WeaponKind[i]],MODIF->MaxDamage[i]);
-		else sprintf(cc,"%s:%d",WPK[MODIF->WeaponKind[i]],MODIF->MaxDamage[i]);
+		if(Nn!=Na)sprintf_s( cc,sizeof(cc),"%s:%d, ",WPK[MODIF->WeaponKind[i]],MODIF->MaxDamage[i]);
+		else sprintf_s( cc,sizeof(cc),"%s:%d",WPK[MODIF->WeaponKind[i]],MODIF->MaxDamage[i]);
 		cc+=strlen(cc);
 	};
 };
@@ -44,13 +44,13 @@ void sprintShield(AdvCharacter* ADC,char* cc){
 	int Ns=0;
 	for(int i=0;i<7;i++)if(ADC->Protection[i])Ns++;
 	int Nn=0;
-	if(Ns)sprintf(cc,"Общая защита:%d, защита ",ADC->Shield);
-	else sprintf(cc,"Общая защита:%d",ADC->Shield);
+	if(Ns)sprintf_s( cc,sizeof(cc),"Общая защита:%d, защита ",ADC->Shield);
+	else sprintf_s( cc,sizeof(cc),"Общая защита:%d",ADC->Shield);
 	cc+=strlen(cc);
 	for(int i=0;i<7;i++)if(ADC->Protection[i]){
 		Nn++;
-		if(Nn!=Ns)sprintf(cc,"от %s:%d, ",SHK[i],ADC->Protection[i]);
-		else sprintf(cc,"от %s:%d",SHK[i],ADC->Protection[i]);
+		if(Nn!=Ns)sprintf_s( cc,sizeof(cc),"от %s:%d, ",SHK[i],ADC->Protection[i]);
+		else sprintf_s( cc,sizeof(cc),"от %s:%d",SHK[i],ADC->Protection[i]);
 		cc+=strlen(cc);
 	};
 };
@@ -60,16 +60,16 @@ void sprintShieldInComp(AdvCharacter* ADC,AdvCharacter* MODIF,char* cc){
 	for(int i=0;i<7;i++)if(ADC->Protection[i]!=MODIF->Protection[i])Ns++;
 	int Nn=0;
 	if(ADC->Shield!=MODIF->Shield){
-		if(Ns)sprintf(cc,"Общая защита:%d\т Защита ",MODIF->Shield);
-		else sprintf(cc,"Общая защита:%d",MODIF->Shield);
+		if(Ns)sprintf_s( cc,sizeof(cc),"Общая защита:%d\т Защита ",MODIF->Shield);
+		else sprintf_s( cc,sizeof(cc),"Общая защита:%d",MODIF->Shield);
 	}else{
-		if(Ns)sprintf(cc,"Защита ");
+		if(Ns)sprintf_s( cc,sizeof(cc),"Защита ");
 	};
 	cc+=strlen(cc);
 	for(int i=0;i<7;i++)if(ADC->Protection[i]!=MODIF->Protection[i]){
 		Nn++;
-		if(Nn!=Ns)sprintf(cc,"от %s:%d, ",SHK[i],MODIF->Protection[i]);
-		else sprintf(cc,"от %s:%d",SHK[i],MODIF->Protection[i]);
+		if(Nn!=Ns)sprintf_s( cc,sizeof(cc),"от %s:%d, ",SHK[i],MODIF->Protection[i]);
+		else sprintf_s( cc,sizeof(cc),"от %s:%d",SHK[i],MODIF->Protection[i]);
 		cc+=strlen(cc);
 	};
 };
@@ -186,8 +186,8 @@ void sprintBriefAttack(AdvCharacter* ADC,char* cc){
 	int Nn=0;
 	for(int i=0;i<4;i++)if(ADC->MaxDamage[i]){
 		Nn++;
-		if(Nn!=Na)sprintf(cc,"%s:%d;",WKN[ADC->WeaponKind[i]],ADC->MaxDamage[i]);
-		else sprintf(cc,"%s:%d",WKN[ADC->WeaponKind[i]],ADC->MaxDamage[i]);
+		if(Nn!=Na)sprintf_s( cc,sizeof(cc),"%s:%d;",WKN[ADC->WeaponKind[i]],ADC->MaxDamage[i]);
+		else sprintf_s( cc,sizeof(cc),"%s:%d",WKN[ADC->WeaponKind[i]],ADC->MaxDamage[i]);
 		cc+=strlen(cc);
 	};
 	if(!Na){
@@ -202,8 +202,8 @@ void sprintBriefAttackInComparison(AdvCharacter* ADC,AdvCharacter* MODIF,char* c
 	int Nn=0;
 	for(int i=0;i<4;i++)if(ADC->MaxDamage[i]!=MODIF->MaxDamage[i]){
 		Nn++;
-		if(Nn!=Na)sprintf(cc,"%s:%d,",WKN[MODIF->WeaponKind[i]],MODIF->MaxDamage[i]);
-		else sprintf(cc,"%s:%d",WKN[MODIF->WeaponKind[i]],MODIF->MaxDamage[i]);
+		if(Nn!=Na)sprintf_s( cc,sizeof(cc),"%s:%d,",WKN[MODIF->WeaponKind[i]],MODIF->MaxDamage[i]);
+		else sprintf_s( cc,sizeof(cc),"%s:%d",WKN[MODIF->WeaponKind[i]],MODIF->MaxDamage[i]);
 		cc+=strlen(cc);
 	};
 };
@@ -211,20 +211,20 @@ void sprintBriefShield(AdvCharacter* ADC,char* cc){
 	int Ns=0;
 	for(int i=0;i<7;i++)if(ADC->Protection[i])Ns++;
 	int Nn=0;
-	if(Ns)sprintf(cc,"%d;",ADC->Shield);
-	else sprintf(cc,"%d",ADC->Shield);
+	if(Ns)sprintf_s( cc,sizeof(cc),"%d;",ADC->Shield);
+	else sprintf_s( cc,sizeof(cc),"%d",ADC->Shield);
 	cc+=strlen(cc);
 	for(int i=0;i<7;i++)if(ADC->Protection[i]){
 		Nn++;
-		if(Nn!=Ns)sprintf(cc,"%s:%d;",WKN[i],ADC->Protection[i]);
-		else sprintf(cc,"%s:%d",WKN[i],ADC->Protection[i]);
+		if(Nn!=Ns)sprintf_s( cc,sizeof(cc),"%s:%d;",WKN[i],ADC->Protection[i]);
+		else sprintf_s( cc,sizeof(cc),"%s:%d",WKN[i],ADC->Protection[i]);
 		cc+=strlen(cc);
 	};
 };
 void sprintBriefShieldInComp(AdvCharacter* ADC,AdvCharacter* MODIF,char* cc){
 	cc[0]=0;
 	if(ADC->Shield+ADC->Protection[0]!=MODIF->Shield+MODIF->Protection[0]){
-		sprintf(cc,"%d",MODIF->Shield+MODIF->Protection[0]);
+		sprintf_s( cc,sizeof(cc),"%d",MODIF->Shield+MODIF->Protection[0]);
 	};
 	cc+=strlen(cc);
 };
@@ -338,7 +338,7 @@ void MakeGlobalReport(){
 	char ccc[100];
 	for(int i=0;i<NNations;i++){
 		char ccc[100];
-		sprintf(ccc,"Units_%s.txt",NatNames[i]);
+		sprintf_s(ccc,sizeof(ccc),"Units_%s.txt",NatNames[i]);
 		GFILE* f=Gopen(ccc,"w");
 
 		int N=NATIONS->NUnits[i];

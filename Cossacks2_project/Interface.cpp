@@ -1557,7 +1557,7 @@ void Draw_RLIST(int x, int y, int Lx, int Ly, int Idx, byte Active, int param) {
 
             if (png != 9999) {
 
-                sprintf(cc, "%d", png);
+                sprintf_s( cc,sizeof(cc), "%d", png);
 
                 ShowString(486 - GetRLCStrWidth(cc, FONT) / 2, y + 3, cc, FONT);
 
@@ -1575,7 +1575,7 @@ void Draw_RLIST(int x, int y, int Lx, int Ly, int Idx, byte Active, int param) {
 
             int np = ServerGetIntValue(GG, "numplayers", 0);
 
-            sprintf(cc, "%d/%d", np, max);
+            sprintf_s( cc,sizeof(cc), "%d/%d", np, max);
 
             ShowString(422 - GetRLCStrWidth(cc, FONT) / 2, y + 3, cc, FONT);
 
@@ -1661,7 +1661,7 @@ void Draw_RLIST(int x, int y, int Lx, int Ly, int Idx, byte Active, int param) {
 
                 char cc[32];
 
-                sprintf(cc, "%d", RIG->NPlayers);
+                sprintf_s( cc,sizeof(cc), "%d", RIG->NPlayers);
 
                 ShowString(422 - GetRLCStrWidth(cc, FONT) / 2, y + 3, cc, FONT);
 
@@ -1780,7 +1780,7 @@ void EnterPersonalMessage(char* Nick){
 
                 char ccc[128];
 
-                sprintf(ccc, "%s-->%s", TPEN.MyNick, nick);
+                sprintf_s(ccc,sizeof(ccc), "%s-->%s", TPEN.MyNick, nick);
 
                 TPEN.GlobalChat.Add(ccc, MESSAGE);
 
@@ -2178,7 +2178,7 @@ void DRAW_TOP100(int x, int y, int Lx, int Ly, int Index, byte Active, int param
 
             if (T100.CLIENT[Index].Score) {
 
-                sprintf(ccc, "%d", T100.CLIENT[Index].Score - 1);
+                sprintf_s(ccc,sizeof(ccc), "%d", T100.CLIENT[Index].Score - 1);
 
             }
             else {
@@ -2189,7 +2189,7 @@ void DRAW_TOP100(int x, int y, int Lx, int Ly, int Index, byte Active, int param
 
             ShowString(x + 698 - GetRLCStrWidth(ccc, FNT) / 2, y + fdy, ccc, FNT);
 
-            sprintf(ccc, "%d", Index + 1);
+            sprintf_s(ccc,sizeof(ccc), "%d", Index + 1);
 
             ShowString(x + 15 - GetRLCStrWidth(ccc, FNT) / 2, y + fdy, ccc, FNT);
 
@@ -2233,7 +2233,7 @@ void DRAW_TOP100(int x, int y, int Lx, int Ly, int Index, byte Active, int param
 
             FileTimeToSystemTime(&FT_CURTIME, &CURTIME);
 
-            sprintf(ccc, "%d", CURTIME.wYear - 1601);
+            sprintf_s(ccc,sizeof(ccc), "%d", CURTIME.wYear - 1601);
 
             ShowString(x + 378 - GetRLCStrWidth(ccc, FNT) / 2, y + fdy, ccc, FNT);
 
@@ -2247,17 +2247,17 @@ void DRAW_TOP100(int x, int y, int Lx, int Ly, int Index, byte Active, int param
 
 
 
-            sprintf(ccc, "%d", NT + NI);
+            sprintf_s(ccc,sizeof(ccc), "%d", NT + NI);
 
             ShowString(x + 459 - GetRLCStrWidth(ccc, FNT) / 2, y + fdy, ccc, FNT);
 
-            sprintf(ccc, "%d", NV);
+            sprintf_s(ccc,sizeof(ccc), "%d", NV);
 
             ShowString(x + 539 - GetRLCStrWidth(ccc, FNT) / 2, y + fdy, ccc, FNT);
 
-            if (NT)sprintf(ccc, "%d(%d%%)", NI, NI * 100 / (NT + NI));
+            if (NT)sprintf_s(ccc,sizeof(ccc), "%d(%d%%)", NI, NI * 100 / (NT + NI));
 
-            else sprintf(ccc, "%d", NI);
+            else sprintf_s(ccc,sizeof(ccc), "%d", NI);
 
             ShowString(x + 618 - GetRLCStrWidth(ccc, FNT) / 2, y + fdy, ccc, FNT);
 
@@ -2298,7 +2298,7 @@ int DrawGraph(Canvas* CAN,int y0,int Npt,GR_ARR Data,byte* Col,int N,word* Max,c
 		};
 	};
 	char cc[32];
-	sprintf(cc,"%d",MaxV);
+	sprintf_s( cc,sizeof(cc),"%d",MaxV);
 	CAN->AddText(10,y0+2,cc,&SmallWhiteFont);
 	return L2+L1;
 };
@@ -2998,7 +2998,7 @@ int ProcessInternetConnection(bool Active){
 
     char cc[32];
 
-    sprintf(cc, "%s", LobbyVersion);
+    sprintf_s( cc,sizeof(cc), "%s", LobbyVersion);
 
     VERSION->AddLine(ALLTX);
 
@@ -3362,7 +3362,7 @@ int ProcessInternetConnection(bool Active){
 
                     PILB->AddText(16, y0 + tdy, GetTextByID("PIF_ST1"), &YellowFont);
 
-                    sprintf(ccc, "%d.%d.%d", GPI.birthday, GPI.birthmonth, GPI.birthyear);
+                    sprintf_s(ccc,sizeof(ccc), "%d.%d.%d", GPI.birthday, GPI.birthmonth, GPI.birthyear);
 
                     PILB->AddText(msx1 + 16, y0 + tdy, ccc, &YellowFont);
 
@@ -3422,7 +3422,7 @@ int ProcessInternetConnection(bool Active){
 
                         PILB->AddText(16, y0 + tdy, GetTextByID("ICQ#"), &YellowFont);
 
-                        sprintf(ccc, "%d", GPI.icquin);
+                        sprintf_s(ccc,sizeof(ccc), "%d", GPI.icquin);
 
                         PILB->AddText(msx1 + 16, y0 + tdy, ccc, &YellowFont);
 
@@ -3568,7 +3568,7 @@ int ProcessInternetConnection(bool Active){
 
                     sprintf(cc2, "RS_RANK_%d", GetRankByScore(CURSCORE));
 
-                    sprintf(ccc, GetTextByID("SCORANK"), CURSCORE, GetTextByID(cc2));
+                    sprintf_s(ccc,sizeof(ccc), GetTextByID("SCORANK"), CURSCORE, GetTextByID(cc2));
 
                     PILB->AddText(0, PILB->BottomY, ccc, &YellowFont);
 
@@ -3576,7 +3576,7 @@ int ProcessInternetConnection(bool Active){
 
                     if (NREC) {
 
-                        sprintf(ccc, GetTextByID("TX_INCOMP"), NINCOMP, NREC + NINCOMP, (NINCOMP * 100) / (NREC + NINCOMP));
+                        sprintf_s(ccc,sizeof(ccc), GetTextByID("TX_INCOMP"), NINCOMP, NREC + NINCOMP, (NINCOMP * 100) / (NREC + NINCOMP));
 
                         PILB->AddText(0, PILB->BottomY, ccc, &YellowFont);
 
@@ -3677,11 +3677,11 @@ int ProcessInternetConnection(bool Active){
 
                                 PILB->AddLine(xx3, Y0, xx3, Y0 + 26, COL);
 
-                                sprintf(ccc, "%d.%d.%d %d:%d%d", Day, Month, Year, Hour, Min / 10, Min % 10);
+                                sprintf_s(ccc,sizeof(ccc), "%d.%d.%d %d:%d%d", Day, Month, Year, Hour, Min / 10, Min % 10);
 
                                 PILB->AddCText((xx3 + XB0) >> 1, Y0 + TextDy, ccc, FNT);
 
-                                sprintf(ccc, "%s (%d min)", GameName, PTime);
+                                sprintf_s(ccc,sizeof(ccc), "%s (%d min)", GameName, PTime);
 
                                 PILB->AddText(xx3 + 16, Y0 + TextDy, ccc, FNT);
 
@@ -3689,7 +3689,7 @@ int ProcessInternetConnection(bool Active){
 
                             
 
-                                //sprintf(ccc,"Map: %s",MapName);
+                                //sprintf_s(ccc,sizeof(ccc),"Map: %s",MapName);
 
                                 //PILB->AddRect(XB0,Y0,393,27,COL);
 
@@ -3765,9 +3765,9 @@ int ProcessInternetConnection(bool Active){
 
                                     byte NationID = data[pos + 8];
 
-                                    //sprintf(ccc,"%s (%.2f), ",MapName,float(Score)/100);
+                                    //sprintf_s(ccc,sizeof(ccc),"%s (%.2f), ",MapName,float(Score)/100);
 
-                                    sprintf(ccc, "%d", TeamID);
+                                    sprintf_s(ccc,sizeof(ccc), "%d", TeamID);
 
                                     int xc = (XB1 + XB2) >> 1;
 
@@ -3777,7 +3777,7 @@ int ProcessInternetConnection(bool Active){
 
                                     PILB->AddText(XB2 + 5, Y0 + TextDy, MapName, FNT);
 
-                                    sprintf(ccc, "%.2f", float(Score) / 100);
+                                    sprintf_s(ccc,sizeof(ccc), "%.2f", float(Score) / 100);
 
                                     PILB->AddCText((XB3 + XB4) >> 1, Y0 + TextDy, ccc, FNT);
 
@@ -3849,7 +3849,7 @@ int ProcessInternetConnection(bool Active){
 
                                 Y0 += DrawGraph(PILB, Y0, 32, Popul, ColorN, Npl, MaxPopul, GetTextByID("HDR_POPUL:"));
 
-                                sprintf(ccc, GetTextByID("HDR_DSCORE"), CSCOR, dscor);
+                                sprintf_s(ccc,sizeof(ccc), GetTextByID("HDR_DSCORE"), CSCOR, dscor);
 
                                 PILB->AddText(0, Y0, ccc, FNT);
 
@@ -4926,7 +4926,7 @@ extern int sfVersion;
 #ifdef MAKE_PTC
 void InstallName(ListBox* LB,WIN32_FIND_DATA* FD,char* StartDir){
 	char CCC[256];
-	sprintf(CCC,"%s%s",StartDir,FD->cFileName);
+	sprintf_s(CCC,sizeof(CCC),"%s%s",StartDir,FD->cFileName);
 	ResFile ff1=RReset(CCC);
 	if(ff1!=INVALID_HANDLE_VALUE){
 		int sig,lap;
@@ -8637,7 +8637,7 @@ void RandomMapDialog(char* Result){
 	ComboBox* CBPLAY=DSY.addComboBox(NULL,x,y,144,25,20,0,255,&FONT2,&FONT3,NULL);
 	for(int p=0;p<RMP.STY[CurSty].NPl;p++){
 		char ccc[16];
-		sprintf(ccc," %d",RMP.STY[CurSty].Players[p].NPlayers);
+		sprintf_s(ccc,sizeof(ccc)," %d",RMP.STY[CurSty].Players[p].NPlayers);
 		CBPLAY->AddLine(ccc);
 	};
 	y+=40;
@@ -8655,7 +8655,7 @@ void RandomMapDialog(char* Result){
 	y+=40;
 	DSY.addTextButton(NULL,x0,y,"Code:",&FONT2,&FONT2,&FONT2,0);
 	char ccc[128];
-	sprintf(ccc,"%d",GetRealTime()&32767);
+	sprintf_s(ccc,sizeof(ccc),"%d",GetRealTime()&32767);
 	InputBox* IB=DSY.addInputBox(NULL,x,y,ccc,20,144,28,&FONT2,&FONT2);
 	y+=40;
 	TextButton* OkBtn=DSY.addTextButton(NULL,10+164/2,315,"OK",&FONT2,&FONT3,&FONT3,1);
@@ -8681,7 +8681,7 @@ void RandomMapDialog(char* Result){
 			CBPLAY->Clear();
 			for(int p=0;p<RMP.STY[CurSty].NPl;p++){
 				char ccc[16];	
-				sprintf(ccc," %d",RMP.STY[CurSty].Players[p].NPlayers);
+				sprintf_s(ccc,sizeof(ccc)," %d",RMP.STY[CurSty].Players[p].NPlayers);
 				CBPLAY->AddLine(ccc);
 			};
 		};
@@ -8794,7 +8794,7 @@ AddMissionsPack::AddMissionsPack(){
 	if(H!=INVALID_HANDLE_VALUE){
 		do{
 			char ccc[128];
-			sprintf(ccc,"UserMissions\\%s",SR.cFileName);
+			sprintf_s(ccc,sizeof(ccc),"UserMissions\\%s",SR.cFileName);
 			GFILE* F=Gopen(ccc,"r");
 			if(F){
 				Pack=(OneAddMission*)realloc(Pack,sizeof(OneAddMission)*(NMiss+1));
@@ -9186,7 +9186,7 @@ int ShowStatScreen(bool Next,bool Prev,byte Kind){
 					//Xbar(gx0+5,gy0+5,gx1-gx0-9,gy1-gy0-9,0xAE);
 					//Xbar(gx0+6,gy0+6,gx1-gx0-11,gy1-gy0-11,0xAE);
 					if(ix==0){
-						sprintf(ccc,"%d",(NGridY-iy-1)*deal);
+						sprintf_s(ccc,sizeof(ccc),"%d",(NGridY-iy-1)*deal);
 						ShowString(gx0+3,gy1-14,ccc,&SmallBlackFont);
 					};
 				};
@@ -10255,7 +10255,7 @@ void ReadClanData(){
 	if(H!=INVALID_HANDLE_VALUE){
 		do{
 			char ccc[128];
-			sprintf(ccc,"Clans\\%s",FD.cFileName);
+			sprintf_s(ccc,sizeof(ccc),"Clans\\%s",FD.cFileName);
 			FILE* F=fopen(ccc,"r");
 			if(F){
 				char cc1[128];
@@ -10264,24 +10264,24 @@ void ReadClanData(){
 				int z=fscanf(F,"%s%s%s",cc1,cc2,cc3);
 				if(z==3){
 					SQPicture P1;
-					sprintf(ccc,"Clans\\%s",cc1);
+					sprintf_s(ccc,sizeof(ccc),"Clans\\%s",cc1);
 					P1.LoadPicture(ccc);
 					if(P1.GetLx()<256&&P1.GetLy()==20){
-						sprintf(ccc,"Clans\\%s",cc2);
+						sprintf_s(ccc,sizeof(ccc),"Clans\\%s",cc2);
 						P1.LoadPicture(ccc);
 						if(P1.GetLx()<256&&P1.GetLy()==20){
-							sprintf(ccc,"Clans\\%s",cc3);
+							sprintf_s(ccc,sizeof(ccc),"Clans\\%s",cc3);
 							P1.LoadPicture(ccc);
 							if(P1.GetLx()<256&&P1.GetLy()==20){
 								CLINFO=(ClanInfo*)realloc(CLINFO,(NClans+1)*sizeof ClanInfo);
 								memset(CLINFO+NClans,0,sizeof ClanInfo);
-								sprintf(ccc,"Clans\\%s",cc1);
+								sprintf_s(ccc,sizeof(ccc),"Clans\\%s",cc1);
 								CLINFO[NClans].Over.LoadPicture(ccc);
 								CLINFO[NClans].Over.Xlat(pset);
-								sprintf(ccc,"Clans\\%s",cc2);
+								sprintf_s(ccc,sizeof(ccc),"Clans\\%s",cc2);
 								CLINFO[NClans].Active.LoadPicture(ccc);
 								CLINFO[NClans].Active.Xlat(pset);
-								sprintf(ccc,"Clans\\%s",cc3);
+								sprintf_s(ccc,sizeof(ccc),"Clans\\%s",cc3);
 								CLINFO[NClans].Passive.LoadPicture(ccc);
 								CLINFO[NClans].Passive.Xlat(pset);
 								strcpy(ccc,FD.cFileName);

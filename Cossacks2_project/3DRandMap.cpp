@@ -46,7 +46,6 @@ void InitHillAmp1();
 extern short randoma[8192];
 extern int ntex;
 
-
 int mrpos=0;
 word XXP=0;
 int mrand(){
@@ -331,7 +330,7 @@ void GenMap::CreateNet(){
 void ErrM(char* s);
 void InvHill(char* Name){
 	char ccc[128];
-	sprintf(ccc,"Invalid file: %s",Name);
+	sprintf_s(ccc,sizeof(ccc),"Invalid file: %s",Name);
 	ErrM(ccc);
 };
 bool LoadTerrain(char* Name){
@@ -394,7 +393,7 @@ void LoadRandomHills(){
 	int NAttm=100;
 	do{
 		char ccc[64];
-		sprintf(ccc,"Terrain\\Hills%d.dat",mrand()&7);
+		sprintf_s(ccc,sizeof(ccc),"Terrain\\Hills%d.dat",mrand()&7);
 		if(LoadTerrain(ccc))return;
 		NAttm--;
 	}while(NAttm);
@@ -1315,7 +1314,7 @@ void GenerateRelief(int Style){
 	MaxHillHeight=H+20;
 	for(int p=0;p<N;p++){
 		char cc[128];
-		sprintf(cc,"Generating hill %d",p+1);
+		sprintf_s( cc,sizeof(cc),"Generating hill %d",p+1);
 		SetNextInfStage(cc);
 		GenerateHill(Thick);
 		ShowProcessInfo();
@@ -2636,7 +2635,7 @@ void RM_Save(char* Name,int x0,int y0,int x1,int y1){
 		RBlockWrite(F,&i,4);
 		RClose(F);
 		char ccc[64];
-		sprintf(ccc,"%s.lnk",Name);
+		sprintf_s(ccc,sizeof(ccc),"%s.lnk",Name);
 		F=RRewrite(ccc);
 		if(F!=INVALID_HANDLE_VALUE){
 			SaveSMSInPieces(F,kx<<5,ky<<5,x0,y0,x1,y1);
@@ -2934,7 +2933,7 @@ void ProcessRM_Load(int x,int y){
 	if(EnterStr(RN_FName,"Load sample")){
 		DelExt();
 		char cc[128];
-		sprintf(cc,"UserPieces\\%s.smp",RN_FName);
+		sprintf_s( cc,sizeof(cc),"UserPieces\\%s.smp",RN_FName);
 		RM_PreLoadOpen();
 		TexPieceMode=true;
 		//RM_Load(cc,x,y);
@@ -2951,7 +2950,7 @@ void ProcessRM_LoadEx(int x,int y,char* Name){
     strcpy(RN_FName,Name);
 	DelExt();
 	char cc[128];
-	sprintf(cc,"UserPieces\\%s.smp",RN_FName);
+	sprintf_s( cc,sizeof(cc),"UserPieces\\%s.smp",RN_FName);
 	RM_PreLoadOpen();
 	TexPieceMode=true;
 	ImmVis=false;
@@ -2960,7 +2959,7 @@ void ProcessRM_Save(int x0,int y0,int x1,int y1){
 	if(EnterStr(RN_FName,"Save sample")){
 		DelExt();
 		char cc[128];
-		sprintf(cc,"UserPieces\\%s.smp",RN_FName);
+		sprintf_s( cc,sizeof(cc),"UserPieces\\%s.smp",RN_FName);
 		RM_Save(cc,x0,y0,x1,y1);
 	};
 
@@ -2976,7 +2975,7 @@ void ProcessTexPiece(int x,int y,bool press){
 	if(TexPieceMode){
 		DelExt();
 		char cc[128];
-		sprintf(cc,"UserPieces\\%s.smp",RN_FName);
+		sprintf_s( cc,sizeof(cc),"UserPieces\\%s.smp",RN_FName);
 		if(press){
 			RM_PreLoadClose();
 			ImmVis=true;
@@ -3264,7 +3263,7 @@ bool CheckInArea(int x0,int y0,int x1,int y1){
 };
 void SaveInSquares(int x0,int y0,int Lx,int Ly,int Nx,int Ny,char* Name){
 	char cc[120];
-	sprintf(cc,"Pieces\\%s.lst",Name);
+	sprintf_s( cc,sizeof(cc),"Pieces\\%s.lst",Name);
 	FILE* f=fopen(cc,"w");
 	for(int iy=0;iy<Ny;iy++){
 		for(int ix=0;ix<Nx;ix++){
@@ -3276,7 +3275,7 @@ void SaveInSquares(int x0,int y0,int Lx,int Ly,int Nx,int Ny,char* Name){
 				if(N<10)sprintf(tri,"00%d",N);
 				else if(N<100)sprintf(tri,"0%d",N);
 				else sprintf(tri,"%d",N);
-				sprintf(cc,"Pieces\\%s%s.smp",Name,tri);
+				sprintf_s( cc,sizeof(cc),"Pieces\\%s%s.smp",Name,tri);
 				fprintf(f,"%s\n",cc);
 				RM_Save(cc,xx0+4,yy0+4,xx0+Lx-4,yy0+Ly-4);
 			};
@@ -3724,7 +3723,7 @@ void ShowProcessInfo(){
 	L1=GetRLCStrWidth(CurMessage,&BlackFont)>>1;
 	ShowString(x0-L1,y0-64+56,CurMessage,&BlackFont);
 	char ccc[128];
-	sprintf(ccc,"Stage:%.1fs Total:%.1fs",t2,t1);
+	sprintf_s(ccc,sizeof(ccc),"Stage:%.1fs Total:%.1fs",t2,t1);
 	L1=GetRLCStrWidth(ccc,&BlackFont)>>1;
 	ShowString(x0-L1,y0-64+48+35,ccc,&BlackFont);
 
@@ -3753,7 +3752,7 @@ void ShowProgressBar(char* Message,int N,int NMax){
 	int L1=GetRLCStrWidth(Message,&BigRedFont)>>1;
 	ShowString(x0-L1,y0-64+20,Message,&BigRedFont);
 	char cc[32];
-	sprintf(cc,"%d%%",N*100/NMax);
+	sprintf_s( cc,sizeof(cc),"%d%%",N*100/NMax);
 	L1=GetRLCStrWidth(cc,&BigWhiteFont)>>1;
 	ShowString(x0-L1,y0-64+48+10,cc,&BigYellowFont);
 };
@@ -4617,7 +4616,7 @@ RandomMapDesc::~RandomMapDesc(){
 };
 void ERRMP(char* name,char* Sect){
 	char cc[128];
-	sprintf(cc,"File %s is corrupted in section %s",name,Sect);
+	sprintf_s( cc,sizeof(cc),"File %s is corrupted in section %s",name,Sect);
 	ErrM(cc);
 };
 void normstr(char* str);
@@ -4973,7 +4972,7 @@ void GenerateMapForMission(char* Relief,char* Ground,char* Mount,char* Soft,int 
 		if(!(GetKeyState(VK_CONTROL)&0x8000))SetFractalTexture();
 		SetNextInfStage("Creating cost");
 		char ccc[128];
-		sprintf(ccc,"Terrain\\cost%d.dat",style);
+		sprintf_s(ccc,sizeof(ccc),"Terrain\\cost%d.dat",style);
 		GFILE* f=Gopen(ccc,"r");
 		if(f){
 			int z=Gscanf(f,"%d%d",&NTLines,&Divisor);
@@ -5097,7 +5096,7 @@ void GenerateMapForMission(char* Relief,char* Ground,char* Mount,char* Soft,int 
 		SetNextInfStage("Texturing");
 		MFIELDS[0].ClearMaps();
 		CreateLandLocking(120,false);
-		sprintf(ccc,"Terrain\\Hills%d.dat",style);
+		sprintf_s(ccc,sizeof(ccc),"Terrain\\Hills%d.dat",style);
 		LoadTerrain(ccc);
 		PaintAllMap(GMAP.VertHi,GMAP.VertType,PHILL,1);
 		int LesX[4096];
@@ -5118,7 +5117,7 @@ void GenerateMapForMission(char* Relief,char* Ground,char* Mount,char* Soft,int 
 			};
 			pos=(pos+33)&65535;
 		};
-		sprintf(ccc,"Pieces\\FOREST%d.LST",style);
+		sprintf_s(ccc,sizeof(ccc),"Pieces\\FOREST%d.LST",style);
 		GenerateInPoints(ccc,LesX,LesY,NLes,200);
 		SetNextInfStage("Generating background");
 		//GenerateByStyle("Pieces\\Empty.sty",0);
@@ -6138,7 +6137,7 @@ void DRAW_MAP_TMP(){
 		if(M[i+j*Lx]){
 			CBar(i*2,40+j*2,2,2,0xD4);//+(M[i+j*Lx]<<2));
 			//char cc[32];
-			//sprintf(cc,"%d",M[i+j*Lx]);
+			//sprintf_s( cc,sizeof(cc),"%d",M[i+j*Lx]);
 			//ShowString(i*15,40+j*10-2,cc,&fn8);
 		};
 	*/

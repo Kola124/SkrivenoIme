@@ -463,7 +463,7 @@ bool MPL_WaitingBattleGame(bool Host,int BattleID){
 			if(MaxPingTime)MaxPingTime+=500;
 			char cc2[300];
 			CreateDiffStr(cc2);
-			sprintf(ccc,"max ping: %d  (%s)",png,cc2);
+			sprintf_s(ccc,sizeof(ccc),"max ping: %d  (%s)",png,cc2);
 			ShowString(10,768-24,ccc,&SmallYellowFont);
 		};
 		

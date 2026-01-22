@@ -714,7 +714,7 @@ void OneObject::Die(){
 	};
 	if(NewBuilding&&NNUM==MyNation&&delay<1500){
 		char ccc[200];
-		sprintf(ccc,LOSTBLD,Ref.General->Message);
+		sprintf_s(ccc,sizeof(ccc),LOSTBLD,Ref.General->Message);
 		AssignHint1(ccc,100,32);
 		LastActionX=RealX>>4;
 		LastActionY=RealY>>4;

@@ -245,12 +245,12 @@ void ScenErr(char* Mess){
 };
 void ScenErr(char* Mess,char* Par1){
 	char ccc[160];
-	sprintf(ccc,Mess,Par1);
+	sprintf_s(ccc,sizeof(ccc),Mess,Par1);
 	ScenErr(ccc);
 };
 void ScenErr(char* Mess,char* Par1,char* Par2){
 	char ccc[160];
-	sprintf(ccc,Mess,Par1,Par2);
+	sprintf_s(ccc,sizeof(ccc),Mess,Par1,Par2);
 	ScenErr(ccc);
 };
 int GetCPos(char C){
@@ -416,7 +416,7 @@ void IntErr(char* Mess){
 };
 void IntErr(char* Mess,char* s1){
 	char ccc[256];
-	sprintf(ccc,Mess,s1);
+	sprintf_s(ccc,sizeof(ccc),Mess,s1);
 	IntErr(ccc);
 };
 void TestUnitsGroup(int id){
@@ -4486,7 +4486,7 @@ bool AssignMineUpgrade(word U,char* Str,word val){
 			for(k=0;k<N&&strcmp(NUG[k]->Name,Str);k++);
 			if(k>=N){
 				char cc[128];
-				sprintf(cc,"AssignMineUpgrade : Invalid upgrade name:%s",Str);
+				sprintf_s( cc,sizeof(cc),"AssignMineUpgrade : Invalid upgrade name:%s",Str);
 				AIER(cc);
 				return false;
 			}else{
@@ -5121,7 +5121,7 @@ CampaginPack::CampaginPack(){
 						else op0=0;
 						for(int p=0;p<MISSLIST.NMiss;p++)if(!strcmp(MISSID,MISSLIST.MISS[p].ID))miss=p;
 						if(miss==-1){
-							sprintf(cc,"CAMPAGINS.TXT: Uncnown mission %s",MISSID);
+							sprintf_s( cc,sizeof(cc),"CAMPAGINS.TXT: Uncnown mission %s",MISSID);
 							ErrM(cc);
 						};
 						SCamp[i].OpenIndex[q]=op0+(op1<<8)+(op2<<16)+(op3<<24);
@@ -5161,14 +5161,14 @@ void LoadAIFromDLL(byte Nat,char* Name){
 		NT->ProcessAIinDLL=(VoidProc*)GetProcAddress(NT->hLibAI,"ProcessAI");
 		if(!NT->ProcessAIinDLL){
 			char cc[128];
-			sprintf(cc,"%s : Could not load <void ProcessAI()>",Name);
+			sprintf_s( cc,sizeof(cc),"%s : Could not load <void ProcessAI()>",Name);
 			MessageBox(NULL,cc,"AI loadind from DLL",MB_TOPMOST);
 			assert(0);
 		}else{
 			VoidProc* INITAI=(VoidProc*)GetProcAddress(NT->hLibAI,"InitAI");
 			if(!INITAI){
 				char cc[128];
-				sprintf(cc,"%s : Could not load <void InitAI()>",Name);
+				sprintf_s( cc,sizeof(cc),"%s : Could not load <void InitAI()>",Name);
 				MessageBox(NULL,cc,"AI loadind from DLL",MB_TOPMOST);
 				assert(0);
 			};
@@ -5180,7 +5180,7 @@ void LoadAIFromDLL(byte Nat,char* Name){
 	}else{
 #ifndef STARFORCE
 		char cc[128];
-		sprintf(cc,"Could not load %s",Name);
+		sprintf_s( cc,sizeof(cc),"Could not load %s",Name);
 		MessageBox(NULL,cc,"AI loadind from DLL",MB_TOPMOST);
 		assert(0);
 #endif
@@ -5196,7 +5196,7 @@ extern int GetNSBattle();
 extern char PlName[64];
 void SavePlayerData(char* Name){
 	char cc[200];
-	sprintf(cc,"Players\\%s.txt",Name);
+	sprintf_s( cc,sizeof(cc),"Players\\%s.txt",Name);
 	GFILE* F=Gopen(cc,"w");
 	if(F){
 		Gprintf(F,"%d ",CAMPAGINS.NCamp);
@@ -5229,7 +5229,7 @@ bool PLOAD=0;
 void LoadPDATA(char* Name){
 	PLOAD=0;
 	char cc[200];
-	sprintf(cc,"Players\\%s.txt",Name);
+	sprintf_s( cc,sizeof(cc),"Players\\%s.txt",Name);
 	GFILE* F=Gopen(cc,"r");
 	if(F){
 		int x1,x2;

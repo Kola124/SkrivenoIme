@@ -1698,7 +1698,7 @@ void SetupPointTexs(){
 	//---testing---//
 	for(int i=0;i<40;i++){
 		char cc[64];
-		sprintf(cc,"Ground\\tex%d.bmp",i);
+		sprintf_s( cc,sizeof(cc),"Ground\\tex%d.bmp",i);
 		TCOVER.LoadTexture(cc);
 	};
 	PENA_GP=GPS.PreLoadGPImage("pena");

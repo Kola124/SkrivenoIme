@@ -18,7 +18,7 @@ public:
 	void Replace(char* src,DString& dst);
 	void Replace(char* src,int value){
 		char cc[16];
-		sprintf(cc,"%d",value);
+		sprintf_s( cc,sizeof(cc),"%d",value);
 		Replace(src,cc);
 	};
 	void Replace(char* src,char* dst,...){

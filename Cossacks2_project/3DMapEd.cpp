@@ -42,6 +42,7 @@ extern int TM_Tan1;
 int Prop43(int y);
 word GetTexture();
 void SetTexture(int Vert,int nm);
+
 //returns planar y from(screen coordinates (x,y)
 extern int mul3(int);
 void AddLockBar(word x,word y){
@@ -2514,7 +2515,7 @@ void ShowLockBars(){
 char* GSU_file;
 void GSU_Error(char* Nation){
 	char ccc[100];
-	sprintf(ccc,"Invalid data for %s in %s",Nation,GSU_file);
+	sprintf_s(ccc,sizeof(ccc),"Invalid data for %s in %s",Nation,GSU_file);
 	MessageBox(hwnd,ccc,"ERROR!",0);
 };
 extern HWND hwnd;
@@ -2524,7 +2525,7 @@ bool GenerateStartUnits(char* NationID,byte NI,int x,int y,int GenIndex){
 	memset(ADDRES,0,8*4);
 	if(!GenIndex)return false;
 	char ccc[128];
-	sprintf(ccc,"Data\\Start%d.dat",GenIndex);
+	sprintf_s(ccc,sizeof(ccc),"Data\\Start%d.dat",GenIndex);
 	GSU_file=ccc;
 	GFILE* F=Gopen(ccc,"r");
 	bool READOK=1;

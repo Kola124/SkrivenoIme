@@ -268,7 +268,7 @@ void LoadFog(int set){
 #endif //_USE3D
 	CurPalette=set;
 	char cc[128];
-	sprintf(cc,"%d\\brig.grd",set);
+	sprintf_s( cc,sizeof(cc),"%d\\brig.grd",set);
 	ResFile fx=RReset(cc);//aged.grd");//grassd.grd");//darkb.grd");//004g.grd");
 	if(fx!=INVALID_HANDLE_VALUE){
 		RBlockRead(fx,&BrFog,8192);
@@ -277,7 +277,7 @@ void LoadFog(int set){
 			memcpy(InvBrFog+(((15-i)&31)<<8),BrFog+(i<<8),256);
 		};
 	};
-	sprintf(cc,"%d\\agew_1d.grd",set);
+	sprintf_s( cc,sizeof(cc),"%d\\agew_1d.grd",set);
 	fx=RReset(cc);//aged.grd");//grassd.grd");//darkb.grd");//004g.grd");
 	RBlockRead(fx,&fog[1024],8192);
 	memcpy(&fog[0],&fog[1024],256);
@@ -289,25 +289,25 @@ void LoadFog(int set){
 	RBlockRead(fx,&graysc,256);
 	RClose(fx);
 	//fx=RReset("003xw.grd");
-	sprintf(cc,"%d\\orange.grd",set);
+	sprintf_s( cc,sizeof(cc),"%d\\orange.grd",set);
 	fx=RReset(cc);//agew.grd");//grassw.grd");//darkw.grd");//003cm.grd");
 	RBlockRead(fx,&Optional1,8192);
 	DoTransparent(Optional1);
 	RClose(fx);
 	//optional tables
-	sprintf(cc,"%d\\opt2.grd",set);
+	sprintf_s( cc,sizeof(cc),"%d\\opt2.grd",set);
 	fx=RReset(cc);
 	if(fx!=INVALID_HANDLE_VALUE){
 		RBlockRead(fx,&Optional2,8192);
 		RClose(fx);
 	};
-	sprintf(cc,"%d\\opt3.grd",set);
+	sprintf_s( cc,sizeof(cc),"%d\\opt3.grd",set);
 	fx=RReset(cc);
 	if(fx!=INVALID_HANDLE_VALUE){
 		RBlockRead(fx,&Optional3,8192);
 		RClose(fx);
 	};
-	sprintf(cc,"%d\\opt4.grd",set);
+	sprintf_s( cc,sizeof(cc),"%d\\opt4.grd",set);
 	fx=RReset(cc);
 	if(fx!=INVALID_HANDLE_VALUE){
 		RBlockRead(fx,&Optional4,8192);
@@ -315,11 +315,11 @@ void LoadFog(int set){
 	};
 	//
 
-	sprintf(cc,"%d\\agew_1w.grd",set);
+	sprintf_s( cc,sizeof(cc),"%d\\agew_1w.grd",set);
 	fx=RReset(cc);//agew.grd");//grassw.grd");//darkw.grd");//003cm.grd");
 	RBlockRead(fx,&wfog,8192);
 	RClose(fx);
-	sprintf(cc,"%d\\agew_1br.grd",set);
+	sprintf_s( cc,sizeof(cc),"%d\\agew_1br.grd",set);
 	fx=RReset(cc);//agew.grd");//grassw.grd");//darkw.grd");//003cm.grd");
 	RBlockRead(fx,&Bright,8192);
 	DoTransparent(Bright);
@@ -327,20 +327,20 @@ void LoadFog(int set){
 	fx=RReset("ageb.grd");//grassw.grd");//darkw.grd");//003cm.grd");
 	RBlockRead(fx,&rfog,8192);
 	RClose(fx);
-	sprintf(cc,"%d\\agew_1r.grd",set);
+	sprintf_s( cc,sizeof(cc),"%d\\agew_1r.grd",set);
 	fx=RReset(cc);//agered.grd");
 	RBlockRead(fx,&yfog,8192);
 	DoTransparent(yfog);
 	RClose(fx);
-	//sprintf(cc,"%d\\agew_1dr.grd",set);
+	//sprintf_s( cc,sizeof(cc),"%d\\agew_1dr.grd",set);
 	fx=RReset("0\\agew_1dr.grd");//darkage.grd");//darkfog.grd");
 	RBlockRead(fx,&	darkfog,40960);
 	RClose(fx);
-	sprintf(cc,"%d\\agew_tr.grd",set);
+	sprintf_s( cc,sizeof(cc),"%d\\agew_tr.grd",set);
 	fx=RReset(cc);//agew.grd");//grassw.grd");//darkw.grd");//003cm.grd");
 	RBlockRead(fx,&trans8,65536);
 	RClose(fx);
-	sprintf(cc,"%d\\agew_tr4.grd",set);
+	sprintf_s( cc,sizeof(cc),"%d\\agew_tr4.grd",set);
 	fx=RReset(cc);//agew.grd");//grassw.grd");//darkw.grd");//003cm.grd");
 	RBlockRead(fx,&trans4,65536);
 	RClose(fx);

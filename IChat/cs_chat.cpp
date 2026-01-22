@@ -106,7 +106,7 @@ void PrivateMessage(CHAT chat, const char * user, const char * message, int type
 			if(!mute){
 				CC->Private.Add((char*)user,(char*)message);
 				char cc[128];
-				sprintf(cc,"%s%s:",user,GetTextByID("ONLYOU"));
+				sprintf_s( cc,sizeof(cc),"%s%s:",user,GetTextByID("ONLYOU"));
 				CC->Common[CC->CurChannel].Add(cc,(char*)message);
 				AddToGChat(cc,(char*)message);
 			};
