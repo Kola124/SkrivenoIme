@@ -118,7 +118,17 @@ bool HashedTexture::Create( DXDevice* pDevice, const TextureDescr* td )
 	}
 
 	HRESULT result = 
+#ifdef _DX9
 	pDevice->CreateTexture( descr.getSideX	(), 
+							descr.getSideY	(), 
+							descr.getNMips	(),
+							TexUsageG2DX	( descr.getTexUsage()	),			
+							ColorFormatG2DX	( descr.getColFmt()		), 
+							MemoryPoolG2DX	( descr.getMemPool()	), 
+							&iTexture, NULL
+							);
+#else
+        pDevice->CreateTexture( descr.getSideX	(), 
 							descr.getSideY	(), 
 							descr.getNMips	(),
 							TexUsageG2DX	( descr.getTexUsage()	),			
@@ -126,7 +136,7 @@ bool HashedTexture::Create( DXDevice* pDevice, const TextureDescr* td )
 							MemoryPoolG2DX	( descr.getMemPool()	), 
 							&iTexture 
 							);
-
+#endif
 	if (result == D3DERR_OUTOFVIDEOMEMORY)
 	{
 		Log.Error( "Not enough video memory when creating texture: %s(%dx%d), mp:%d", 

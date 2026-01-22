@@ -270,9 +270,14 @@ const char		Shader::errstr[] = "ERROR";
 double			Shader::perfCounterRes;					
 
 	
-
+#ifdef _DX9
+Shader::Shader() : pStateBlock(NULL), execTime(0.0), 
+                   nStates(0), baseShader(0), id(0), nameLen(0), 
+                   vshID(NULL), iEffect(NULL) 
+#else
 Shader::Shader() :	stateBlockID(NO_STATE_BLOCK), execTime(0.0), 
 					nStates(0), baseShader(0), id(0), nameLen(0) 
+#endif
 {
 	//  static table initialization
 	if (nStateDesc == 0) initStatesTable();
@@ -377,6 +382,15 @@ bool Shader::getMaterialField( const char* fieldName, void* dataPtr )
 	return true;
 } // Shader::getMaterialField
 
+#ifdef _DX9
+void Shader::InvalidateDeviceObjects( IDirect3DDevice9* pDevice )  // Changed type
+{
+    assert( pDevice );
+    SAFE_RELEASE( pStateBlock );  // Release the state block object
+    SAFE_RELEASE( vshID );        // Release vertex shader
+    SAFE_RELEASE( iEffect );
+}
+#else
 void Shader::InvalidateDeviceObjects( DXDevice* pDevice )
 {
 	assert( pDevice );
@@ -387,11 +401,20 @@ void Shader::InvalidateDeviceObjects( DXDevice* pDevice )
 	}
 	SAFE_RELEASE( iEffect );
 } // Shader::InvalidateDeviceObjects
+#endif
 
+#ifdef _DX9
+bool Shader::CreateFromCurrentDeviceState( IDirect3DDevice9* pDevice )  // Changed type
+{   
+    //  vertex shader ID
+    SAFE_RELEASE( vshID );  // Release old one first
+    DX_CHK( pDevice->GetVertexShader( &vshID ) );  // Now returns interface pointer
+#else
 bool Shader::CreateFromCurrentDeviceState( DXDevice* pDevice )
 {	
 	//  vertex shader ID
 	DX_CHK( pDevice->GetVertexShader( &vshID ) );
+#endif
 
 	getRenderState( pDevice, "ZEnable"					);
 	getRenderState( pDevice, "ZWriteEnable"				);
@@ -649,15 +672,27 @@ void Shader::Dump( FILE* fp, ShaderCache* cache )
 		state[i].dump( fp );
 	}
 } // Shader::Dump
-
+#ifdef _DX9
+bool Shader::Load( const char* rootDirectory, IDirect3DDevice9* pDevice )  // Changed type
+#else
 bool Shader::Load( const char* rootDirectory, DXDevice* pDevice )
+#endif
 {
 	char fname[_MAX_PATH];
+#ifdef _DX9
 	sprintf( fname, "%s\\shaders\\%s.sha", rootDirectory, name );
+#else
+    sprintf( fname, "%s\\shaders\\%s.fx", rootDirectory, name );
+#endif
 
 	SAFE_RELEASE( iEffect );
 	ID3DXBuffer* compileErr = NULL;
-	HRESULT hres = D3DXCreateEffectFromFile( pDevice, fname, &iEffect, &compileErr );
+#ifdef _DX9
+    DWORD dwShaderFlags = D3DXSHADER_NO_PRESHADER;
+	HRESULT hres = D3DXCreateEffectFromFile( pDevice, fname, NULL, NULL, dwShaderFlags, NULL, &iEffect, &compileErr );
+#else
+    HRESULT hres = D3DXCreateEffectFromFile( pDevice, fname, &iEffect, &compileErr );
+#endif
 	if (hres != S_OK) 
 	{
 		if (!compileErr)
@@ -673,7 +708,29 @@ bool Shader::Load( const char* rootDirectory, DXDevice* pDevice )
 		}
 		return false;
 	}
-	SAFE_RELEASE( compileErr );
+#ifdef _DX9
+	SAFE_RELEASE( pStateBlock );  // Release old state block
+    
+    // Validate technique in DX9
+    D3DXHANDLE hTechnique = iEffect->GetTechniqueByName("T0");
+    if (hTechnique == NULL || 
+        iEffect->ValidateTechnique(hTechnique) != D3D_OK)
+    {
+        Log.Warning( "Shader <%s> is invalid for current device", name );
+    }
+
+    // Begin/End rendering in DX9
+    UINT numPasses;
+    iEffect->SetTechnique("T0");
+    iEffect->Begin(&numPasses, 0);
+    iEffect->BeginPass(0);  // Changed from Pass(0) to BeginPass(0)
+    CreateFromCurrentDeviceState(pDevice);
+    iEffect->EndPass();     // Need to call EndPass
+    iEffect->End();
+
+    return true;
+#else
+    SAFE_RELEASE( compileErr );
 	
 	if (stateBlockID != NO_STATE_BLOCK)
 	//  delete state block
@@ -696,6 +753,7 @@ bool Shader::Load( const char* rootDirectory, DXDevice* pDevice )
 	iEffect->End();
 
 	return true;
+#endif
 } // Shader::Load
 
 void Shader::addState( const ShaderState& st )
@@ -1014,8 +1072,11 @@ void ShaderState::dump( FILE* fp )
 				/*, Shader::stateDesc[tableIdx].stateDevID*/ );
 	fprintf( fp, "%s\n", buf );
 } // ShaderState::dump
-
+#ifdef _DX9
+bool ShaderState::apply( IDirect3DDevice9* pDevice )  // Changed type
+#else
 bool ShaderState::apply( DXDevice* pDevice )
+#endif
 {
 	HRESULT hres;
 

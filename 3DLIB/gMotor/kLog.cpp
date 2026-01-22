@@ -167,7 +167,7 @@ Logger::Logger()
 	outCB		= 0;
 	numWarnings = 0;
 	
-	getcwd( logFName, _MAX_PATH );
+	_getcwd( logFName, _MAX_PATH );
 	strcat( logFName, "\\log.txt" );
 
 	fLog		= fopen( logFName, "wt" );

@@ -139,9 +139,13 @@ protected:
 	int						nameLen;
 	int						baseShader;
 	int						id;
-
-	DWORD					stateBlockID;
+#ifdef _DX9
+	IDirect3DStateBlock9*					stateBlockID;
+	IDirect3DVertexShader9*					vshID;
+#else
+    DWORD					stateBlockID;
 	DWORD					vshID;
+#endif
 
 public:
 							Shader		();

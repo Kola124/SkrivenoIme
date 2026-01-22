@@ -335,8 +335,8 @@ bool GPSystem::LoadGP( int seqID )
 		{
 			char fullPath[_MAX_PATH];
 			strcpy( fullPath, rootDirectory );
-			strcat( fullPath, "\\" );
-			strcat( fullPath, gpHash.entry( seqID ).key );
+			strcat_s( fullPath,sizeof(fullPath), "\\" );
+			strcat_s( fullPath,sizeof(fullPath), gpHash.entry( seqID ).key );
 			pGps = GPSeq::CreateHeaderFromFile( fullPath );
 		}
 		else

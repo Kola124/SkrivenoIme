@@ -11,8 +11,11 @@
 
 #include "kStatistics.h"
 #include "kStrUtil.h"
-
+#ifdef _DX9
+IDirect3D9*								D3DRenderSystem::pD3D;
+#else
 IDirect3D8*								D3DRenderSystem::pD3D;
+#endif
 DXDevice*								D3DRenderSystem::pDevice;
 ScreenProp								D3DRenderSystem::screenProp;
 DEVMODE									D3DRenderSystem::dmDesktop;
@@ -234,8 +237,11 @@ D3DRenderSystem::SetCursorBitmap( const char* bmpName )
 	DX_CHK( pDevice->SetCursorProperties( 0, 0, GetTexSurface( bmpTex ) ) );
 	SaveTexture( bmpTex, "c:\\dumps\\tipaCursor.dds" );
 } // D3DRenderSystem::SetCursorBitmap
-
+#ifdef _DX9
+IDirect3DSurface9* D3DRenderSystem::GetTexSurface( int texID )
+#else
 IDirect3DSurface8* D3DRenderSystem::GetTexSurface( int texID )
+#endif
 {
 	return textureCache.GetTextureSurface( texID, 0 );
 } // D3DRenderSystem::GetTexSurface
@@ -346,7 +352,11 @@ D3DRenderSystem::GetClientSize( int& width, int& height )
 void __stdcall 	
 D3DRenderSystem::SetViewPort( const ViewPort& vp )
 {
-	pDevice->SetViewport( (D3DVIEWPORT8*)&vp );	
+#ifdef _DX9
+	pDevice->SetViewport( (D3DVIEWPORT9*)&vp );
+#else
+    pDevice->SetViewport( (D3DVIEWPORT8*)&vp );
+#endif
 	curViewPort = vp;
 } // D3DRenderSystem::SetViewPort
 
@@ -384,7 +394,11 @@ void __stdcall D3DRenderSystem::dbgDumpShader( int shaderID, FILE* fp )
 
 bool D3DRenderSystem::InitD3D()
 {
-	pD3D = Direct3DCreate8( D3D_SDK_VERSION );
+#ifdef _DX9
+	pD3D = Direct3DCreate9( D3D_SDK_VERSION );
+#else
+    pD3D = Direct3DCreate8( D3D_SDK_VERSION );
+#endif
 	massert( pD3D != NULL, "Failed to create DirectX device" );
 	BuildDeviceList();
 
@@ -508,7 +522,7 @@ D3DRenderSystem::Init( HWND hWnd, bool subclassWnd )
 {
 	massert( hWnd != 0, "D3D Render System - No window handle." );
 
-	getcwd( rootDirectory, _MAX_PATH );
+	_getcwd( rootDirectory, _MAX_PATH );
 	hRenderWindow = hWnd;
 
 	Log.Info( "Initializing D3D Render System..." );
@@ -554,7 +568,11 @@ D3DRenderSystem::Init( HWND hWnd, bool subclassWnd )
 
 HRESULT D3DRenderSystem::InitDeviceObjects()
 {
-	DX_CHK( pDevice->GetBackBuffer( 0, D3DBACKBUFFER_TYPE_MONO, &backBufferSurf ) );
+#ifdef _DX9
+	DX_CHK( pDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backBufferSurf ) );
+#else
+    DX_CHK( pDevice->GetBackBuffer( 0, D3DBACKBUFFER_TYPE_MONO, &backBufferSurf ) );
+#endif
 	DX_CHK( pDevice->GetDepthStencilSurface( &depthStencilSurf ) );
 
 	shaderCache		.Init( pDevice );
@@ -567,7 +585,11 @@ HRESULT D3DRenderSystem::InitDeviceObjects()
 
 HRESULT D3DRenderSystem::RestoreDeviceObjects()
 {
-	DX_CHK( pDevice->GetBackBuffer( 0, D3DBACKBUFFER_TYPE_MONO, &backBufferSurf ) );
+#ifdef _DX9
+	DX_CHK( pDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backBufferSurf ) );
+#else
+    DX_CHK( pDevice->GetBackBuffer( 0, D3DBACKBUFFER_TYPE_MONO, &backBufferSurf ) );
+#endif
 	DX_CHK( pDevice->GetDepthStencilSurface	( &depthStencilSurf ) );
 	
 	shaderCache		.SetDevice( pDevice );
@@ -679,12 +701,19 @@ D3DRenderSystem::Dump( const char* fname )
 	fprintf( fp, "\n\nTexture7:\n" );
 	pDevice->GetTransform( D3DTS_TEXTURE7, &matr );
 	fpmatr( fp, matr );
-
-	D3DVIEWPORT8 vp;
+#ifdef _DX9
+	D3DVIEWPORT9 vp;
+#else
+    D3DVIEWPORT8 vp;
+#endif
 	pDevice->GetViewport( &vp );
 	fprintf( fp, "\nViewport: x=%f; y=%f; w=%f; h =%f; minz=%f; maxz=%f\n",
 				vp.X, vp.Y, vp.Width, vp.Height, vp.MinZ, vp.MaxZ );
-	IDirect3DSurface8* rt;
+#ifdef _DX9
+	IDirect3DSurface9* rt;
+#else
+    IDirect3DSurface8* rt;
+#endif
 	pDevice->GetRenderTarget( &rt );
 	fprintf( fp, "\nRender target: %X\n", rt );
 
@@ -837,7 +866,12 @@ bool D3DRenderSystem::ResetDevice()
 
 	D3DSURFACE_DESC bbDesc;
 	LPDIRECT3DSURFACE8 pBackBuffer;
+#ifdef _DX9
+    LPDIRECT3DSURFACE9 pBackBuffer;
+    pDevice->GetBackBuffer( 0,0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer );
+#else
     pDevice->GetBackBuffer( 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer );
+#endif
     pBackBuffer->GetDesc( &bbDesc );
     pBackBuffer->Release();
 

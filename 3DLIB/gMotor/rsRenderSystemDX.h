@@ -76,7 +76,11 @@ public:
 	D3DDeviceInfo*	FindDevice( D3DDEVTYPE devType );
 
 protected:
+#ifdef _DX9
+    D3DADAPTER_IDENTIFIER9		adapterID;
+#else
     D3DADAPTER_IDENTIFIER8		adapterID;
+#endif
     D3DDISPLAYMODE				desktopDisplayMode;
     int							nDevices;
     D3DDeviceInfo				devices[c_MaxAdapterDevices];

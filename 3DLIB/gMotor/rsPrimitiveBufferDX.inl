@@ -124,12 +124,21 @@ _inl bool PrimitiveBuffer::Draw( BaseMesh& bm, int firstPri, int numPri,
 	
 	if (bm.isIndexed() || bm.isQuadList())
 	{
+#ifdef _DX9
 		DX_CHK( VertexBuffer::dev->DrawIndexedPrimitive(	PriTypeDX( bm.getPriType() ),
+															0, 0,
+															numVert, 
+															bm.getIBPos() + firstIdx,
+															numPri ) );
+	}
+#else
+        DX_CHK( VertexBuffer::dev->DrawIndexedPrimitive(	PriTypeDX( bm.getPriType() ),
 															0, 
 															numVert, 
 															bm.getIBPos() + firstIdx,
 															numPri ) );
 	}
+#endif
 	else
 	{
 		DX_CHK( VertexBuffer::dev->DrawPrimitive(	PriTypeDX( bm.getPriType() ),
@@ -156,12 +165,21 @@ _inl bool PrimitiveBuffer::Draw( BaseMesh& bm )
 	
 	if (bm.isIndexed() || bm.isQuadList())
 	{
+#ifdef _DX9
 		DX_CHK( VertexBuffer::dev->DrawIndexedPrimitive(	PriTypeDX( bm.getPriType() ),
+															0, 0,
+															bm.getNVert(), 
+															bm.getIBPos(),
+															bm.getNPri() ) );
+	}
+#else
+        DX_CHK( VertexBuffer::dev->DrawIndexedPrimitive(	PriTypeDX( bm.getPriType() ),
 															0, 
 															bm.getNVert(), 
 															bm.getIBPos(),
 															bm.getNPri() ) );
 	}
+#endif
 	else
 	{
 		DX_CHK( VertexBuffer::dev->DrawPrimitive(	PriTypeDX( bm.getPriType() ),
@@ -199,8 +217,11 @@ _inl void VertexBuffer::SetCurrent( DWORD fvf, int stride )
 		assert( D3DXGetFVFVertexSize( fvf ) == stride );
 		DX_CHK( dev->SetVertexShader( fvf ) );
 	}
-	
-	dev->SetStreamSource( 0, dxVB, stride );
+#ifdef _DX9
+	dev->SetStreamSource( 0, dxVB, 0, stride );
+#else
+    dev->SetStreamSource( 0, dxVB, stride );
+#endif
 
 	curFVF		= fvf;
 	curVB		= this;
@@ -218,8 +239,11 @@ _inl void IndexBuffer::SetCurrent( unsigned int baseIndex )
 	{
 		DX_CHK( dev->SetRenderState( D3DRS_SOFTWAREVERTEXPROCESSING, TRUE ) );
 	}
-
-	dev->SetIndices( dxIB, baseIndex );
+#ifdef _DX9
+	dev->SetIndices( dxIB);
+#else
+    dev->SetIndices( dxIB, baseIndex );
+#endif
 } // IndexBuffer::SetCurrent
 
 

@@ -36,12 +36,18 @@ DWORD RSeekFromCurrent(ResFile hFile,int nBytes)
 }
 
 //Reading the file
-DWORD RBlockRead(ResFile hFile,LPVOID lpBuffer,DWORD BytesToRead)
+DWORD RBlockRead(ResFile hFile, LPVOID lpBuffer, DWORD BytesToRead)
 {
-	SetLastError(0);
-	DWORD readBytes;
-	ReadFile(hFile,lpBuffer,BytesToRead,&readBytes,NULL);
-	return readBytes;
+    SetLastError(0);
+    DWORD readBytes = 0;
+
+    if (!ReadFile(hFile, lpBuffer, BytesToRead, &readBytes, NULL)) {
+        // Read operation failed, handle error appropriately
+        // You might want to return 0 or a specific error code
+        return 0;
+    }
+
+    return readBytes;
 }
 //Writing the file
 DWORD RBlockWrite(ResFile hFile,LPVOID lpBuffer,DWORD BytesToWrite)

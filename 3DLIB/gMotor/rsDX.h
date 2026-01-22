@@ -15,7 +15,7 @@ const int  c_MaxTextureStages	= 8;
 #ifdef _DX9 // DirectX9
 	#include "d3d9.h"
 	#include "d3dx9.h"
-	#include "dxerr9.h"
+	//#include "dxerr9.h"
 	
 typedef IDirect3DSurface9	DXSurface;
 typedef IDirect3DTexture9	DXTexture;
@@ -29,7 +29,7 @@ typedef D3DMATERIAL9		DXMaterial;
 typedef D3DLIGHT9			DXLight;
 typedef ID3DXBuffer			DXBuffer;
 typedef ID3DXEffect			DXEffect;
-typedef	D3DCAPS8			DXCaps;
+typedef	D3DCAPS9			DXCaps;
 
 #else // DirectX8
 	#include "d3d8.h"

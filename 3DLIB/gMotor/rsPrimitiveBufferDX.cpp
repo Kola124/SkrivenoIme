@@ -129,12 +129,22 @@ bool StaticIB::Create( DXDevice* pDevice, int nInd )
 {
 	IndexBuffer::Create( pDevice, nInd );
 	int sizeBytes = nInd * c_IBStride;
+#ifdef _DX9
 	DX_CHK( pDevice->CreateIndexBuffer(	sizeBytes, 
+										D3DUSAGE_WRITEONLY, 
+										D3DFMT_INDEX16, 
+										D3DPOOL_DEFAULT, 
+										&dxIB,
+                                        NULL     
+										) );
+#else
+    DX_CHK( pDevice->CreateIndexBuffer(	sizeBytes, 
 										D3DUSAGE_WRITEONLY, 
 										D3DFMT_INDEX16, 
 										D3DPOOL_DEFAULT, 
 										&dxIB
 										) );
+#endif
 	softwareVP = false;
 	return true;
 } // StaticIB::Create
@@ -172,12 +182,24 @@ bool DynamicIB::Create( DXDevice* pDevice, int nInd )
 	IndexBuffer::Create( pDevice, nInd );
 	
 	int sizeBytes = nInd * c_IBStride;
-	DX_CHK( pDevice->CreateIndexBuffer(	sizeBytes, 
+#ifdef _DX9
+    DX_CHK( pDevice->CreateIndexBuffer(	sizeBytes, 
+										D3DUSAGE_WRITEONLY | D3DUSAGE_DYNAMIC, 
+										D3DFMT_INDEX16, 
+										D3DPOOL_DEFAULT, 
+										&dxIB,
+                                        NULL
+										) );
+#else
+    DX_CHK( pDevice->CreateIndexBuffer(	sizeBytes, 
 										D3DUSAGE_WRITEONLY | D3DUSAGE_DYNAMIC, 
 										D3DFMT_INDEX16, 
 										D3DPOOL_DEFAULT, 
 										&dxIB
 										) );
+#endif 
+
+	
 	softwareVP = false;
 	return true;
 } // DynamicIB::Create
@@ -220,12 +242,22 @@ bool SoftwareProcessIB::Create( DXDevice* pDevice, int nInd )
 	IndexBuffer::Create( pDevice, nInd );
 	
 	int sizeBytes = nInd * c_IBStride;
+#ifdef _DX9
 	DX_CHK( pDevice->CreateIndexBuffer(	sizeBytes, 
+										D3DUSAGE_WRITEONLY | D3DUSAGE_DYNAMIC | D3DUSAGE_SOFTWAREPROCESSING, 
+										D3DFMT_INDEX16, 
+										D3DPOOL_DEFAULT, 
+										&dxIB,
+                                        NULL
+										) );
+#else
+    DX_CHK( pDevice->CreateIndexBuffer(	sizeBytes, 
 										D3DUSAGE_WRITEONLY | D3DUSAGE_DYNAMIC | D3DUSAGE_SOFTWAREPROCESSING, 
 										D3DFMT_INDEX16, 
 										D3DPOOL_DEFAULT, 
 										&dxIB
 										) );
+#endif
 	softwareVP = false;
 	return true;
 } // SoftwareProcessIB::Create
@@ -309,12 +341,22 @@ bool SharedIB::FillData( WORD* idxPtr, int nInd, BaseMesh& bm )
 void StaticVB::Create( DXDevice* pDevice, int nBytes, VertexFormat vf )
 {
 	VertexBuffer::Create( pDevice, nBytes, vf );
+#ifdef _DX9
 	DX_CHK( pDevice->CreateVertexBuffer(	nBytes, 
 											D3DUSAGE_WRITEONLY,
 											0, 
 											D3DPOOL_DEFAULT, 
-											&dxVB
+											&dxVB,
+                                            NULL
 										) );
+#else
+    DX_CHK( pDevice->CreateVertexBuffer(	nBytes, 
+											D3DUSAGE_WRITEONLY,
+											0, 
+											D3DPOOL_DEFAULT, 
+                                            &dxVB
+										) );
+#endif
 	softwareVP = false;
 } // StaticVB::Create
 
@@ -353,12 +395,22 @@ void StaticVB::FillData( void* vert, int nVert, BaseMesh& bm, int newStride )
 void DynamicVB::Create( DXDevice* pDevice, int nBytes, VertexFormat vf )
 {
 	VertexBuffer::Create( pDevice, nBytes, vf );
+#ifdef _DX9
 	DX_CHK( pDevice->CreateVertexBuffer(	nBytes, 
+											D3DUSAGE_WRITEONLY | D3DUSAGE_DYNAMIC,
+											0, 
+											D3DPOOL_DEFAULT, 
+											&dxVB,
+                                            NULL                
+										) );
+#else
+    DX_CHK( pDevice->CreateVertexBuffer(	nBytes, 
 											D3DUSAGE_WRITEONLY | D3DUSAGE_DYNAMIC,
 											0, 
 											D3DPOOL_DEFAULT, 
 											&dxVB
 										) );
+#endif
 	softwareVP = false;
 } // DynamicVB::Create
 
@@ -405,12 +457,22 @@ void DynamicVB::FillData( void* vert, int nVert, BaseMesh& bm, int newStride )
 void SoftwareProcessVB::Create( DXDevice* pDevice, int nBytes, VertexFormat vf )
 {
 	VertexBuffer::Create( pDevice, nBytes, vf );
+#ifdef _DX9
 	DX_CHK( pDevice->CreateVertexBuffer(	nBytes, 
+											D3DUSAGE_WRITEONLY | D3DUSAGE_DYNAMIC | D3DUSAGE_SOFTWAREPROCESSING,
+											0, 
+											D3DPOOL_DEFAULT, 
+                                            &dxVB,
+                                            NULL
+										) );
+#else
+    DX_CHK( pDevice->CreateVertexBuffer(	nBytes, 
 											D3DUSAGE_WRITEONLY | D3DUSAGE_DYNAMIC | D3DUSAGE_SOFTWAREPROCESSING,
 											0, 
 											D3DPOOL_DEFAULT, 
 											&dxVB
 										) );
+#endif
 	softwareVP = true;
 } // SoftwareProcessVB::Create
 
