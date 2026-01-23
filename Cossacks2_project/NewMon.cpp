@@ -1933,7 +1933,16 @@ bool NewMonster::CreateFromFile(char* name){
 						    SpriteVisual=p1;
 							NLine(f1);
 	                        Line++;
-		                }else
+		                }
+#ifdef NEWMORALE
+						else
+						if(!strcmp(gx,"EXTRAMORALE")){
+							ExtraMorale=1;
+							NLine(f1);
+							Line++;
+						}
+#endif
+                        else
 						if(!strcmp(gx,"EXPLRADIUS")){
 							z=Gscanf(f1,"%d",&p1);
 							if(z!=1)IncPar(name,Line,gx);

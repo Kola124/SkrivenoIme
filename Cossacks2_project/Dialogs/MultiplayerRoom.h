@@ -789,6 +789,20 @@ ffe2:;
 	int CancelX = 959;
 	int ButY = 706;
 	
+    if(/*TPEN.Connected || */ UseGSC_Login) { // Iternet game
+
+		MENU.addGPPicture(NULL,672,689,CGR.GPID,7);
+
+		GP_Button* ENC=MENU.addGP_Button(NULL,BInChatX,ButY,GmBtn.GPID,5,6);
+
+		ENC->UserParam=99;
+
+		ENC->OnUserClick=&MMItemChoose;
+
+		ENC->Hint=GetTextByID("BACKINCHAT");
+
+	};
+	
 	GP_Button* OkBtn=MENU.addGP_Button(NULL,OkX,ButY,GmBtn.GPID,1,0);
 	GP_Button* CancelBtn=MENU.addGP_Button(NULL,CancelX,ButY,GmBtn.GPID,3,4);	
 	

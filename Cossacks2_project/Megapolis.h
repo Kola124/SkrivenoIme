@@ -261,7 +261,7 @@ public:
 	word   DefendersSN;
 	word   MinersID;
 	word   MinersSN;
-	/*
+	
 	word   TowID;
 	word   TowSN;
 	word   NWalls;
@@ -270,7 +270,7 @@ public:
 	short* GateProj;
 	word   NGates;
 	short* Gates;
-	*/
+	
 };
 class PRM_Info:public Inform{
 public:

@@ -186,7 +186,11 @@ void StartTest(){
 	//ProcessNewInternetLogin();
 	//Process_GSC_ChatWindow();
 	return;
+#ifdef SCREENFIX
 	DialogsSystem DSS(menu_x_off, menu_y_off);
+#else
+    DialogsSystem DSS(0, 0);
+#endif
 	SQPicture BACK("Interface\\Back_shell.bmp");
 	DSS.addPicture(NULL,0,0,&BACK,&BACK,&BACK);
 	RunExplorer(0,"LF|LW_new|open&req.txt",35,152,35+758,152+315-2);

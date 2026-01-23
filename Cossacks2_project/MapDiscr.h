@@ -432,6 +432,7 @@ public:
 	short       MoraleDecSpeed;
 	int         StartMorale;
     bool 		NoFear : 1;
+    bool        ExtraMorale;
 #else //NEWMORALE
 	word FearFactor[NFEARSUBJ];
 #endif //NEWMORALE
@@ -782,6 +783,7 @@ public:
 	short       MoraleDecSpeed;
 	int         StartMorale;
     bool 		NoFear : 1;
+    bool        ExtraMorale;
 #else //NEWMORALE
 	word		FearFactor[NFEARSUBJ];	
 #endif //NEWMORALE

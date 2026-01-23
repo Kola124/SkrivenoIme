@@ -404,24 +404,21 @@ void ReadChainObjectsDesc();
 void ClipCursorToWindowArea()
 {
     if (!window_mode)
-    {//Just in case
+    {
+        // In fullscreen, SDL handles cursor clipping
         return;
     }
 
     if (!InGame && !InEditor)
-    {//Reset mouse locking in menues
+    {
         ClipCursor(NULL);
         return;
     }
 
-    //Determine absolute coordinates of window client area
     RECT client_coords;
     GetClientRect(hwnd, &client_coords);
     MapWindowPoints(hwnd, NULL, (LPPOINT)&client_coords, 2);
 
-    //Necessary for correct cursor capture
-    //Using exact ClientRect causes cursor to freeze short of
-    //right or bottom border when moving fast
     client_coords.right--;
     client_coords.bottom--;
 
@@ -2828,7 +2825,13 @@ void CHECKIT(){
 void ProcessGuard();
 void DecreaseVeruVPobedu();
 int InEnum=0;
-extern "C" CEXPORT
+
+#ifdef SPEEDFIX
+unsigned long GetRealTime();
+#else
+int GetRealTime();
+#endif
+
 void CreateFields(byte NI);
 extern int LastWaterchange;
 extern int LastBrightspot;
@@ -3638,6 +3641,7 @@ bool RunSMD(){
 			MidiSound=0;
             int ex_window_x, ex_window_y, ex_x, ex_y;
             int dummy;
+            int FPSTimeSF;
             if (window_mode)
             {
                 ex_window_x = exRealLx;
@@ -3654,7 +3658,7 @@ bool RunSMD(){
             }
 			if(fff){
 #ifdef SPEEDFIX
-                Gscanf(fff, "%d%d%d%d%d%d%d%d%d", &exRealLx, &exRealLy, &WarSound, &OrderSound, &OrderSound, &MidiSound, &ScrollSpeed, &exFMode, &PlayMode);
+                Gscanf(fff, "%d%d%d%d%d%d%d%d%d%d", &exRealLx, &exRealLy, &WarSound, &OrderSound, &OrderSound, &MidiSound, &FPSTimeSF, &ScrollSpeed, &exFMode, &PlayMode);
 #else
                 Gscanf(fff, "%d%d%d%d%d%d%d%d%d%d", &exRealLx, &exRealLy, &WarSound, &OrderSound, &OrderSound, &MidiSound, &FPSTime, &ScrollSpeed, &exFMode, &PlayMode);
 #endif
@@ -3672,7 +3676,7 @@ bool RunSMD(){
 					GFILE* fff=Gopen("mode.dat","wt");
 					if(fff){
 #ifdef SPEEDFIX
-                        Gscanf(fff, "%d%d%d%d%d%d%d%d%d", &exRealLx, &exRealLy, &WarSound, &OrderSound, &OrderSound, &MidiSound, &ScrollSpeed, &exFMode, &PlayMode);
+                        Gscanf(fff, "%d%d%d%d%d%d%d%d%d%d", &exRealLx, &exRealLy, &WarSound, &OrderSound, &OrderSound, &MidiSound, &FPSTimeSF, &ScrollSpeed, &exFMode, &PlayMode);
 #else
                         Gscanf(fff, "%d%d%d%d%d%d%d%d%d%d", &exRealLx, &exRealLy, &WarSound, &OrderSound, &OrderSound, &MidiSound, &FPSTime, &ScrollSpeed, &exFMode, &PlayMode);
 #endif
@@ -3835,21 +3839,20 @@ int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 			strcpy(USERMISSPATH,ss+9);
 		};
 	};
-    if (strstr(lpCmdLine, "/window"))
-    {
-        window_mode = true;
-    }
-    else
-    {
-        window_mode = false;
-    }
-
     if (strstr(lpCmdLine, "/borderless"))
     {
         window_mode = true;
         window_style = WS_POPUP;
     }
-
+    else if (strstr(lpCmdLine, "/window"))
+    {
+        window_mode = true;
+        window_style = WS_OVERLAPPEDWINDOW;
+    }
+    else
+    {
+        window_mode = false;
+    }
 #ifndef CDVERSION
 	CDGINIT_EnCD();
 	CDGINIT_INIT3();
@@ -3904,6 +3907,7 @@ int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	WorkSound=0;
 	OrderSound=0;
 	MidiSound=0;
+    int FPSTimeSF = 50;
 	
 	InitObjs3();
 
@@ -3927,10 +3931,10 @@ int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
         int dummy;
         //7th value was FPSTime
 #ifdef SPEEDFIX
-        Gscanf(fff, "%d%d%d%d%d%d%d%d%d%d%d%d",
+        Gscanf(fff, "%d%d%d%d%d%d%d%d%d%d%d%d%d",
             &ex_window_x, &ex_window_y, &ex_x, &ex_y,
             &WarSound, &OrderSound, &OrderSound, &MidiSound,
-            &dummy, &ScrollSpeed, &exFMode, &PlayMode);
+            &dummy, &FPSTimeSF, &ScrollSpeed, &exFMode, &PlayMode);
 #else
         Gscanf(fff, "%d%d%d%d%d%d%d%d%d%d%d%d%d",
             &ex_window_x, &ex_window_y, &ex_x, &ex_y,
@@ -4129,6 +4133,7 @@ int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 			SaveAllFiles();
             //Distinguish between last window adn fullscreen resolutions
             int ex_window_x, ex_window_y, ex_x, ex_y;
+        int FPSTimeSF;
 
             //Set last 'global resolution' according to current mode
             if (window_mode)
@@ -4151,10 +4156,10 @@ int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 				//Gprintf(fff, "%d %d %d %d %d %d %d %d %d %d", exRealLx, exRealLy, WarSound, OrderSound, OrderSound, MidiSound, FPSTime, ScrollSpeed, exFMode, PlayMode);
 				//Gclose(fff);
 #ifdef SPEEDFIX
-                Gprintf(fff, "%d %d %d %d %d %d %d %d %d %d %d %d",
+            Gprintf(fff, "%d %d %d %d %d %d %d %d %d %d %d %d %d",
                     ex_window_x, ex_window_y, ex_x, ex_y,
                     WarSound, OrderSound, OrderSound,
-                    MidiSound, 0, ScrollSpeed, exFMode, PlayMode);
+                MidiSound, 0, FPSTimeSF, ScrollSpeed, exFMode, PlayMode);
 #else
                 Gprintf(fff, "%d %d %d %d %d %d %d %d %d %d %d %d &d",
                     ex_window_x, ex_window_y, ex_x, ex_y,

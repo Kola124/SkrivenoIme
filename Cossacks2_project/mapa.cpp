@@ -798,7 +798,36 @@ void DrawHealth(OneObject* OB){
 	Hline(-2+x+c2+dc+1,y+ddy+1,x+c2+hs+dc+1,clrGreen);
 	Hline(-2+x+c2+dc+1,y+ddy,x+c2+hs+dc+1,clrGreen);
 #ifdef EW
-    if (OB->MaxMorale > 0) {
+    if (!OB->NewBuilding) {
+        if ((OB->Morale - 330000) > 0) {
+
+            byte drzava = OB->Nat->NMask;
+            byte boja = 0;
+
+            if (drzava == 128) {
+                boja = GetPaletteColor(103, 63, 19);
+            }
+            else if (drzava == 64) {
+                boja = GetPaletteColor(223, 223, 223);
+            }
+            else if (drzava == 32) {
+                boja = GetPaletteColor(39, 39, 59);
+            }
+            else if (drzava == 16) {
+                boja = GetPaletteColor(239, 131, 19);
+            }
+            else if (drzava == 8) {
+                boja = GetPaletteColor(151, 71, 175);
+            }
+            else if (drzava == 4) {
+                boja = GetPaletteColor(43, 179, 147);
+            }
+            else if (drzava == 2) {
+                boja = GetPaletteColor(0, 59, 191);
+            }
+            else if (drzava == 1) {
+                boja = GetPaletteColor(163, 0, 0);
+            }
 
         if (OB->BrigadeID != 0xFFFF) {
             int M = CITY[OB->NNUM].Brigs[OB->BrigadeID].Morale;
@@ -808,10 +837,20 @@ void DrawHealth(OneObject* OB){
         else {
             hs = div(mhs * (OB->Morale - 330000), (OB->MaxMorale - 330000)).quot;
         }
+
+            if (OB->newMons->ShowDelay) {
+                Hline(-2 + x + c2 + dc + 1, y + ddy + 4, x + c2 + hs + dc + 1, boja);
+                Hline(-2 + x + c2 + dc + 1, y + ddy + 5, x + c2 + hs + dc + 1, boja);
+
+            }
+            else {
+                Hline(-2 + x + c2 + dc + 1, y + ddy + 2, x + c2 + hs + dc + 1, boja);
+                Hline(-2 + x + c2 + dc + 1, y + ddy + 3, x + c2 + hs + dc + 1, boja);
+            }
     };
 
-    Hline(-2 + x + c2 + dc + 1, y + ddy + 4, x + c2 + hs + dc + 1, clrBlue);
-    Hline(-2 + x + c2 + dc + 1, y + ddy + 5, x + c2 + hs + dc + 1, clrBlue);
+
+    }
 #endif
 	if(OB->newMons->ShowDelay){
 		int mxd=1;
@@ -821,12 +860,34 @@ void DrawHealth(OneObject* OB){
 		hs=(mhs*(mxd-OB->delay))/mxd;
 		Hline(-2+x+c2+dc+1,y+ddy+2,x+c2+hs+dc+1,0xD0);
 		Hline(-2+x+c2+dc+1,y+ddy+3,x+c2+hs+dc+1,0xD0);
+#ifndef EW
 		Vline(-2+x+c2+dc,y+ddy,y+ddy+3,255);
 		Vline(-2+x+Lx-1-c2,y+ddy,y+ddy+3,255);
 	}else{
 		Vline(-2+x+c2+dc,y+ddy,y+ddy+1,255);
 		Vline(-2+x+Lx-1-c2,y+ddy,y+ddy+1,255);
 	};
+#else
+        if (OB->MaxMorale > 0) {
+            Vline(-2 + x + c2 + dc, y + ddy, y + ddy + 5, 255);
+            Vline(-2 + x + Lx - 1 - c2, y + ddy, y + ddy + 5, 255);
+        }
+        else {
+            Vline(-2 + x + c2 + dc, y + ddy, y + ddy + 3, 255);
+            Vline(-2 + x + Lx - 1 - c2, y + ddy, y + ddy + 3, 255);
+        }
+}
+    else {
+        if (OB->MaxMorale > 0) {
+            Vline(-2 + x + c2 + dc, y + ddy, y + ddy + 3, 255);
+            Vline(-2 + x + Lx - 1 - c2, y + ddy, y + ddy + 3, 255);
+        }
+        else {
+            Vline(-2 + x + c2 + dc, y + ddy, y + ddy + 1, 255);
+            Vline(-2 + x + Lx - 1 - c2, y + ddy, y + ddy + 1, 255);
+        }
+    };
+#endif
 	if(OB->NewBuilding){
 		int x0=-2+x+c2+dc+1;
 		int y0=y+ddy+2;

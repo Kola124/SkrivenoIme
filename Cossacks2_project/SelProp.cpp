@@ -103,6 +103,7 @@ static word LastID;
 extern int curptr;
 extern int curdx;
 extern int curdy;
+
 //uniq properties
 bool GetCoord;
 UniqMethood* UNIM;
@@ -203,6 +204,13 @@ void HPSEL(int i){
 		};
 	};
 };
+void SelectUnits(GAMEOBJ* Units, bool Add);
+void TEST(int i) {
+    OneObject* OB1 = Group[i];
+    //OB1->Selected=true;
+    //OB1->ImSelected=true;
+    //SelectUnits(OB1->Index, 1);
+}
 void HPSELBRIG(int i){
 	if(GetKeyState(VK_CONTROL)&0x8000){
 		CmdChooseUnSelBrig(MyNation,i);
@@ -423,7 +431,11 @@ void ShowTiringInfo(OneObject* OB,int x,int y,int LX,int LY){
 	y+=39;
 	Xbar(x-1,y-1,LX+2,LY+2,clrYello);
 	LX=(LX*(OB->GetTired/100))/1000;
+#ifndef EW
 	CBar(x,y,LX,LY,clrGreen);
+#else
+    CBar(x,y,LX,LY,clrYello);
+#endif
 };
 void ShowTiringInfo(Brigade* BR,int x,int y,int LX,int LY){
 	x+=20;
@@ -720,13 +732,19 @@ void ShowProp(){
 			if(bid!=0xFFFF){
 				City* CT=NATIONS[NatRefTBL[MyNation]].CITY;
 				Brigade* BR=CT->Brigs+bid;
-#ifdef COSSACKS2
+
+                char ccc[130];
+                sprintf_s(ccc,sizeof(ccc), "Formation: %s (%s)", OBJ->Ref.General->Message, NatNames[OBJ->Ref.General->NatID]);
+                AssignHint(ccc, 5);
+//#ifdef COSSACKS2
+#ifdef NEWMORALE
 				if(BR->NKills&&!(HintTime&&WasLoHint)){
 					char str[128];
 					sprintf(str,KILLUNI,BR->NKills);//"Lñøû:%d"
 					ShowString(Zone1X+10,PanelY+Zone1Y-20,str,&SmallWhiteFont);
 				};
-#endif //COSSACKS2
+#endif
+//#endif //COSSACKS2
 				GeneralObject* GO=NATIONS[NatRefTBL[MyNation]].Mon[BR->MembID];
 				NewMonster* NM=GO->newMons;
 				//Xbar(Zone1X,PanelY+Zone1Y+1,Zone1LX,Zone1LY,0xD0+(MyNation<<2));
@@ -1178,18 +1196,17 @@ void ShowProp(){
         int brojac = 0;
         if (GeneralsMode) {
             for (int j = 0; j < N; j++) {
-                OneObject* OB = Group[j];
                 OneObject* OB1 = Group[j];
                 Brigade* BR = BR0 + j;
                 bool UNFND = true;
                 bool SEL = false;
-                if (OB && OB->newMons->Officer && OB->NNUM == NatRefTBL[MyNation]) {
-                    OneObject* OB1 = Group[j];
-                    UNFND = false;
-                    if (BR->Enabled) UNFND = true;
-                    SEL = OB1->Selected & GM(MyNation);
-                }
                 int NU = 0;
+                if (OB1 && OB1->newMons->Officer && OB1->NNUM == NatRefTBL[MyNation]) {
+                    //OneObject* OB1 = Group[j];
+                    //if (BR->Enabled) UNFND = true;
+                    SEL = OB1->Selected & GM(MyNation);
+                    UNFND = false;
+                } 
                 //SEL = OB1->Selected & GM(MyNation);
                 NU++;
                 if (!UNFND) {
@@ -1197,7 +1214,7 @@ void ShowProp(){
                     //GeneralObject* GO = NATIONS[NatRefTBL[MyNation]].Mon[BR->MembID];
                     //NewMonster* NM = GO->newMons;
                     OI = GeneralPanel.AddIconFixed(NM->IconFileID, NM->IconID, brojac + BrigNx);
-                    OI->AssignLeft(&SELBRIG, OB1->Serial);
+                    OI->AssignLeft(&TEST, j);
                     //OI->AssignIntVal(NU);
                     //OI->AssignMoveOver(&PreBrig, j);
                     OI->AssignIntParam(brojac + 1);
