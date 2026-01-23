@@ -646,7 +646,12 @@ SmallZBuffer::~SmallZBuffer(){
 void SmallZBuffer::Add(int y,int sx,int sy,int FID,int spr){
 	if(y>=0&&y<MaxLines){
 		if(NSprs[y]>=MaxSprs[y]){
-			MaxSprs[y]+=4;
+#ifdef EW
+			MaxSprs[y]+=124000;
+#else
+            MaxSprs[y]+=124000;
+            //MaxSprs[y]+=4;
+#endif
 			SPRS[y]=(OneSprInfo*)realloc(SPRS[y],MaxSprs[y]*sizeof OneSprInfo);
 		};
 		OneSprInfo* OSI=SPRS[y]+NSprs[y];
@@ -672,6 +677,7 @@ void SmallZBuffer::Draw(){
 	};
 };
 int RSIZE;
+extern int RealLx;
 void GenerateMiniMap(){
 //#ifdef _USE3D
 //	return;
@@ -680,7 +686,7 @@ void GenerateMiniMap(){
 	TempWindow TW;
 	PushWindow(&TW);
 	void* sptr=ScreenPtr;
-	MM_Lx=(1920<<ADDSH)+2;
+	MM_Lx=(RealLx <<ADDSH)+2;
 	MM_Ly=(MM_Lx>>1)+2;
 	MM_Y0=64;
 	MMR_Lx=(MM_Lx/M4CellLX)+1;
@@ -1996,111 +2002,116 @@ void CheckMM_Change(){
 		MM_MaxChangeY=-10000;
 	};
 };
-void PreShowMiniSprites(){
-	int spx0=(mapx-2)>>2;
-	int spx1=(mapx+smaplx+2)>>2;
-	int spy0=(mapy-2)>>2;
-	if(spx0<0)spx0=0;else
-	if(spx0>=VAL_SPRNX)spx0=VAL_SPRNX-1;
-	if(spy0<0)spy0=0;else
-	if(spy0>=VAL_SPRNX)spy0=VAL_SPRNX-1;
-	if(spx1<0)spx1=0;else
-	if(spx1>=VAL_SPRNX)spx1=VAL_SPRNX-1;
 
-	int x0=mapx<<5;
-	int y0=(mapy)<<4;
-	int Lx= RealLx;
-	int Ly= RealLy;
-	int x1=x0+Lx;
-	int y1=y0+Ly;
-	int SH=5-Shifter;
+void PreShowMiniSprites() {
+    int spx0 = (mapx - 2) >> 2;
+    int spx1 = (mapx + smaplx + 2) >> 2;
+    int spy0 = (mapy - 2) >> 2;
+    if (spx0 < 0)spx0 = 0; else
+        if (spx0 >= VAL_SPRNX)spx0 = VAL_SPRNX - 1;
+    if (spy0 < 0)spy0 = 0; else
+        if (spy0 >= VAL_SPRNX)spy0 = VAL_SPRNX - 1;
+    if (spx1 < 0)spx1 = 0; else
+        if (spx1 >= VAL_SPRNX)spx1 = VAL_SPRNX - 1;
 
-	for(int spx=spx0;spx<=spx1;spx++){
-		int ofst=spx+(spy0<<SprShf);
-		int spy=spy0;
+    int x0 = mapx << 5;
+    int y0 = (mapy) << 4;
+    int Lx = smaplx << 5;
+    int Ly = (smaply) << 4;
+    int x1 = x0 + Lx;
+    int y1 = y0 + Ly;
+    int SH = 5 - Shifter;
+
+    for (int spx = spx0; spx <= spx1; spx++) {
+        int ofst = spx + (spy0 << SprShf);
+        int spy = spy0;
 		int maxy;
-		int xx=(spx<<7)+64;
-		do{
-			int N=NSpri[ofst];
-			int* List=SpRefs[ofst];
-			if(N&&List){
-				for(int i=0;i<N;i++){
-					OneSprite* OS=Sprites+List[i];
-					if(OS->Enabled){
-						int z=OS->z;//GetHeight(OS->x,OS->y);
-						if(!Mode3D)z=0;
-						int ry=((OS->y)>>1)-y0;
-						int ry1=ry-z;
-						int rx=OS->x-x0;
-						if(ry1>-128&&ry1<Ly+128&&rx>-128&&rx<Lx+128){
-							ObjCharacter* OC=OS->OC;
-							SprGroup* SG=OS->SG;
-							if(OC->Stand){
-								int tm1=div(tmtmt,OC->Delay).quot;
-								int fr=div(tm1+OS->x*47+OS->y*83,OC->Frames).rem;
-								int spr=fr*OC->Parts;
-								int z0=ry+OC->Z0;
-								int XX=rx-SG->Dx[OS->SGIndex];
-								int YY=ry-SG->Dy[OS->SGIndex]-z;
-								NewAnimation* NA=OC->Stand;
-								for(int p=0;p<OC->Parts;p++){
-									NewFrame* OF=&NA->Frames[spr+p];
-									AddPoint(rx>>2,z0>>2,XX>>2,YY>>2,NULL,OF->FileID,OF->SpriteID,0,0);
-									z0+=OC->DZ;
+        int xx = (spx << 7) + 64;
+        do {
+            int N = NSpri[ofst];
+            int* List = SpRefs[ofst];
+            if (N && List) {
+                for (int i = 0; i < N; i++) {
+                    OneSprite* OS = Sprites + List[i];
+                    if (OS->Enabled) {
+                        int z = OS->z;//GetHeight(OS->x,OS->y);
+                        if (!Mode3D)z = 0;
+                        int ry = ((OS->y) >> 1) - y0;
+                        int ry1 = ry - z;
+                        int rx = OS->x - x0;
+                        if (ry1 > -128 && ry1<Ly + 128 && rx>-128 && rx < Lx + 128) {
+                            ObjCharacter* OC = OS->OC;
+                            SprGroup* SG = OS->SG;
+                            if (OC->Stand) {
+                                int tm1 = div(tmtmt, OC->Delay).quot;
+                                int fr = div(tm1 + OS->x * 47 + OS->y * 83, OC->Frames).rem;
+                                int spr = fr * OC->Parts;
+                                int z0 = ry + OC->Z0;
+                                int XX = rx - SG->Dx[OS->SGIndex];
+                                int YY = ry - SG->Dy[OS->SGIndex] - z;
+                                NewAnimation* NA = OC->Stand;
+                                for (int p = 0; p < OC->Parts; p++) {
+                                    NewFrame* OF = &NA->Frames[spr + p];
+                                    AddPoint(rx >> 2, z0 >> 2, XX >> 2, YY >> 2, NULL, OF->FileID, OF->SpriteID, 0, 0);
+                                    z0 += OC->DZ;
 								};
-							}else{
+                            }
+                            else {
 #ifdef CONQUEST
-								if(SG==&SPECIAL){
-									int xx=(OS->x)-x0;
-									int yy=(OS->y>>1)-y0;
-									int zz=yy;
-									GeneralObject* GO=NATIONS[7].Mon[OS->NIndex];
-									NewAnimation* NAM=&GO->newMons->DeathLie1;
-									if(NAM->Enabled){
-										int octs,oc2,sesize,oc1,ocM;
-										if(NAM->Rotations&1){
-											octs=(NAM->Rotations-1)*2;
-											oc2=NAM->Rotations-1;
-											if(!octs)octs=1;
-											sesize=div(255,octs<<1).quot;
-											oc1=octs;
-											ocM=oc2;
-										}else{
-											octs=NAM->Rotations*2;
-											oc2=NAM->Rotations-1;
-											ocM=oc2+1;
-											if(!octs)octs=1;
-											sesize=0;
-											oc1=octs-1;
+                                if (SG == &SPECIAL) {
+                                    int xx = (OS->x) - x0;
+                                    int yy = (OS->y >> 1) - y0;
+                                    int zz = yy;
+                                    GeneralObject* GO = NATIONS[7].Mon[OS->NIndex];
+                                    NewAnimation* NAM = &GO->newMons->DeathLie1;
+                                    if (NAM->Enabled) {
+                                        int octs, oc2, sesize, oc1, ocM;
+                                        if (NAM->Rotations & 1) {
+                                            octs = (NAM->Rotations - 1) * 2;
+                                            oc2 = NAM->Rotations - 1;
+                                            if (!octs)octs = 1;
+                                            sesize = div(255, octs << 1).quot;
+                                            oc1 = octs;
+                                            ocM = oc2;
+                                        }
+                                        else {
+                                            octs = NAM->Rotations * 2;
+                                            oc2 = NAM->Rotations - 1;
+                                            ocM = oc2 + 1;
+                                            if (!octs)octs = 1;
+                                            sesize = 0;
+                                            oc1 = octs - 1;
 										};
 						
-										byte dir=(((OS->Direction+64+sesize)&255)*octs)>>8;
-										byte dir2=dir;
-										int csp=0;
+                                        byte dir = (((OS->Direction + 64 + sesize) & 255) * octs) >> 8;
+                                        byte dir2 = dir;
+                                        int csp = 0;
 							
-										NewFrame* NF=&NAM->Frames[csp];
-										if(dir<ocM)
-											AddOptPoint(ZBF_LO,xx>>2,(yy-256)>>2,(xx-NF->dx)>>(5-Shifter),((ry1+NF->dy)>>(5-Shifter)),NULL,NF->FileID,oc2-dir+NAM->Rotations*NF->SpriteID+4096,0);
-										else{
-											dir=oc1-dir;
-											AddOptPoint(ZBF_LO,xx>>2,(yy-256)>>2,(xx+NF->dx)>>(5-Shifter),((ry1+NF->dy)>>(5-Shifter)),NULL,NF->FileID,oc2-dir+NAM->Rotations*NF->SpriteID,0);
+                                        NewFrame* NF = &NAM->Frames[csp];
+                                        if (dir < ocM)
+                                            AddOptPoint(ZBF_LO, xx >> 2, (yy - 256) >> 2, (xx - NF->dx) >> (5 - Shifter), ((ry1 + NF->dy) >> (5 - Shifter)), NULL, NF->FileID, oc2 - dir + NAM->Rotations * NF->SpriteID + 4096, 0);
+                                        else {
+                                            dir = oc1 - dir;
+                                            AddOptPoint(ZBF_LO, xx >> 2, (yy - 256) >> 2, (xx + NF->dx) >> (5 - Shifter), ((ry1 + NF->dy) >> (5 - Shifter)), NULL, NF->FileID, oc2 - dir + NAM->Rotations * NF->SpriteID, 0);
 										};
 									};
-								}else
+                                }
+                                else
 #endif
-								if(SG==&ANMSPR){
+                                    if (SG == &ANMSPR) {
 									GPS.SetWhiteFont(GP_L_IDXS[SG->FileID]);
-									int sp=SG->ObjChar[OS->SGIndex].SpriteIndex;
-									int dx=SG->Dx[OS->SGIndex];
-									if(sp>=4096)AddSuperLoPoint((rx+dx)>>2,(ry1-SG->Dy[OS->SGIndex])>>2,NULL,SG->FileID,sp,0,0);
-									else AddSuperLoPoint((rx-dx)>>2,(ry1-SG->Dy[OS->SGIndex])>>2,NULL,SG->FileID,sp,0,0);
-								}else if(SG==&TREES){
+                                        int sp = SG->ObjChar[OS->SGIndex].SpriteIndex;
+                                        int dx = SG->Dx[OS->SGIndex];
+                                        if (sp >= 4096)AddSuperLoPoint((rx + dx) >> 2, (ry1 - SG->Dy[OS->SGIndex]) >> 2, NULL, SG->FileID, sp, 0, 0);
+                                        else AddSuperLoPoint((rx - dx) >> 2, (ry1 - SG->Dy[OS->SGIndex]) >> 2, NULL, SG->FileID, sp, 0, 0);
+                                    }
+                                    else if (SG == &TREES) {
 #ifdef _USE3D
                                     extern int g_CurTree;
                                     g_CurTree = OS->Index;
-								AddPoint(rx>>SH,ry>>SH,(rx-SG->Dx[OS->SGIndex])>>SH,(ry1-SG->Dy[OS->SGIndex])>>SH,NULL,SG->FileID,SG->ObjChar[OS->SGIndex].SpriteIndex,AV_ROUGH,AV_ROUGH);
+                                        AddPoint(rx >> SH, ry >> SH, (rx - SG->Dx[OS->SGIndex]) >> SH, (ry1 - SG->Dy[OS->SGIndex]) >> SH, NULL, SG->FileID, SG->ObjChar[OS->SGIndex].SpriteIndex, AV_ROUGH, AV_ROUGH);
 #else
-    								AddPoint(rx>>2,ry>>2,(rx-SG->Dx[OS->SGIndex])>>2,(ry1-SG->Dy[OS->SGIndex])>>2,NULL,SG->FileID,SG->ObjChar[OS->SGIndex].SpriteIndex,AV_ROUGH,AV_ROUGH);
+                                        AddPoint(rx>>2,ry>>2,(rx-SG->Dx[OS->SGIndex])>>2,(ry1-SG->Dy[OS->SGIndex])>>2,NULL,SG->FileID,SG->ObjChar[OS->SGIndex].SpriteIndex,AV_NORMAL, AV_NORMAL);
 #endif // _USE3D
                                 };
 							};
@@ -2109,10 +2120,10 @@ void PreShowMiniSprites(){
 				};
 			};
 			spy++;
-			ofst+=VAL_SPRNX;
-			maxy=spy<<6;
-			if(Mode3D)maxy-=GetHeight(xx,maxy<<1);
-		}while(spy<VAL_SPRNX&&maxy<(y1+100));
+            ofst += VAL_SPRNX;
+            maxy = spy << 6;
+            if (Mode3D)maxy -= GetHeight(xx, maxy << 1);
+        } while (spy < VAL_SPRNX && maxy < (y1 + 100));
 	};
 };
 void GSSetup800();
