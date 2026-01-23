@@ -13,7 +13,11 @@ int MM_ProcessSinglePlayer(){
 	LocalGP BTNS("Interface\\Single_Player");	
 
 	SQPicture MnPanel("Interface\\Background_Single_Player.bmp");
+#ifdef SCREENFIX
 	DialogsSystem MMenu(menu_x_off, menu_y_off);
+#else
+    DialogsSystem MMenu(0, 0);
+#endif
 	LocalGP HFONT("rom10");
 	RLCFont hfnt(HFONT.GPID);
 	hfnt.SetWhiteColor();
@@ -27,8 +31,13 @@ int MM_ProcessSinglePlayer(){
         menu_hint_y = 701;
     }
 	MMenu.HintFont=&hfnt;
+#ifdef SCREENFIX
 	MMenu.HintY= menu_hint_y;
 	MMenu.HintX= menu_hint_x;
+#else
+    MMenu.HintY = 18;
+    MMenu.HintX = 701;
+#endif
 	int Dy=27;
 	Picture* PIC=MMenu.addPicture(NULL,0,0,&MnPanel,&MnPanel,&MnPanel);
 	

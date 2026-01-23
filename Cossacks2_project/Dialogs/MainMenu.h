@@ -54,7 +54,11 @@ int processMainMenu(){
 	RLCFont *FAMain = &fonG60w;
 
 	// Menu
+#ifdef SCREENFIX
 	DialogsSystem MMenu(menu_x_off, menu_y_off);
+#else
+    DialogsSystem MMenu(0, 0);
+#endif
 	
 	// Main Background
 	//SQPicture MnPanel("Interface\\Background_Main_Menu.bmp");
@@ -72,8 +76,13 @@ int processMainMenu(){
         menu_hint_y = 701;
     }
 	MMenu.HintFont=&SmallWhiteFont;
+#ifdef SCREENFIX
 	MMenu.HintY= menu_hint_y;
 	MMenu.HintX= menu_hint_x;   
+#else
+    MMenu.HintY = 18;
+    MMenu.HintX = 701;
+#endif
 
 	// Main menu pictures
 	int MX = 510;	
@@ -112,12 +121,16 @@ int processMainMenu(){
     // Obrezka lishney chasti main menu 
     // Cant Click anything when this is changed to offest but is correct behaviour 19.11.2024
     // Made separate for windowed mode might help with getting it to work 22.11.2024
+#ifdef SCREENFIX
     if (!window_mode) {
         MMenu.addClipper(342 + menu_x_off, 464 + menu_y_off, 676 + menu_x_off, 707 + menu_y_off);
     }
     else {
         MMenu.addClipper(342, 464, 676, 707);
     }
+#else
+    MMenu.addClipper(342, 464, 676, 707);
+#endif
 
 	// Main menu back
 	GPPicture* MBack[4];

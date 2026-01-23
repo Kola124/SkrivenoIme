@@ -140,8 +140,11 @@ void processMLoadGame(){
 	
 	LoadPointer("cur_mn.rlc");
 	SQPicture MnPanel("Interf2\\Background_Load_Game.bmp");
+#ifdef SCREENFIX
 	DialogsSystem MMenu(menu_x_off, menu_y_off);
-	
+#else
+    DialogsSystem MMenu(0, 0);
+#endif
 	// Hint
 	MMenu.HintFont=FHint;
     if (!window_mode)
@@ -153,8 +156,13 @@ void processMLoadGame(){
         menu_hint_x = 513;
         menu_hint_y = 745;
     }
+#ifdef SCREENFIX
 	MMenu.HintX= menu_hint_x;
 	MMenu.HintY= menu_hint_y;
+#else
+    MMenu.HintX = 513;
+    MMenu.HintY = 745;
+#endif
 
 	//int dx=((RealLx-GPS.GetGPWidth(BTNS.GPID,1))>>1)-85-125;
 	//int dy=(RealLy-GPS.GetGPHeight(BTNS.GPID,1))>>1;
@@ -170,13 +178,21 @@ void processMLoadGame(){
 	RVS->Visible=0;
 	
 	// Load game list
+#ifdef SCREENFIX
 	MMenu.addClipper(0,0,709 + menu_x_off,RealLy);
+#else
+    MMenu.addClipper(0, 0, 709, RealLy);
+#endif
 	ListBox* LB=MMenu.addGP_ListBox(NULL,446,256+26,8,BTNS.GPID,0,26,FWhite,FYellow,VS);
 	MMenu.addClipper(0,0,RealLx,RealLy);
 	ListBox* DT=MMenu.addGP_ListBox(NULL,714,256+26,8,BTNS.GPID,-3,26,FWhite,FYellow,VS); // Data / Time
 
 	// Load demorec list
-	MMenu.addClipper(0,0,709 + menu_x_off,RealLy);
+#ifdef SCREENFIX
+    MMenu.addClipper(0, 0, 709 + menu_x_off, RealLy);
+#else
+    MMenu.addClipper(0, 0, 709, RealLy);
+#endif
 	ListBox* RName=MMenu.addGP_ListBox(NULL,446,256+26,8,BTNS.GPID,0,26,FWhite,FYellow,RVS);
 	MMenu.addClipper(0,0,RealLx,RealLy);
 	ListBox* RDT=MMenu.addGP_ListBox(NULL,714,256+26,8,BTNS.GPID,-3,26,FWhite,FYellow,RVS); // Data / Time

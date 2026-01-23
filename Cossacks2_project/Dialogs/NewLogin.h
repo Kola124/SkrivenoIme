@@ -4,7 +4,11 @@ extern int menu_hint_x;
 extern int menu_hint_y;
 
 bool ProcessNewInternetLogin(){
+#ifdef SCREENFIX
 	DialogsSystem DSS(menu_x_off, menu_y_off);
+#else
+    DialogsSystem DSS(0, 0);
+#endif
 	DarkScreen();
 	FlipPages();
 	LoadFog(1);
@@ -45,7 +49,11 @@ bool ProcessNewInternetLogin(){
 	sprintf(REQ,REQ1,DATA);
 	//sprintf(REQ,"GW|LW_new|LW_file&Internet/cml/log.cml");
 	//sprintf(REQ,"LF|LW_new|LW_file&req.txt");
-	RunExplorer(2,REQ,0,0,1024,768);
+#ifdef SCREENFIX
+	RunExplorer(2,REQ,0+ menu_x_off,0+ menu_y_off,1024+ menu_x_off,768+ menu_y_off);
+#else
+    RunExplorer(2, REQ, 0 , 0 , 1024 , 768 );
+#endif
 	ItemChoose=-1;
 	if(SetAccessKey){
 		for(int i=0;i<8;i++)SetAccessKey(i,"");

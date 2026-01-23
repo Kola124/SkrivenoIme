@@ -201,8 +201,11 @@ bool MPL_WaitingGame(bool Host,bool SINGLE){
 	LocalGP HFONT("rom10");
 	RLCFont hfnt(HFONT.GPID);
 	hfnt.SetWhiteColor();
-	
+#ifdef SCREENFIX
 	DialogsSystem MENU(menu_x_off, menu_y_off);
+#else
+    DialogsSystem MENU(0, 0);
+#endif
 	
 	MENU.OkSound=GetSound("START");
 
@@ -217,9 +220,13 @@ bool MPL_WaitingGame(bool Host,bool SINGLE){
     }
 
 	MENU.HintFont=FHint;
+#ifdef SCREENFIX
 	MENU.HintX= menu_hint_x;
 	MENU.HintY= menu_hint_y;
-
+#else
+    MENU.HintX = 440;
+    MENU.HintY = 745;
+#endif
 	Picture* GPPB=MENU.addPicture(NULL,0,0,&Back,&Back,&Back);
 	
 	TextButton* SHOWREC=MENU.addTextButton(NULL,1010,4,"0018",FYellow,FYellow,FYellow,0);
@@ -530,8 +537,11 @@ bool MPL_WaitingGame(bool Host,bool SINGLE){
 	int Tx2=606;
 	
 	int FAO=6; // First number of additional options
-
+#ifdef SCREENFIX
     SimpleDialog* ListClip = MENU.addClipper(601 + menu_x_off, 185 + menu_y_off, 952 + menu_x_off, 340 + menu_y_off);
+#else
+    SimpleDialog* ListClip=MENU.addClipper(601,185,952,340);
+#endif
 	//SimpleDialog* ListClip=MENU.addClipper(0,0,RealLx,RealLy);
 	
 	TGRP1[0] = MENU.addTextButton(NULL,Tx2,0,GetTextByID("INTF_CROOM_O0"),FYellow,FYellow,FYellow,0);
@@ -716,8 +726,12 @@ bool MPL_WaitingGame(bool Host,bool SINGLE){
 	LBSav->FontDx -= 16;
 
 	//---------------  Options of the Current Game  --------------
+    
+ #ifdef SCREENFIX
     GP_PageControl* GPP = MENU.addPageControl(NULL, 11, -1500, BTNS.GPID, 0);
-
+#else
+    GP_PageControl* GPP = MENU.addPageControl(NULL, 11, -150, BTNS.GPID, 0);
+#endif
 	int PageX = 602;
 	int PageW = 125;
 	int PageY = 144;
@@ -986,7 +1000,11 @@ ffe2:;
 		};
 		int a=AOScr->GetPos();
 		for(int i=0; i<NGRP1; i++){
+#ifdef SCREENFIX
 			int y = y2+menu_y_off +(i-a)*26;
+#else
+            int y = y2 +(i-a)*26;
+#endif
 			int y1 = y+CMGRP1[i]->y1-CMGRP1[i]->y;
 			if(CMGRP1[i]){
 				CMGRP1[i]->y=y;
@@ -2125,7 +2143,7 @@ FinCLC:;
 	if(Host){
 		FILE* Fx=fopen("MuliExOpt.dat","w");
 		if(F){
-			fprintf(Fx,"%d %d %d %d %d %d %d",CUROPTVAL[0],CUROPTVAL[1],CUROPTVAL[2],CUROPTVAL[3],CUROPTVAL[4],CUROPTVAL[5],CUROPTVAL[6],CUROPTVAL[7]);
+			fprintf(Fx,"%d %d %d %d %d %d %d %d",CUROPTVAL[0],CUROPTVAL[1],CUROPTVAL[2],CUROPTVAL[3],CUROPTVAL[4],CUROPTVAL[5],CUROPTVAL[6],CUROPTVAL[7]);
 			fclose(Fx);
 		};
 	};

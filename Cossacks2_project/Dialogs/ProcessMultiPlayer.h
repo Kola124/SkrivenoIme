@@ -24,11 +24,17 @@ int MM_ProcessMultiPlayer(){
 	//SQPicture MnPanel("Interface\\Background_Multi_Player.bmp");
 	SQPicture MnPanel("Interface\\Background_Multi_Player.bmp");
 	
-	
+#ifdef SCREENFIX
 	DialogsSystem MMenu(menu_x_off, menu_y_off);
 	MMenu.HintFont=&hfnt;
 	MMenu.HintY= menu_hint_y;
 	MMenu.HintX= menu_hint_x;
+#else
+    DialogsSystem MMenu(0, 0);
+    MMenu.HintFont = &hfnt;
+    MMenu.HintY = 18;
+    MMenu.HintX = 701;
+#endif
 
 	int Dy=110;
 	Picture* PIC=MMenu.addPicture(NULL,0,0,&MnPanel,&MnPanel,&MnPanel);

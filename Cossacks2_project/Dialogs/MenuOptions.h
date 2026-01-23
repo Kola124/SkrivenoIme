@@ -30,7 +30,11 @@ bool ProcessMenuOptions(){
 	*/
 
 	// Main menu	
+#ifdef SCREENFIX
 	DialogsSystem MMenu(menu_x_off, menu_y_off);
+#else
+    DialogsSystem MMenu(0, 0);
+#endif
     if (!window_mode)
     {
         menu_hint_x = 513 + menu_x_off;
@@ -42,8 +46,13 @@ bool ProcessMenuOptions(){
     }
 	// Hint
 	MMenu.HintFont=FHint;
+#ifdef SCREENFIX
     MMenu.HintY = menu_hint_y;
     MMenu.HintX = menu_hint_x;
+#else
+    MMenu.HintX = 513;
+    MMenu.HintY = 745;
+#endif
 	
 	//int dx=((RealLx-GPS.GetGPWidth(BTNS.GPID,1))>>1)-85-125;
 	//int dy=(RealLy-GPS.GetGPHeight(BTNS.GPID,1))>>1;
@@ -104,11 +113,7 @@ bool ProcessMenuOptions(){
 	VScrollBar* MVL=MMenu.addGP_ScrollBarL(NULL,X0,392+DY,100,MidiSound,SCR.GPID,0,LX,12,0,0); //music volume (#2)
 	VScrollBar* SSP=MMenu.addGP_ScrollBarL(NULL,X0,474+DY,8,ScrollSpeed-2,SCR.GPID,0,LX,12,0,0); //sound volume (#1)		
 #ifndef SPEEDFIX	
-#ifndef EW
     VScrollBar* HB = MMenu.addGP_ScrollBarL(NULL, X0, 500 + DY, 100, 100 - FPSTime, SCR.GPID, 0, LX, 12, 0, 0);
-#else
-    VScrollBar* HB = MMenu.addGP_ScrollBarL(NULL, X0, 500 + DY, 100, 100 - FPSTime, SCR.GPID, 0, LX, 12, 0, 0);
-#endif
 #endif
 	
 	SVL->Hint=GetTextByID("INTF5_HINT4");

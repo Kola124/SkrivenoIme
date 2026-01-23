@@ -48,7 +48,11 @@ bool ProcessSingleMission(int n,int Diff){
 		RLCFont* FHint = &SmallYellowFont;
 
 		SQPicture Back("Interf2\\Mission_Loading.bmp");
+#ifdef SCREENFIX
 		DialogsSystem MISS(menu_x_off, menu_y_off);
+#else
+        DialogsSystem MISS(0, 0);
+#endif
 		MISS.addPicture(NULL,0,0,&Back,&Back,&Back);
 
 		// Description
@@ -119,8 +123,13 @@ bool ProcessSingleMission(int n,int Diff){
         }
 
 		MISS.HintFont=FHint;
+#ifdef SCREENFIX
         MISS.HintX = menu_hint_x;
         MISS.HintY = menu_hint_y;
+#else
+        MISS.HintX = 470;
+        MISS.HintY = 745;
+#endif
 		//MISS.HintX=HintX;
 		//MISS.HintY=HintY;
 
@@ -250,7 +259,11 @@ bool ProcessSingleMission(int n,int Diff){
 		RLCFont hdrf(HDR.GPID);
 		//hdrf.SetColorTable(5);
 		SQPicture Back("Interface\\Background_Mission_Text.bmp");
+#ifdef SCREENFIX
 		DialogsSystem MISS(menu_x_off, menu_y_off);
+#else
+        DialogsSystem MISS(0, 0);
+#endif
 		MISS.addPicture(NULL,0,0,&Back,&Back,&Back);
 		MISS.addGPPicture(NULL,48,119,PIC.GPID,0);
 		//GPS.SetOptionalColor(PIC.GPID,5);

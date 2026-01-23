@@ -1399,14 +1399,14 @@ void GameKeyCheck(){
 				case 46:
 					SpecCmd=200;
 					break;
-#ifndef SPEEDFIX
 				case 'D':
+#ifndef SPEEDFIX
 					if(!(GetKeyState(VK_CONTROL)&0x8000)){
 						if(!(GetKeyState(VK_SHIFT)&0x8000)){
 							//FlipDipDialog();
 						}else
 						if(NPlayers<2){
-							if((GetKeyState(VK_SHIFT)&0x8000)//&&PlayGameMode){
+							if((GetKeyState(VK_SHIFT))&0x8000){//&&PlayGameMode)
 								switch(HISPEED){
 								case 0:
 									HISPEED=1;
@@ -1427,8 +1427,8 @@ void GameKeyCheck(){
 						if(FrmDec==1)CmdSetSpeed(1+128);
 						else CmdSetSpeed(128);
 					};
-					break;
 #endif
+					break;
 				case 'A':
 					if(GetKeyState(VK_CONTROL)&0x8000)SpecCmd=1;
 					else if(NSL[MyNation])GoAndAttackMode=1;
@@ -1724,6 +1724,7 @@ void GameKeyCheck(){
 						//};
 					};
 			 };
+        
 	};
 };
 void TestRoads();
@@ -2015,7 +2016,7 @@ void EditorKeyCheck(){
 				case 'D':
 					
 					if(!(GetKeyState(VK_CONTROL)&0x8000)){
-						if((GetKeyState(VK_SHIFT)&0x8000)//&&PlayGameMode){
+						if((GetKeyState(VK_SHIFT))&0x8000){//&&PlayGameMode)
 							switch(HISPEED){
 							case 0:
 								HISPEED=1;

@@ -2991,14 +2991,14 @@ ppp:		mov		ecx,Lx
 					BV->y+iy*BV->OneLy,BV->OneLx-1,BV->OneLy-1,char(254));
 				char ccc[16];
 				if(BV->Nx>1){
-					sprintf(ccc,"%d",BV->Choosed[ix+(iy+BV->PosY)*BV->Nx]);
+					sprintf_s(ccc,sizeof(ccc),"%d",BV->Choosed[ix+(iy+BV->PosY)*BV->Nx]);
 					ShowString(BV->x+ix*BV->OneLx+4,BV->y+iy*BV->OneLy+4,ccc,&fn10);
 				};
 			};
 			if(SSTAT){
 				char cc[32];
 				if(BV->Nx>1){
-					sprintf(cc,"%d",ix+(iy+BV->PosY)*BV->Nx);
+					sprintf_s( cc,sizeof(cc),"%d",ix+(iy+BV->PosY)*BV->Nx);
 					ShowString(BV->x+ix*BV->OneLx+4,BV->y+(iy+1)*BV->OneLy-16,cc,&fn10);
 				};
 			};

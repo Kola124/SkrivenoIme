@@ -505,7 +505,7 @@ LONG __stdcall FEX_CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pEx)
 		unsigned long ss = MAX_COMPUTERNAME_LENGTH + 1;
 
 		GetComputerName(tmp, &ss);
-		sprintf(cc,"%s%s_BUG_%d.%d.%d_%d@%d@%d",COPY_PATH,tmp,ST.wDay,ST.wMonth,ST.wYear,ST.wHour,ST.wMinute,ST.wSecond);
+		sprintf_s( cc,sizeof(cc),"%s%s_BUG_%d.%d.%d_%d@%d@%d",COPY_PATH,tmp,ST.wDay,ST.wMonth,ST.wYear,ST.wHour,ST.wMinute,ST.wSecond);
 		CreateDirectory(cc,0);
 		strcat(cc,"\\");
 		strcat(cc,FEX_fnameDump);

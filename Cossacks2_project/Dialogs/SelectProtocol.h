@@ -10,6 +10,7 @@ int SPdX = 12;
 
 bool MMChooseNameEx(SimpleDialog* SD){
 	int x1 = SPX+SPW;
+#ifdef SCREENFIX
 	IPX->x=SPX+menu_x_off;
 	IPX->x1=x1 + menu_x_off;
 	TCP->x=SPX + menu_x_off;
@@ -21,7 +22,19 @@ bool MMChooseNameEx(SimpleDialog* SD){
 
 	SD->x=SPX-SPdX + menu_x_off;
 	SD->x1=SPX+SPW+SPdX + menu_x_off;
-	
+#else
+    IPX->x = SPX;
+    IPX->x1 = x1;
+    TCP->x = SPX;
+    TCP->x1 = x1;
+    TCPDIRECT->x = SPX;
+    TCPDIRECT->x1 = x1;
+    INET->x = SPX;
+    INET->x1 = x1;
+
+    SD->x = SPX - SPdX;
+    SD->x1 = SPX + SPW + SPdX;
+#endif
 	NameChoose=SD->UserParam;
 	Lpressed=false;
 	return false;
@@ -58,8 +71,11 @@ int MPL_ChooseConnection(){
 #ifndef FRANCEVERSION
 	SQPicture IBACK("Interface\\Background_Type_Connection_Crop.bmp");
 #endif
-	
+#ifdef SCREENFIX
 	DialogsSystem MENU(menu_x_off, menu_y_off);
+#else
+    DialogsSystem MENU(0, 0);
+#endif
 	//int dx=((RealLx-GPS.GetGPWidth(BTNS.GPID,0))>>1)-85;
 	//int dy=(RealLx-GPS.GetGPWidth(BTNS.GPID,0))>>1;
 	MENU.addPicture(NULL,0,0,&Back,&Back,&Back);
@@ -90,9 +106,13 @@ int MPL_ChooseConnection(){
     }
 
 	MENU.HintFont=FHint;
+#ifdef SCREENFIX
 	MENU.HintX= menu_hint_x;
 	MENU.HintY= menu_hint_y;
-
+#else
+    MENU.HintX = 513;
+    MENU.HintY = 745;
+#endif
 	IPX=MENU.addUniversalButton(SPX,SPY,SPW,GetTextByID("INTF_PROT_B0"),TB3.GPID,Set3,0,0,0,FWhite,FWhite,FYellow);
 	TCP=MENU.addUniversalButton(SPX,SPY+26,SPW,GetTextByID("INTF_PROT_B1"),TB3.GPID,Set3,0,0,0,FWhite,FWhite,FYellow);
 	TCPDIRECT=MENU.addUniversalButton(SPX,SPY+26*2,SPW,GetTextByID("INTF_PROT_B2"),TB3.GPID,Set3,0,0,0,FWhite,FWhite,FYellow);

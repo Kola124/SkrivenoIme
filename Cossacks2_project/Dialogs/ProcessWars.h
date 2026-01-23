@@ -22,7 +22,12 @@ int ProcessWars(){
 
 	RLCFont FontW(FONT.GPID);
 	FontW.SetWhiteColor();
+
+#ifdef SCREENFIX
 	DialogsSystem MMenu(menu_x_off, menu_y_off);
+#else
+    DialogsSystem MMenu(0, 0);
+#endif
 
 	LocalGP HFONT("rom10");
 	RLCFont hfnt(HFONT.GPID);
@@ -37,8 +42,13 @@ int ProcessWars(){
         menu_hint_y = 701;
     }
 	MMenu.HintFont=&hfnt;
+#ifdef SCREENFIX
 	MMenu.HintY= menu_hint_y;
 	MMenu.HintX= menu_hint_x;
+#else
+    MMenu.HintY = 18;
+    MMenu.HintX = 701;
+#endif
 
 	MMenu.addPicture(NULL,0,0,&Back,&Back,&Back);
 	VideoButton* ENC=MMenu.addVideoButton(NULL,862,468,ENC1.GPID,ENC2.GPID);
@@ -173,8 +183,11 @@ bool MPL_WaitingBattleGame(bool Host,int BattleID){
 	RLCFont FontW(FONT.GPID);
 	FontW.SetColorTable(4);
 	LoadOptionalTable(4,"2\\white.grd");
-
+#ifdef SCREENFIX
 	DialogsSystem MENU(menu_x_off, menu_y_off);
+#else
+    DialogsSystem MENU(0, 0);
+#endif
 	MENU.OkSound=GetSound("START");
 	LocalGP HFONT("rom10");
 	RLCFont hfnt(HFONT.GPID);
@@ -189,8 +202,13 @@ bool MPL_WaitingBattleGame(bool Host,int BattleID){
         menu_hint_x = 18;
         menu_hint_y = 701;
     }
+#ifdef SCREENFIX
 	MENU.HintY= menu_hint_y;
     MENU.HintX = menu_hint_x;
+#else
+    MENU.HintY = 18;
+    MENU.HintX = 701;
+#endif
 	Picture* GPPB=MENU.addPicture(NULL,0,0,&Back,&Back,&Back);
 	GPPicture*  NameBack[2];
 	GPPicture*  NationBack[2];

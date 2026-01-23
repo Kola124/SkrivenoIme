@@ -20,7 +20,13 @@ bool PostCampaignMessage(int n){
 
 		// Dialog
 		SQPicture Back("Interf2\\Mission_Loading.bmp");
-		DialogsSystem MISS(menu_x_off, menu_y_off);
+#ifdef SCREENFIX
+        DialogsSystem MISS(menu_x_off, menu_y_off);
+#else
+        DialogsSystem MISS(0, 0);
+#endif// 
+
+		
 		MISS.addPicture(NULL,0,0,&Back,&Back,&Back);
 
 		// Hint
@@ -38,8 +44,13 @@ bool PostCampaignMessage(int n){
         }
 
 		MISS.HintFont=FHint;
+#ifdef SCREENFIX
 		MISS.HintX= menu_hint_x;
 		MISS.HintY= menu_hint_y;
+#else
+        MISS.HintX = 470;
+        MISS.HintY = 745;
+#endif
 
 		// Picture
 		LocalGP PIC("Interf2\\MissPreview");

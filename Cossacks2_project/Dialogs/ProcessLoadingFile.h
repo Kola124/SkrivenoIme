@@ -33,8 +33,13 @@ bool ProcessLoadingFile(char* Mask,char* DestName,int Header){
     }
 
 	MMenu.HintFont=&hfnt;
+#ifdef SCREENFIX
 	MMenu.HintY= menu_hint_y;
 	MMenu.HintX= menu_hint_x;
+#else
+    MMenu.HintY = 18;
+    MMenu.HintX = 701;
+#endif
 
 	int X = 0;
 	int Y = 0;

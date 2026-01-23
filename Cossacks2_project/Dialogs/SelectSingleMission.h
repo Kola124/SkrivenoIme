@@ -44,7 +44,11 @@ bool SelectSingleMission(){
 	RLCFont* FMissText = &fon18y3;
 	RLCFont* FHint = &SmallYellowFont;
 
+#ifdef SCREENFIX
 	DialogsSystem MMenu(menu_x_off, menu_y_off);
+#else
+    DialogsSystem MMenu(0, 0);
+#endif
 	MMenu.addPicture(NULL,0,0,&Back,&Back,&Back);
 	
 	/*
@@ -78,8 +82,13 @@ bool SelectSingleMission(){
     }
 
 	MMenu.HintFont=FHint;
+#ifdef SCREENFIX
 	MMenu.HintX=menu_hint_x;
 	MMenu.HintY=menu_hint_y;
+#else
+    MMenu.HintX = 440;
+    MMenu.HintY = 745;
+#endif
 
 	TextButton* HintTxt = MMenu.addTextButton(NULL,HintX,HintY,"                                                                                               ",FHint,FHint,FHint,1);
 

@@ -13,8 +13,11 @@ bool MPL_JoinGame(int ID){
 	
 	LoadFog(1);
 	SQPicture Back("Interf2\\Game_Select_Background.bmp");
-
+#ifdef SCREENFIX
 	DialogsSystem MENU(menu_x_off, menu_y_off);
+#else
+    DialogsSystem MENU(0, 0);
+#endif
 	MENU.addPicture(NULL,0,0,&Back,&Back,&Back);
 	
 	//int dx=((RealLx-GPS.GetGPWidth(BTNS.GPID,0))>>1)-85;

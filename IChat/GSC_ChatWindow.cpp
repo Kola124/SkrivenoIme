@@ -498,7 +498,11 @@ void EnterPersonalMessage(char* Nick,bool Active){
 	LocalGP BARS("Interface\\bor2");
 	LocalGP BTNS("Internet\\pix\\i_bor1");
 	DarkScreen();
+#ifdef SCREENFIX
 	DialogsSystem DSS(menu_x_off, menu_y_off);
+#else
+    DialogsSystem DSS(0, 0);
+#endif
 	DSS.addBPXView(NULL,0,0,RealLx,RealLy,1,1,1,ptr,NULL);
 	int DL=120;
 	int ba[8]={74,75,72,73,76,77,80,79};

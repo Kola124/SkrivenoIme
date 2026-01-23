@@ -1,8 +1,14 @@
 bool ProcessGameOptions(){
     if (!window_mode)
     {//Calculate offsets for centering menu in fullscreen mode
+#ifdef SCREENFIX
         menu_x_off = (screen_width - 1024) / 2;
-        menu_y_off = (screen_height - 768) / 2;
+        menu_y_off = (screen_height - 768) / 2;  
+#else
+        menu_x_off = 0;
+        menu_y_off = 0;
+#endif
+        
         menu_hint_x = 18 + menu_x_off;
         menu_hint_y = 701 + menu_y_off;
     }
@@ -31,8 +37,13 @@ bool ProcessGameOptions(){
         menu_hint_x = 18;
         menu_hint_y = 701;
     }
+#ifdef SCREENFIX
 	MMenu.HintY= menu_hint_y;
 	MMenu.HintX= menu_hint_x;
+#else
+    MMenu.HintY = 18;
+    MMenu.HintX = 701;
+#endif
 	
 	// Fonts
 	RLCFont* FWin = &fon16y5;
@@ -91,11 +102,7 @@ bool ProcessGameOptions(){
 	VScrollBar* MVL=MMenu.addGP_ScrollBarL(NULL,X0,ScrDy+ComY+4*DY,100,MidiSound,SCR.GPID,0,LX,12,0,0);	
 	VScrollBar* SSP=MMenu.addGP_ScrollBarL(NULL,X0,ScrDy+1+ComY+7*DY,8,ScrollSpeed-2,SCR.GPID,0,LX,12,0,0);
 #ifndef SPEEDFIX
-#ifndef EW
     VScrollBar* HB = MMenu.addGP_ScrollBarL(NULL, X0, ScrDy + ComY + 8 * DY, 100, 100 - FPSTime, SCR.GPID, 0, LX, 12, 0, 0);
-#else
-    VScrollBar* HB = MMenu.addGP_ScrollBarL(NULL, X0, ScrDy + ComY + 8 * DY, 100, 100 - FPSTime, SCR.GPID, 0, LX, 12, 0, 0);
-#endif
 #endif
 
 	int ButY = Y+527;

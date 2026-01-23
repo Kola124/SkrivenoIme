@@ -1703,7 +1703,11 @@ CEXPORT void DRAWBOX(int x,int y,int Lx,int Ly,int Idx,byte Active,int param){
 bool EnterPassword(){
 	LocalGP BARS("Interface\\bor2");
 	DarkScreen();
+#ifdef SCREENFIX
 	DialogsSystem DSS(menu_x_off, menu_y_off);
+#else
+    DialogsSystem DSS(0, 0);
+#endif
 	SessPassword[0]=0;
 	CustomBox* CBOX=DSS.addCustomBox(RealLx/2-170,RealLy/2-44,340,80,&DRAWBOX);
 	CBOX->param=BARS.GPID;
@@ -1730,7 +1734,11 @@ void EnterPersonalMessage(char* Nick){
 	strcpy(nick,Nick);
 	LocalGP BARS("Interface\\bor2");
 	DarkScreen();
+#ifdef SCREENFIX
 	DialogsSystem DSS(menu_x_off, menu_y_off);
+#else
+    DialogsSystem DSS(0, 0);
+#endif
 	int DL=60;
 	int Y0=RealLy/2-44+10+70+3;
 	int X0=RealLx/2-70-DL-80;
@@ -2606,7 +2614,11 @@ int ProcessInternetConnection(bool Active){
     if (TPEN.MyRoom && Active)TPEN.LeaveMyRoom();
     */
         
+#ifdef SCREENFIX
     DialogsSystem DSS(menu_x_off, menu_y_off);
+#else
+    DialogsSystem DSS(0, 0);
+#endif
 
 
 
@@ -2627,10 +2639,15 @@ int ProcessInternetConnection(bool Active){
         menu_hint_x = 18;
         menu_hint_y = 701;
     }
-
+#ifdef SCREENFIX
     DSS.HintY = menu_hint_y;
 
     DSS.HintX = menu_hint_x;
+#else
+    DSS.HintY = 18;
+
+    DSS.HintX = 701;
+#endif
 
 
 
@@ -4885,7 +4902,11 @@ extern int AddIconLx;
 extern int AddIconLy;
 //extern int IconLx;
 extern int IconLy;
+#ifdef SCREENFIX
 DialogsSystem GSYS(menu_x_off, menu_y_off);
+#else
+DialogsSystem GSYS(0, 0);
+#endif
 SimpleDialog* GVPort;
 SimpleDialog* MiniVPort;
 SimpleDialog* AblVPort;
@@ -8056,7 +8077,11 @@ bool WaitingGame(bool Host){
 	TextButton* MGRP   [8];
 	RLCFont     FontA(GETS("@MNMENUACTF"));
 	RLCFont     FontP(GETS("@MNMENUPASF"));
+#ifdef SCREENFIX
 	DialogsSystem MPLAY(menu_x_off, menu_y_off);
+#else
+    DialogsSystem MPLAY(0, 0);
+#endif
 	MPLAY.addPicture(NULL,0,0,&MPL,&MPL,&MPL);
 	char NAMY[16];
 	int NameX=GETV("MINAMEX");
@@ -8838,7 +8863,11 @@ void SlideShow(){
 				ResFile F=RReset(cc);
 				if(F!=INVALID_HANDLE_VALUE){
 					RClose(F);
+#ifdef SCREENFIX
 					DialogsSystem DSS(menu_x_off, menu_y_off);
+#else
+                    DialogsSystem DSS(0, 0);
+#endif
 					SQPicture PIC;
 					PIC.LoadPicture(cc);
 					DSS.addPicture(NULL,0,0,&PIC,&PIC,&PIC);
@@ -8874,7 +8903,11 @@ void ShowPreview(){
 		RClose(F);
 		ClearScreen();
 		LoadFog(2);
+#ifdef SCREENFIX
 		DialogsSystem DSS(menu_x_off, menu_y_off);
+#else
+        DialogsSystem DSS(0, 0);
+#endif
 		SQPicture PIC;
 		PIC.LoadPicture("Slides\\Preview.bmp");
 		DSS.addPicture(NULL,0,0,&PIC,&PIC,&PIC);
@@ -9057,8 +9090,11 @@ int ShowStatScreen(bool Next,bool Prev,byte Kind){
 		else deal=750;
 		int NGridY=(MaxPop/deal)+1;
 		MaxPop=NGridY*deal;
-
+#ifdef SCREENFIX
 		DialogsSystem STAT(menu_x_off, menu_y_off);
+#else
+        DialogsSystem STAT(0, 0);
+#endif
 		STAT.addPicture(NULL,0,0,&BACK,&BACK,&BACK);
 		int DDX=110;
 		//if(!ExStyle)DDX=0;
@@ -9161,10 +9197,17 @@ int ShowStatScreen(bool Next,bool Prev,byte Kind){
 			STAT.MarkToDraw();
 			STAT.ProcessDialogs();
 			//DrawStatTable(x,y-ODY,Lx,GrLy+ODY,OneLy,NNAT);
+#ifdef SCREENFIX
 			int gx0=GrpX+x+ menu_x_off;
 			int gx1=GrpX+x+GrpLx-1+ menu_x_off;
 			int gy0=GrpY+y+ menu_y_off;
 			int gy1=GrpY+y+GrpLy-1+ menu_y_off;
+#else
+            int gx0 = GrpX + x ;
+            int gx1 = GrpX + x + GrpLx - 1 ;
+            int gy0 = GrpY + y ;
+            int gy1 = GrpY + y + GrpLy - 1 ;
+#endif
 			Xbar(gx0-1,gy0-1,gx1-gx0+4,gy1-gy0+4,0xEC);
 			//Xbar(gx0-2,gy0-2,gx1-gx0+5,gy1-gy0+5,0x3A);
 			//Xbar(gx0-3,gy0-3,gx1-gx0+7,gy1-gy0+7,0x39);
@@ -9173,11 +9216,21 @@ int ShowStatScreen(bool Next,bool Prev,byte Kind){
 			//Xbar(gx0-6,gy0-6,gx1-gx0+13,gy1-gy0+13,0xAE);
 			//drawing grids
 			for(int ix=0;ix<8;ix++){
+#ifdef SCREENFIX
 				int gx0=x+GrpX+((GrpLx*ix)>>3)+ menu_x_off;
 				int gx1=x+GrpX+((GrpLx*(ix+1))>>3)+ menu_x_off;
+#else
+                int gx0 = x + GrpX + ((GrpLx * ix) >> 3) ;
+                int gx1 = x + GrpX + ((GrpLx * (ix + 1)) >> 3) ;
+#endif
 				for(int iy=0;iy<NGridY;iy++){
+#ifdef SCREENFIX
 					int gy0=y+GrpY+((GrpLy*iy)/NGridY)+ menu_y_off;
 					int gy1=y+GrpY+((GrpLy*(iy+1))/NGridY)+ menu_y_off;
+#else
+                    int gy0 = y + GrpY + ((GrpLy * iy) / NGridY) ;
+                    int gy1 = y + GrpY + ((GrpLy * (iy + 1)) / NGridY) ;
+#endif
 					Xbar(gx0,gy0,gx1-gx0+1,gy1-gy0+1,0xEC);
 					//Xbar(gx0+1,gy0+1,gx1-gx0-1,gy1-gy0-1,0x3B);
 					//Xbar(gx0+2,gy0+2,gx1-gx0-3,gy1-gy0-3,0x3A);
@@ -9202,8 +9255,13 @@ int ShowStatScreen(bool Next,bool Prev,byte Kind){
 						X0=X1;
 						Y0=Y1;
 					};
+#ifdef SCREENFIX
 					X1=x+GrpX+((j<<8)*GrpLx)/MaxUpgTime+ menu_x_off;
 					Y1=y+GrpY+GrpLy-(VAL[j]*(GrpLy-10))/MaxPop+ menu_y_off;
+#else
+                    X1 = x + GrpX + ((j << 8) * GrpLx) / MaxUpgTime ;
+                    Y1 = y + GrpY + GrpLy - (VAL[j] * (GrpLy - 10)) / MaxPop ;
+#endif
 					if(j>0){
 						DrawLine(X0,Y0,X1,Y1,c);
 						DrawLine(X0+1,Y0,X1+1,Y1,c);
@@ -9239,7 +9297,11 @@ int ShowUserStat(bool Prev,bool Next){
 	LocalGP BTNS;
 	SQPicture BACK2("Interf2\\statistic_background.bmp");
 	BTNS.Load("Interf2\\stats");
+#ifdef SCREENFIX
 	DialogsSystem STAT(menu_x_off, menu_y_off);
+#else
+    DialogsSystem STAT(0, 0);
+#endif
 	STAT.addPicture(NULL,0,0,&BACK2,&BACK2,&BACK2);
 	int DDX=110;
 	//if(!ExStyle)DDX=0;
@@ -9311,14 +9373,23 @@ int ShowUserStat(bool Prev,bool Next){
 	char* KHDR=GetTextByID("ST_KILL");
 	char* PHDR=GetTextByID("ST_PROD");
 	int curnat=0;
-
+#ifdef SCREENFIX
 	int ux=230-30+ menu_x_off;
 	int uy=320+ menu_y_off;
+#else
+    int ux = 230 - 30;
+    int uy = 320;
+#endif
 	int ulx=353;
 	int uly=373;
 	int kx=ux+ulx+45;
+#ifdef SCREENFIX
 	VScrollBar* PBR=STAT.addNewGP_VScrollBar(NULL,ux+ulx+11-15- menu_x_off,uy+1+2- menu_y_off,uly-2-2,1,0,3,0);
 	VScrollBar* KBR=STAT.addNewGP_VScrollBar(NULL,kx+ulx+11-15- menu_x_off,uy+1+2- menu_y_off,uly-2-2,1,0,3,0);
+#else
+    VScrollBar* PBR = STAT.addNewGP_VScrollBar(NULL, ux + ulx + 11 - 15 , uy + 1 + 2 , uly - 2 - 2, 1, 0, 3, 0);
+    VScrollBar* KBR = STAT.addNewGP_VScrollBar(NULL, kx + ulx + 11 - 15 , uy + 1 + 2 , uly - 2 - 2, 1, 0, 3, 0);
+#endif
 	PBR->ScrDy=200;
 	KBR->ScrDy=200;
 	do{
@@ -9333,11 +9404,20 @@ int ShowUserStat(bool Prev,bool Next){
 		for(int i=0;i<LB->NItems;i++){
 			CBar(LB->x-15,LB->y+15+i*25,12,3,0xD0+NatRefTBL[NATS[i]]*4);
 		};
+#ifdef SCREENFIX
 		ShowString(512-GetRLCStrWidth(STHDR,&fon18y5)/2+ menu_x_off,26+ menu_y_off,STHDR,&fon18y5);
+#else
+        ShowString(512 - GetRLCStrWidth(STHDR, &fon18y5) / 2 , 26, STHDR, &fon18y5);
+#endif
 		ShowString(ux+(ulx>>1)+7-(GetRLCStrWidth(PHDR,&YellowFont)>>1),uy-22,PHDR,Statfont);
 		ShowString(kx+(ulx>>1)+7-(GetRLCStrWidth(KHDR,&YellowFont)>>1),uy-22,KHDR,Statfont);
+#ifdef SCREENFIX
 		int rx=190+ menu_x_off;
 		int ry=y+48+ menu_y_off;
+#else
+        int rx = 190;
+        int ry = y + 48;
+#endif
 		int rx1=rx+219+5;
 		int rxl=80;
 		for(int q=0;q<6;q++){
@@ -10358,7 +10438,11 @@ void ShowClanString(int x,int y,char* s,byte State,RLCFont* Fn,RLCFont* Fn1,int 
 	return;
 };
 //--------------DIPLOMACY IMPLEMENTATION-------------
+#ifdef SCREENFIX
 DialogsSystem DIP_DSS(menu_x_off, menu_y_off);
+#else
+DialogsSystem DIP_DSS(0, 0);
+#endif
 bool DIP_DSS_Init=0;
 bool DIP_DSS_Vis=0;
 char CUR_Request[256]="LF|LW_new|open&req1.txt";

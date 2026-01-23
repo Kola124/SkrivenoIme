@@ -23,7 +23,11 @@ bool EnterName(){
 	RLCFont hfnt(FONT1.GPID);
 
 	SQPicture Back("Interf2\\Background_Player_Name.bmp");
+#ifdef SCREENFIX
 	DialogsSystem MENU(menu_x_off, menu_y_off);
+#else
+    DialogsSystem MENU(0, 0);
+#endif
 	MENU.UserClickSound=-1;
 	MENU.addPicture(NULL,0,0,&Back,&Back,&Back);
 
@@ -54,8 +58,15 @@ bool EnterName(){
     }
 
 	MENU.HintFont=FHint;
-	MENU.HintX= menu_hint_x;
-	MENU.HintY= menu_hint_y;
+#ifdef SCREENFIX
+    MENU.HintX = menu_hint_x;
+    MENU.HintY = menu_hint_y;
+#else
+    MENU.HintX = 490;
+    MENU.HintY = 745;
+#endif
+
+	
 
 	InputBox* IB=MENU.addInputBox(NULL,594,524,PlName,16,308,40,FYellow,FWhite,0);	
 	IB->Active=true;

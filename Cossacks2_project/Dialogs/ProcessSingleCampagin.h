@@ -42,8 +42,11 @@ bool ProcessSingleCampagin(int n){
         menu_hint_x = 440;
         menu_hint_y = 745;
     }
-
+#ifdef SCREENFIX
 	DialogsSystem MMenu(menu_x_off, menu_y_off);
+#else
+    DialogsSystem MMenu(0, 0);
+#endif
 	MMenu.OkSound=GetSound("START");
 	MMenu.addPicture(NULL,0,0,&Back,&Back,&Back);
 
@@ -72,8 +75,13 @@ bool ProcessSingleCampagin(int n){
 	// Hint
 
 	MMenu.HintFont=FHint;
+#ifdef SCREENFIX
 	MMenu.HintX= menu_hint_x;
 	MMenu.HintY= menu_hint_y;
+#else
+    MMenu.HintX = 440;
+    MMenu.HintY = 745;
+#endif
 
 	TextButton* HintTxt = MMenu.addTextButton(NULL,HintX,HintY,"                                                                                                                                 ",FHint,FHint,FHint,1);
 

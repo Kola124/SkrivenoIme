@@ -28,8 +28,13 @@ void ProcessGLoadGame(){
         menu_hint_x = 18;
         menu_hint_y = 701;
     }
+#ifdef SCREENFIX
 	MMenu.HintY= menu_hint_y;
 	MMenu.HintX= menu_hint_x;
+#else
+    MMenu.HintY = 18;
+    MMenu.HintX = 701;
+#endif
 
 	int X = -60;
 	int Y = -40;

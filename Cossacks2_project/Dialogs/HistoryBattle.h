@@ -56,8 +56,11 @@ bool MPL_WaitingBattleGame(bool Host,int BattleID){
 	int Set0[30] = {2,2,2,2,2, 3,3,3,3,3, 3,3,3,3,3,
 				    2,2,2,2,2, 3,3,3,3,3, 3,3,3,3,3};
 
-	
+#ifdef SCREENFIX
 	DialogsSystem MENU(menu_x_off, menu_y_off);
+#else
+    DialogsSystem MENU(0, 0);
+#endif
 	MENU.OkSound=GetSound("START");
 
 	SQPicture Back("Interf2\\Background_Historical_Create.bmp");
@@ -77,8 +80,14 @@ bool MPL_WaitingBattleGame(bool Host,int BattleID){
     }
 
 	MENU.HintFont=FHint;
-	MENU.HintX= menu_hint_x;
-	MENU.HintY= menu_hint_y;
+#ifdef SCREENFIX
+    MENU.HintX = menu_hint_x;
+    MENU.HintY = menu_hint_y;
+#else
+    MENU.HintX = 440;
+    MENU.HintY = 745;
+#endif
+	
 
 	GPPicture*  NameBack[2];
 	GPPicture*  NationBack[2];
@@ -763,7 +772,11 @@ bool ProcessOneBattle(int BtlID){
 
 	RLCFont FontW(FONT.GPID);
 	FontW.SetWhiteColor();
+#ifdef SCREENFIX
 	DialogsSystem MMenu(menu_x_off, menu_y_off);
+#else
+    DialogsSystem MMenu(0, 0);
+#endif
 
 	LocalGP HFONT("rom10");
 	RLCFont hfnt(HFONT.GPID);
@@ -778,8 +791,15 @@ bool ProcessOneBattle(int BtlID){
         menu_hint_x = 18;
         menu_hint_y = 701;
     }
+#ifdef SCREENFIX
     MMenu.HintY = menu_hint_y;
     MMenu.HintX = menu_hint_x;
+#else
+    MMenu.HintY = 18;
+    MMenu.HintX = 701;
+#endif
+
+    
 
 	MMenu.addPicture(NULL,0,0,&Back,&Back,&Back);
 	VideoButton* ENC=MMenu.addVideoButton(NULL,862,468,ENC1.GPID,ENC2.GPID);
@@ -855,7 +875,11 @@ int ProcessWars(){
 
 	RLCFont FontW(FONT.GPID);
 	FontW.SetWhiteColor();
+#ifdef SCREENFIX
 	DialogsSystem MMenu(menu_x_off, menu_y_off);
+#else
+    DialogsSystem MMenu(0, 0);
+#endif
 
 	LocalGP HFONT("rom10");
 	RLCFont hfnt(HFONT.GPID);
@@ -870,8 +894,13 @@ int ProcessWars(){
         menu_hint_x = 18;
         menu_hint_y = 701;
     }
+#ifdef SCREENFIX
 	MMenu.HintY= menu_hint_y;
 	MMenu.HintX= menu_hint_x;
+#else
+    MMenu.HintY = 18;
+    MMenu.HintX = 701;
+#endif
 
 	MMenu.addPicture(NULL,0,0,&Back,&Back,&Back);
 	VideoButton* ENC=MMenu.addVideoButton(NULL,862,468,ENC1.GPID,ENC2.GPID);

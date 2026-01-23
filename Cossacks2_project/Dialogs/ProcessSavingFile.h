@@ -33,8 +33,13 @@ bool ProcessSavingFile(char* Mask,char* DestName,int Header,bool clear){
     }
 
 	MMenu.HintFont=&hfnt;
+#ifdef SCREENFIX
 	MMenu.HintY= menu_hint_y;
 	MMenu.HintX= menu_hint_x;
+#else
+    MMenu.HintY = 18;
+    MMenu.HintX = 701;
+#endif
 
 	int SaveDx = 0;
 	int SaveDy = 0;

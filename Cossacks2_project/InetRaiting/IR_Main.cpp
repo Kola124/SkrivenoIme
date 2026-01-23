@@ -196,7 +196,11 @@ bool ProcessNewInternetLogin();
 
 bool EnterEMail(char* EMail){
 	EMail[0]=0;
+#ifdef SCREENFIX
 	DialogsSystem DSS(menu_x_off, menu_y_off);
+#else
+    DialogsSystem DSS(0, 0);
+#endif
 	SQPicture BACK("Interface\\Background_Wizard.bmp");
 	LocalGP WBT("Interface\\LogWizard");
 	LocalGP BTNS("Interface\\Login");
@@ -235,7 +239,11 @@ bool EnterEMail(char* EMail){
 	return ItemChoose==2;
 };
 int EnterNewNick(char* Nick){
-	DialogsSystem DSS(menu_x_off, menu_y_off);
+#ifdef SCREENFIX
+    DialogsSystem DSS(menu_x_off, menu_y_off);
+#else
+    DialogsSystem DSS(0, 0);
+#endif
 	SQPicture BACK("Interface\\Background_Wizard.bmp");
 	LocalGP WBT("Interface\\LogWizard");
 	LocalGP BTNS("Interface\\Login");
@@ -276,7 +284,11 @@ int EnterNewNick(char* Nick){
 	return ItemChoose;
 };
 int CreateNewAccount(char* EMail,char* Password,bool* Store){
-	DialogsSystem DSS(menu_x_off, menu_y_off);
+#ifdef SCREENFIX
+    DialogsSystem DSS(menu_x_off, menu_y_off);
+#else
+    DialogsSystem DSS(0, 0);
+#endif
 	SQPicture BACK("Interface\\Background_Wizard.bmp");
 	LocalGP WBT("Interface\\LogWizard");
 	LocalGP BTNS("Interface\\Login");
@@ -332,7 +344,11 @@ int CreateNewAccount(char* EMail,char* Password,bool* Store){
 };
 int EnterAccountPassword(char* Password,bool First,char* mail){
 	Password[0]=0;
-	DialogsSystem DSS(menu_x_off, menu_y_off);
+#ifdef SCREENFIX
+    DialogsSystem DSS(menu_x_off, menu_y_off);
+#else
+    DialogsSystem DSS(0, 0);
+#endif
 	SQPicture BACK("Interface\\Background_Wizard.bmp");
 	LocalGP WBT("Interface\\LogWizard");
 	LocalGP BTNS("Interface\\Login");
@@ -541,7 +557,11 @@ void GETPROFINFO(int ProfileID){
 
 };
 bool ProcessPlayerForm(GPGetInfoResponseArg* INFO){
-	DialogsSystem DSS(menu_x_off, menu_y_off);
+#ifdef SCREENFIX
+    DialogsSystem DSS(menu_x_off, menu_y_off);
+#else
+    DialogsSystem DSS(0, 0);
+#endif
 	SQPicture BACK("Interface\\Background_Internet_Form.bmp");
 	LocalGP WBT("Interface\\LogWizard");
 	LocalGP BTNS("Interface\\Login");

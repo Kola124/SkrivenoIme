@@ -245,7 +245,11 @@ int NSinBattle;
 int BattleTopScore(){
 	
 	SQPicture Back("Interf2\\Background_Battles.bmp");
+#ifdef SCREENFIX
 	DialogsSystem MMenu(menu_x_off, menu_y_off);
+#else
+    DialogsSystem MMenu(0, 0);
+#endif
 	MMenu.addPicture(NULL,0,0,&Back,&Back,&Back);
 
 	// Controls
@@ -270,8 +274,13 @@ int BattleTopScore(){
         menu_hint_x = 513;
         menu_hint_y = 745;
     }
+#ifdef SCREENFIX
     MMenu.HintY = menu_hint_y;
     MMenu.HintX = menu_hint_x;
+#else
+    MMenu.HintY = 513;
+    MMenu.HintX = 745;
+#endif
 
 	// Text
 	TextButton* T0=MMenu.addTextButton(NULL,512,18,GetTextByID("INTF_SBATL_T0"),FScreen,FScreen,FScreen,1);
@@ -550,7 +559,11 @@ bool SelectSingleBattle(){
 	RLCFont* FMissText = &fon18y3;
 	RLCFont* FHint = &SmallYellowFont;
 
+#ifdef SCREENFIX
 	DialogsSystem MMenu(menu_x_off, menu_y_off);
+#else
+    DialogsSystem MMenu(0, 0);
+#endif
 	MMenu.addPicture(NULL,0,0,&Back,&Back,&Back);
 	
 	/*
@@ -585,8 +598,13 @@ bool SelectSingleBattle(){
         menu_hint_y = 745;
     }
 	MMenu.HintFont=FHint;
+#ifdef SCREENFIX
 	MMenu.HintX=menu_hint_x;
 	MMenu.HintY=menu_hint_y;
+#else
+    MMenu.HintX = 440;
+    MMenu.HintY = 745;
+#endif
 
 	TextButton* HintTxt = MMenu.addTextButton(NULL,HintX,HintY,"                                                                                               ",FHint,FHint,FHint,1);
 
