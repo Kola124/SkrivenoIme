@@ -4865,6 +4865,13 @@ void DialogsSystem::RefreshView(){
         return;
     }
 
+    int T0=GetTickCount();
+	if(!PrevCHhange)PrevCHhange=T0-1000;
+	if(T0-PrevCHhange>60){
+		curptr=MouseNext[curptr];
+		PrevCHhange=T0;
+	};
+
     if (window_mode)
     {
         RSCRSizeX = SCRSizeX;
