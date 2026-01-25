@@ -105,7 +105,7 @@
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;INTEXPLORER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeaderOutputFile>.\../_release/IntExplorer.pch</PrecompiledHeaderOutputFile>
       <AssemblerListingLocation>.\../_release/</AssemblerListingLocation>
@@ -130,7 +130,7 @@
       <MapFileName>.\../_release/IntExplorer.map</MapFileName>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
-      <ImportLibrary>.\../_release/IntExplorer.lib</ImportLibrary>
+      <ImportLibrary>.\../lib/IntExplorer.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
@@ -324,11 +324,9 @@ copy ..\_debug\IntExplorer\$(ProjectName).lib ..\lib\$(ProjectName).lib
     <ClInclude Include="StdAfx.h" />
   </ItemGroup>
   <ItemGroup>
-    <Library Include="..\bin\dmcr.lib">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">true</ExcludedFromBuild>
-    </Library>
-    <Library Include="..\bin\IChat.lib">
+    <Library Include="..\lib\dmcr.lib" />
+    <Library Include="..\lib\IChat.lib" />
+    <Library Include="..\lib\LF_Server.lib">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </Library>
   </ItemGroup>

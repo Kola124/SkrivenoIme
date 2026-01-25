@@ -70,7 +70,8 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="..\bin\dmcr.lib" />
-    <Library Include="..\bin\IChat.lib" />
+    <Library Include="..\lib\IChat.lib" />
+    <Library Include="..\lib\LF_Server.lib" />
+    <Library Include="..\lib\dmcr.lib" />
   </ItemGroup>
 </Project>

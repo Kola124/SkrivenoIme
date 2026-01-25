@@ -11,9 +11,6 @@
 //в тексте
 //|pix.gp,dx,dy,idx|-картинка
 //{текст}-активная текстовая ссылка
-CIMPORT void PushWindow(TempWindow* W);
-CIMPORT void PopWindow(TempWindow* W);
-CIMPORT void IntersectWindows(int x0, int y0, int x1, int y1);
 void Replace(char** str,char* src,char* dst,int& MaxL);
 extern char HXARR[16];
 void SendSmartRequest(sicExplorer* SXP,char* Str);
@@ -129,12 +126,20 @@ void SendSmartRequest(sicExplorer* SXP,char* Str){
 	free(SSX);
 };
 int ReadNumber(char* s,int* L,int vmax);
+extern int menu_y_off;
+extern int menu_x_off;
+extern int menu_hint_x;
+extern int menu_hint_y;
+CIMPORT void DDLog2(LPSTR sz, ...);
 bool ADI_Txt(sicExplorer* SXP,DialogsSystem* DSS,int* x,int* y,int* x1,int* y1,
 			 int NActive,char** Active,int NParam,char** Param,char* param){
 
 	RLCFont* PFONT=SXP->GetFontByName(SXP->FONT1);
+    //DDLog2("BEFORE GetRLCWidthUNICODE: PFONT=%p, PFONT->RLC=%p\n", PFONT, PFONT->RLC);
 	RLCFont* AFONT=SXP->GetFontByName(SXP->FONT2);
+    //DDLog2("AFTER AFONT: PFONT=%p, PFONT->RLC=%p\n", PFONT, PFONT->RLC);
 	RLCFont* MFONT=SXP->GetFontByName(SXP->FONT3);
+    //DDLog2("AFTER MFONT: PFONT=%p, PFONT->RLC=%p\n", PFONT, PFONT->RLC);
 	int align=0;
 	if(!strcmp(param,"c"))align=1;
 	if(!strcmp(param,"r"))align=2;
@@ -181,9 +186,9 @@ bool ADI_Txt(sicExplorer* SXP,DialogsSystem* DSS,int* x,int* y,int* x1,int* y1,
 			wasactive=curactive;
 			do{
 				c=s[pos];
-				int L;
+				int L=0;
 				int lx=GetRLCWidthUNICODE(PFONT->RLC,(byte*)(s+pos),&L);
-				if((c==' '&&nsym)||((c=='{'||c=='}'||c=='|'||c==13||c==10||c==0)&&ntotsym)||reallx+lx>Lx){
+				if((c == ' ' && nsym) || ((c == '{' || c == '}' || c == '|' || c == 13 || c == 10 || c == 0) && ntotsym) || reallx + lx>Lx) {
 					//end of phrase
 					doit=0;
 				}else
@@ -847,7 +852,7 @@ bool ADI_Poly(sicExplorer* SXP,DialogsSystem* DSS,int* x,int* y,int* x1,int* y1,
 //#tbl[%...](%...[...],{%variable},n_columns,"hdr1",sort1,filter1,
 //------------simple table-------------
 //stbl[](%...,{...}...,nx,btype,align1,lx2,align2,...,Line_height1,"text1_line1",..,Line_height2,"text1_line2",...)
-CIMPORT void LimitString(char* str, lpRLCFont FONT, int L);/* {
+void LimitString(char* str, lpRLCFont FONT, int L) {
 	int L0;
 	do{
 		L0=GetRLCStrWidth(str,FONT);
@@ -859,7 +864,7 @@ CIMPORT void LimitString(char* str, lpRLCFont FONT, int L);/* {
 			str[LL-1]=0;
 		};
 	}while(L0>L);
-};*/
+};
 bool ADI_Stbl(sicExplorer* SXP,DialogsSystem* DSS,int* x,int* y,int* x1,int* y1,
 			 int NActive,char** Active,int NParam,char** Param,char* param){
 	if(NParam<1)return false;
@@ -1978,19 +1983,44 @@ bool ADI_FBrowse(sicExplorer* SXP,DialogsSystem* DSS,int* x,int* y,int* x1,int* 
 //#nfont(FONTID,gp-file,color_index,shadow)
 bool ADI_NewFont(sicExplorer* SXP,DialogsSystem* DSS,int* x,int* y,int* x1,int* y1,
 			 int NActive,char** Active,int NParam,char** Param,char* param){
+    //DDLog2("sizeof(RLCFont) = %d\n", sizeof(RLCFont));
+    //DDLog2("sizeof(OneAddFont) = %d\n", sizeof(OneAddFont));
+    //DDLog2("offsetof(OneAddFont, FID) = %d\n", offsetof(OneAddFont, FID));
+    //DDLog2("offsetof(OneAddFont, FONT) = %d\n", offsetof(OneAddFont, FONT));
+    //DDLog2("offsetof(RLCFont, RLC) = %d\n", offsetof(RLCFont, RLC));
+    //DDLog2("offsetof(OneAddFont, sdx) = %d\n", offsetof(OneAddFont, sdx));
+    //DDLog2("offsetof(OneAddFont, sdy) = %d\n", offsetof(OneAddFont, sdy));
 	if(NParam<3)return false;
 	if(SXP->CurWPosition>SXP->NWindows)return true;
 	OneSicWindow* OSW=SXP->Windows[SXP->CurWPosition];
 	int GPID=SXP->GetGPPictureIndex(Param[1]);
 	if(GPID==-1)return true;
-	if(!OSW->NAddFonts)OSW->ADFonts=(OneAddFont*)malloc(64*sizeof OneAddFont);
+
+	if(!OSW->NAddFonts) {
+        OSW->ADFonts = new OneAddFont[64];  // Use new[] instead of malloc
+    }
+
 	if(OSW->NAddFonts>64)return false;
 	strcpy(OSW->ADFonts[OSW->NAddFonts].FID,Param[0]);
-	memset(&OSW->ADFonts[OSW->NAddFonts].FONT,0,sizeof OSW->ADFonts[OSW->NAddFonts].FONT);
+	//memset(&OSW->ADFonts[OSW->NAddFonts].FONT,0,sizeof OSW->ADFonts[OSW->NAddFonts].FONT);
+    //DDLog2("BEFORE SetGPIndex call: &FONT=%p\n", &OSW->ADFonts[OSW->NAddFonts].FONT);
 	OSW->ADFonts[OSW->NAddFonts].FONT.SetGPIndex(GPID);
+    //DDLog2("IMMEDIATELY after SetGPIndex returns: FONT.RLC=%p\n", OSW->ADFonts[OSW->NAddFonts].FONT.RLC);
 	OSW->ADFonts[OSW->NAddFonts].FONT.SetColorTable(atoi(Param[2]));
+    //DDLog2("After SetColorTable: FONT.RLC=%p\n", OSW->ADFonts[OSW->NAddFonts].FONT.RLC);
 	OSW->ADFonts[OSW->NAddFonts].sdx=0;
+    //DDLog2("After sdx=0: FONT.RLC=%p\n", OSW->ADFonts[OSW->NAddFonts].FONT.RLC);
 	OSW->ADFonts[OSW->NAddFonts].sdy=0;
+    //DDLog2("After sdy=0: FONT.RLC=%p\n", OSW->ADFonts[OSW->NAddFonts].FONT.RLC);
+
+    unsigned char* ptr = (unsigned char*)&OSW->ADFonts[OSW->NAddFonts].FONT;
+    //DDLog2("Memory dump of FONT object:\n");
+    //for(int i = 0; i < sizeof(RLCFont); i++) {
+        //DDLog2("%02X ", ptr[i]);
+    //   if((i+1) % 8 == 0) DDLog2("\n");
+    //}
+    //DDLog2("\n");
+
 	if(NParam==6){
 		OSW->ADFonts[OSW->NAddFonts].sdx=atoi(Param[4]);
 		OSW->ADFonts[OSW->NAddFonts].sdy=atoi(Param[5]);

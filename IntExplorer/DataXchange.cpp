@@ -10,7 +10,7 @@
 CIMPORT void SetCurPtr(int v);
 extern CIMPORT bool GameInProgress;
 bool LOGMODE=0;
-CIMPORT void ReportIt(char* s, ...);/* {
+void ReportIt(char* s, ...) {
 	if(!LOGMODE)return;
 	SYSTEMTIME ST;
 	GetSystemTime(&ST);
@@ -25,7 +25,7 @@ CIMPORT void ReportIt(char* s, ...);/* {
 		fprintf(F,"%s",ach);
 		fclose(F);
 	};
-};*/
+};
 //data Xcange format:
 //request to server:
 //dev_name|command1&parm1&parm2&... |command2 parm1 ...
@@ -83,7 +83,7 @@ DWORD SXP_DevScope::SendRequest(sicExplorer* SXP,char* request,bool AllowNewWind
 	//---------DEBUG----------
 		char CCC[16384]="too long...";
 		P1.UnParse(CCC,16384);
-		//ReportIt("%s\n",CCC);
+		ReportIt("%s\n",CCC);
 	//------------------------
 	};
 	return SendRequest(SXP,&P1,AllowNewWindow,Auto);
@@ -175,7 +175,7 @@ void SXP_DevScope::RegisterDevice(char* ID,char* DLL_Path){
 		DEVS[NDEVS].H=H;
 		strcpy(DEVS[NDEVS].Name,ID);
 		NDEVS++;
-	};
+};
 };
 SXP_DevScope DEVSCOPE;
 void InitDevs(){
@@ -1022,7 +1022,7 @@ void ProcessDataXchange(){
 					//---------DEBUG----------
 						char CCC[16384]="too long...";
 						P1.UnParse(CCC,16384);
-						//ReportIt("-->%s\n",CCC);
+						ReportIt("-->%s\n",CCC);
 					//------------------------
 					};
 					for(int j=0;j<P1.NComm;j++){
@@ -1393,7 +1393,7 @@ int CurrUplPos=0;
 CEXPORT
 void SendRecBuffer(byte* Data,int size,bool Final){
 	if(CurrUplID[0]){
-		//ReportIt("upfile(%s,%d+%d->%d)\n",CurrUplID,CurrUplPos,size,CurrUplPos+size);
+		ReportIt("upfile(%s,%d+%d->%d)\n",CurrUplID,CurrUplPos,size,CurrUplPos+size);
 		ParsedRQ P1;
 		strcpy(P1.DevName,"GW");
 		P1.AddComm("upfile");

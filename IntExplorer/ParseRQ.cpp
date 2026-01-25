@@ -1,7 +1,7 @@
 #include "..\common.h"
 #include <crtdbg.h>
 #include <assert.h>
-#include "StdAfx.h"
+//#include "StdAfx.h"
 #include "ParseRQ.h"
 #include <cstdlib>
 #include <cstdio>

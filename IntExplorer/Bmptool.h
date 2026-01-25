@@ -25,12 +25,8 @@ struct PAL3{
 struct PAL4{
 	byte b,g,r,reserved;
 };
-CIMPORT
 void SaveToBMP24(char* Name,int Lx,int Ly,byte* data);
-CIMPORT
 bool ReadBMP24(char* Name,BMPformat* BM,byte** data);
-CIMPORT
 bool ReadBMP8(char* Name,BMPformat* BM,byte** data);
-CIMPORT
 bool ReadBMP8TOBPX(char* Name,byte** data);
 void SaveToBMP8(char* Name,int Lx,int Ly,byte* data,PAL3* pal);

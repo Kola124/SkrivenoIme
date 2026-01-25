@@ -1,39 +1,38 @@
-#include <crtdbg.h>
-#include <assert.h>
+//#include <crtdbg.h>
+//#include <assert.h>
 #include "..\common.h"
 #include "IntExplorer.h"
 #include "ParseRQ.h"
 #include "bmptool.h"
-CIMPORT
-void SaveToBMP24(char* Name, int Lx, int Ly, byte* data);/* {
-    ResFile f1=RRewrite(Name);
-    BMPformat BM;
-    BM.bfType='MB';
-    int rlx=Lx*3;
-    if(rlx&3)rlx=(rlx|3)+1;
-    BM.bfSize=(sizeof BMPformat)+rlx*Ly;
-    BM.bfReserved1=0;
-    BM.bfReserved2=0;
-    BM.bfOffBits=(sizeof BMPformat);
-    BM.biSize=40;
-    BM.biWidth=Lx;
-    BM.biHeight=Ly;
-    BM.biPlanes=1;
-    BM.biBitCount=24;
-    BM.biCompression=BI_RGB;
-    BM.biSizeImage=0;
-    BM.biXPelsPerMeter=0;
-    BM.biYPelsPerMeter=0;
-    BM.biClrUsed=0;
-    BM.biClrImportant=0;
-    RBlockWrite(f1,&BM,sizeof BM);
-    for(int j=0;j<Ly;j++){
-        RBlockWrite(f1,&data[3*Lx*(Ly-j-1)],rlx);
-    };
-    RClose(f1);
-};*/
-CIMPORT
-bool ReadBMP24(char* Name, BMPformat* BM, byte** data);/* {
+
+void SaveToBMP24(char* Name,int Lx,int Ly,byte* data){
+	ResFile f1=RRewrite(Name);
+	BMPformat BM;
+	BM.bfType='MB';
+	int rlx=Lx*3;
+	if(rlx&3)rlx=(rlx|3)+1;
+	BM.bfSize=(sizeof BMPformat)+rlx*Ly;
+	BM.bfReserved1=0;
+	BM.bfReserved2=0;
+	BM.bfOffBits=(sizeof BMPformat);
+	BM.biSize=40;
+	BM.biWidth=Lx;
+	BM.biHeight=Ly;
+	BM.biPlanes=1;
+	BM.biBitCount=24;
+	BM.biCompression=BI_RGB;
+	BM.biSizeImage=0;
+	BM.biXPelsPerMeter=0;
+	BM.biYPelsPerMeter=0;
+	BM.biClrUsed=0; 
+	BM.biClrImportant=0; 
+	RBlockWrite(f1,&BM,sizeof BM);
+	for(int j=0;j<Ly;j++){
+		RBlockWrite(f1,&data[3*Lx*(Ly-j-1)],rlx);
+	};
+	RClose(f1);
+};
+bool ReadBMP24(char* Name,BMPformat* BM,byte** data){
 	ResFile f1=RReset(Name);
 	if(f1!=INVALID_HANDLE_VALUE){
 		RBlockRead(f1,BM,sizeof BMPformat);
@@ -49,11 +48,9 @@ bool ReadBMP24(char* Name, BMPformat* BM, byte** data);/* {
 		};
 		RClose(f1);
 		return true;
-    }
-	else return false;
-};*/
-CIMPORT
-bool ReadBMP8(char* Name, BMPformat* BM, byte** data);/* {
+    }else return false;
+};
+bool ReadBMP8(char* Name,BMPformat* BM,byte** data){
 	ResFile f1=RReset(Name);
 	if(f1!=INVALID_HANDLE_VALUE){
 		RBlockRead(f1,BM,sizeof BMPformat);
@@ -69,11 +66,9 @@ bool ReadBMP8(char* Name, BMPformat* BM, byte** data);/* {
 		};
 		RClose(f1);
 		return true;
-    }
-	else return false;
-};*/
-CIMPORT
-bool ReadBMP8TOBPX(char* Name, byte** data);/* {
+    }else return false;
+};
+bool ReadBMP8TOBPX(char* Name,byte** data){
 	BMPformat BM;
 	ResFile f1=RReset(Name);
 	if(f1!=INVALID_HANDLE_VALUE){
@@ -87,16 +82,14 @@ bool ReadBMP8TOBPX(char* Name, byte** data);/* {
 		((short*)*data)[0]=BM.biWidth;
 		((short*)*data)[1]=BM.biHeight;
 		for(int i=0;i<BM.biHeight;i++){
-			RSeek(f1,//(sizeof BMPformat)+1024//BM.bfOffBits+(BM.biHeight-i-1)*rwid);
+			RSeek(f1,/*(sizeof BMPformat)+1024*/BM.bfOffBits+(BM.biHeight-i-1)*rwid);
 			RBlockRead(f1,&((*data)[i*wid+4]),wid);
 		};
 		RClose(f1);
 		return true;
-    }
-	else return false;
-};*/
-CEXPORT
-bool LoadBitmapLikeGrayscale(char* Name, int* Lx, int* Ly, byte** res);/* {
+    }else return false;
+};
+bool LoadBitmapLikeGrayscale(char* Name,int* Lx,int* Ly,byte** res){
 	byte* data;
 	BMPformat BM;
 	if(ReadBMP24(Name,&BM,&data)){
@@ -117,9 +110,8 @@ bool LoadBitmapLikeGrayscale(char* Name, int* Lx, int* Ly, byte** res);/* {
 		return true;
 	};
 	return false;
-};*/
-CIMPORT
-int GetResVal(byte* res, int LX, int LY, int RLX, int RLY, int x, int y);/* {
+};
+int GetResVal(byte* res,int LX,int LY,int RLX,int RLY,int x,int y){
 	int vx=(x*LX)/RLX;
 	int vy=(y*LY)/RLY;
 	int rx=(vx*RLX)/LX;
@@ -141,10 +133,9 @@ int GetResVal(byte* res, int LX, int LY, int RLX, int RLY, int x, int y);/* {
 	int z3=res[vx+LX*vy1];
 	int z4=res[vx1+LX*vy1];
 	return z1+((x-rx)*(z2-z1))/(rx1-rx)+((y-ry)*(z3-z1))/(ry1-ry)-(((z2+z3-z1-z4)*(x-rx)*(y-ry))/(rx1-rx)/(ry1-ry));
-};*/
-CIMPORT byte* DATA;
-CIMPORT
-DWORD GetSumm(char* Name);/* {
+};
+byte* DATA;
+DWORD GetSumm(char* Name){
 	ResFile F=RReset(Name);
 	if(F!=INVALID_HANDLE_VALUE){
 		int sz=RFileSize(F);
@@ -155,10 +146,9 @@ DWORD GetSumm(char* Name);/* {
 		for(int i=0;i<sz;i++)SZZ+=DATA[i];
 		SZZ&=65535;
 		return SZZ;
-	}
-	else return 0;
-};*/
-void SaveToBMP8(char* Name, int Lx, int Ly, byte* data, PAL3* pal) {
+	}else return 0;
+};
+void SaveToBMP8(char* Name,int Lx,int Ly,byte* data,PAL3* pal){
 	ResFile f1=RRewrite(Name);
 	BMPformat BM;
 	BM.bfType='MB';

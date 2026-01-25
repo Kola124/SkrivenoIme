@@ -141,44 +141,54 @@ public:
 			if(str&&index>L)return str[index];
 			else return 0;
 		};
-	void ExtractLine(DString& dst)
-		{
-			dst.Clear();
-			char seps[]="\n";
-			char *token;
-			DString rez;
-			rez.Assign(str);
-			token=strtok(str,seps);
-			if(token!=NULL)
-			{
-				dst.Add(token);
-				int s=strlen(token);
-				char* c;
-				if(s<rez.L)
-					c=(char*)(strstr(rez.str,token)+s+1);
-				else 
-					c=(char*)(strstr(rez.str,token)+s);
-				Assign(c);
-			}
-		}
-	void ExtractWord(DString& dst)
-		{
-			dst.Clear();
-			char seps[]=" ,;:\t\n";
-			char *token;
-			DString rez;
-			rez.Assign(str);
-			token=strtok(str,seps);
-			if(token!=NULL)
-			{
-				dst.Add(token);
-				int s=strlen(token);
-				char* c;
-				if(s<rez.L)
-					c=(char*)(strstr(rez.str,token)+s+1);
-				else 
-					c=(char*)(strstr(rez.str,token)+s);
-				Assign(c);
-			}
-		}
+	void ExtractLine(DString& dst) {
+        dst.Clear();
+    
+        // Create a writable copy of the string
+        DString tempCopy;
+        tempCopy.Assign(str);  // Makes a copy
+    
+        char seps[] = "\n";
+        char* token = strtok(tempCopy.str, seps);  // Work on the copy
+    
+        if(token != NULL) {
+            dst.Add(token);
+        
+            // Calculate where we are in the ORIGINAL string
+            int s = strlen(token);
+            char* remaining = (char*)(str + (token - tempCopy.str) + s);
+        
+            // Skip the newline character if present
+            if(*remaining == '\n') {
+                remaining++;
+            }
+        
+            Assign(remaining);
+        }
+    }
+	void ExtractWord(DString& dst) {
+        dst.Clear();
+    
+        // Create a writable copy of the string
+        DString tempCopy;
+        tempCopy.Assign(str);  // Makes a copy
+    
+        char seps[] = " ,;:\t\n";
+        char* token = strtok(tempCopy.str, seps);  // Work on the copy
+    
+        if(token != NULL) {
+            dst.Add(token);
+        
+            // Calculate where we are in the ORIGINAL string
+            int s = strlen(token);
+            char* remaining = (char*)(str + (token - tempCopy.str) + s);
+        
+            // Skip the delimiter if present
+            if(*remaining && strchr(seps, *remaining)) {
+                remaining++;
+            }
+        
+            Assign(remaining);
+        }
+    }
 };

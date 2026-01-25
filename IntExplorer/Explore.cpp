@@ -314,7 +314,7 @@ int CReadY(char** sx,int x0,int x1,OneBox* BOX){
 };
 void ReadCoordinates(char** src,int& x,int& y,int& xR,int& yR,OneBox* BOX){
 	char c;
-	int x0,y0,x1,y1,xc,yc,w,h;
+	int x0=0, y0=0, x1=0, y1=0, xc=0, yc=0, w=0, h=0;
 	bool vx0=0;
 	bool vy0=0;
 	bool vx1=0;
@@ -356,10 +356,10 @@ void ReadCoordinates(char** src,int& x,int& y,int& xR,int& yR,OneBox* BOX){
 			vyc=1;
 		}else
 		if(c=='w'&&(*src)[1]==':'){
-			(*src)+=2;
-			w=CReadX(src,0,xR-x);
-			vw=1;
-		}else
+        (*src)+=2;
+        w=CReadX(src,0,xR-x);
+        vw=1;
+        }else
 		if(c=='h'&&(*src)[1]==':'){
 			(*src)+=2;
 			h=CReadY(src,0,yR-y,BOX);
@@ -987,7 +987,6 @@ int OneSicWindow::ParseTheWholeText(){
 				OneInterfaceElement IFS;
 				memset(&IFS,0,sizeof IFS);
 				DialogsSystem* DSS=NULL;
-				int j;
 				for(int i=0;i<N_IFNS;i++){
 					if(!strcmp(IFNS[i].Name,com)){
 						if(IFNS[i].ReqName&&Result[pos]=='['){
@@ -1003,7 +1002,8 @@ int OneSicWindow::ParseTheWholeText(){
 						if(Result[pos]!='(')return pos;
 						pos++;
 						OneBox* CURBOX=NULL;
-						if(IFNS[i].ReqCoor){
+                        int j = 0;
+						if(IFNS[i].ReqCoor){ 
 							if(Result[pos]!='%')return pos;
 							int p1=pos;
 							char ss[16];
@@ -1174,7 +1174,7 @@ void OneSicWindow::Erase(){
 		free(ResizeComm);
 		ResizeComm=NULL;
 	};
-	if(ADFonts)free(ADFonts);
+	if(ADFonts) delete[] ADFonts;
 	ADFonts=NULL;
 	memset(this,0,sizeof *this);
 	LoadDefaultSettings();
@@ -1311,8 +1311,8 @@ void sicExplorer::ChangeOutput(int x,int y,int x1,int y1){
 		if(OW->Boxes)free(OW->Boxes);
 		OW->Boxes=NULL;
 		if(OW->NAddFonts&&OW->ADFonts){
-			free(OW->ADFonts);
-		};
+            delete[] OW->ADFonts;  // Use delete[] instead of free
+        }
 		OW->ADFonts=NULL;
 		OW->NAddFonts=0;
 		if(OW->Ready&&j==CurWPosition&&OW->Parsed){
@@ -1448,10 +1448,10 @@ void ProcessSXP(int Index, DialogsSystem * DSS) {
         SXPR->LastReparseTime = GetTickCount();
         for (int i = 0; i < SXPR->NDownl; i++) {
             byte* DNMASK = SXPR->DOWNL[i].ReqMask;
-            for (int j = 0; j < 128; j++)if (DNMASK[j]) {
-                byte B = DNMASK[j];
-                int w = j << 3;
-                for (int h = 0; h < 8; j++)if (B & (1 << h)) {
+            for (int i = 0; i < 128; i++)if (DNMASK[i]) {
+                byte B = DNMASK[i];
+                int w = i << 3;
+                for (int j = 0; j < 8; j++)if (B & (1 << j)) {
                     if (w < SXPR->NWindows && SXPR->Windows[w]->Parsed) {
                         SXPR->Windows[w]->ReParse();
                     };
@@ -1461,7 +1461,7 @@ void ProcessSXP(int Index, DialogsSystem * DSS) {
         };
     };
     {
-    int i = SXPR->CurWPosition;
+        int i = SXPR->CurWPosition;
         if (i >= SXPR->NWindows)return;
         SXPR->Windows[i]->Process();
         for (int j = 0; j < SXPR->Windows[i]->NBoxes; j++) {
@@ -1576,7 +1576,7 @@ void ProcessSXP(int Index, DialogsSystem * DSS) {
         SendSmartRequest(RSXP, REQ);
         free(REQ);
     };
-};
+}; 
 void EraseSXP(){
 	for(int i=0;i<8;i++){
 		SXP[i].EraseAllDialogs();

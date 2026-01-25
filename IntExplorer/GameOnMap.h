@@ -10,9 +10,9 @@ struct TempWindow{
 	int WindY1; 
 	int ScrWidth;
 };
-/*CIMPORT void PushWindow(TempWindow* W);
-CIMPORT void PopWindow(TempWindow* W);
-CIMPORT void IntersectWindows(int x0,int y0,int x1,int y1);*/
+void PushWindow(TempWindow* W);
+void PopWindow(TempWindow* W);
+void IntersectWindows(int x0,int y0,int x1,int y1);
 struct OneScale{
 	byte* Data;
 	byte* ColoredData;
