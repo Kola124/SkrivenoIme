@@ -10,7 +10,7 @@ BOOL CCommCore::SetSessionName(LPCSTR lpcszSessionName)
 {
 	_log_message("SetSessionName()");
 	
-	strcpy(m_szSessionName,lpcszSessionName);
+    strcpy(m_szSessionName, lpcszSessionName);
 	return TRUE;
 }
 
@@ -37,7 +37,7 @@ BOOL CCommCore::SetUserName(LPCSTR lpcszUserName)
 {
 	_log_message("SetUserName()");
 
-	strcpy(m_szUserName,lpcszUserName);
+    strcpy(m_szUserName, lpcszUserName);
 
 	return TRUE;//SendUserName();
 }
@@ -50,7 +50,7 @@ BOOL CCommCore::SendUserName()
 
 	if(m_bServer){
 
-		strcpy(m_PeerList[0].m_szUserName,m_szUserName);
+        strcpy(m_PeerList[0].m_szUserName, m_szUserName);
 
 //		return SendServerList();
 		return SendNewName(m_piNumber);
@@ -59,7 +59,7 @@ BOOL CCommCore::SendUserName()
 
 		CC_PK_SEND_USER_NAME	SendUserNamePacket;
 
-		strcpy(SendUserNamePacket.m_szUserName,m_szUserName);
+        strcpy(SendUserNamePacket.m_szUserName, m_szUserName);
 
 		return SendRawPacket(	m_paServAddr,
 								htons(DATA_PORT),
@@ -208,36 +208,44 @@ BOOL CCommCore::SendToAll(LPBYTE lpbBuffer, u_short u_Size, BOOL bSecure)
 
 BOOL CCommCore::SendToPeer(PEER_ID piNumber, LPBYTE lpbBuffer, u_short uSize, BOOL bSecure)
 {
-	_log_message("SendToPeer()");
+    _log_message("SendToPeer()");
 
-	if(piNumber==m_piNumber)
-		return TRUE;
+    if (piNumber == m_piNumber)
+        return TRUE;
 
-	LPCC_PK_SEND_DATA	lpFrame;
-	u_short				uFrameSize;
+    // Allocate memory (check for failure)
+    u_short uFrameSize = sizeof(CC_PK_SEND_DATA) + uSize;
+    LPCC_PK_SEND_DATA lpFrame = (LPCC_PK_SEND_DATA)malloc(uFrameSize);
 
-	uFrameSize=sizeof(CC_PK_SEND_DATA)+uSize;
+    if (!lpFrame) {  // Check if malloc failed
+        _log_message("SendToPeer(): Memory allocation failed!");
+        return FALSE;
+    }
 
-	lpFrame=(LPCC_PK_SEND_DATA)malloc(uFrameSize);
+    // Copy data safely
+    lpFrame->m_uSize = uSize;
+    memcpy(lpFrame->m_bData, lpbBuffer, uSize);
 
-	lpFrame->m_uSize=uSize;
-	memcpy(lpFrame->m_bData,lpbBuffer,uSize);
+    // Find peer
+    u_short uPeerNum = GetPeerById(piNumber);
+    if (uPeerNum == BAD_PEER_ID) {
+        free(lpFrame);  // Clean up before exit
+        return FALSE;
+    }
 
-	u_short	uPeerNum=GetPeerById(piNumber);
-	if(uPeerNum==BAD_PEER_ID)
-		return FALSE;
+    // Send packet
+    BOOL bRes = SendRawPacket(
+        (uPeerNum == 0) ? m_paServAddr : m_PeerList[uPeerNum].m_ex_Addr,
+        m_PeerList[uPeerNum].m_ex_Port,
+        CC_PT_SEND_DATA,
+        (LPBYTE)lpFrame,
+        uFrameSize,
+        bSecure,
+        FALSE
+    );
 
-	BOOL bRes=SendRawPacket(	(uPeerNum==0) ? m_paServAddr : m_PeerList[uPeerNum].m_ex_Addr,
-								m_PeerList[uPeerNum].m_ex_Port,
-								CC_PT_SEND_DATA,
-								(LPBYTE)lpFrame,
-								uFrameSize,
-								bSecure,
-								FALSE);
-	
-	free(lpFrame);
-	
-	return bRes;
+    free(lpFrame);  // Free memory
+    return bRes;
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -357,7 +365,7 @@ VOID CCommCore::NewCommCoreUID(LPSTR lpszCCUID)
 	CHAR	szComputerName[255];
 	CHAR	szCCUID[255];
 	DWORD	dwSize=64;
-	DWORD	dwTicks;
+	unsigned int	dwTicks;
 	int		iRand;
 
 	GetComputerName(szComputerName,&dwSize);
@@ -367,17 +375,18 @@ VOID CCommCore::NewCommCoreUID(LPSTR lpszCCUID)
 
 	szComputerName[iRand]='\0';
 
-	dwTicks=GetTickCount();
+	//dwTicks=GetTickCount();
+    dwTicks=unsigned int (GetTickCount64());
 
 	srand(dwTicks);
 
 	iRand=rand();
 
-	sprintf(szCCUID,"%-8.8s-%8.8X-%4.4X",szComputerName,dwTicks,iRand);
+    sprintf_s(szCCUID, sizeof(szCCUID), "%-8.8s-%8.8X-%4.4X", szComputerName, dwTicks, iRand);
 
 	SetCommCoreUID(szCCUID);
 	
-	strcpy(lpszCCUID,szCCUID);
+	strcpy(lpszCCUID, szCCUID);
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -412,7 +421,7 @@ VOID CCommCore::GetCommCoreUID(LPSTR lpszCCUID)
 
 	RegCloseKey(hKey);
 
-	strcpy(lpszCCUID,szCCUID);
+	strcpy(lpszCCUID, szCCUID);
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -427,7 +436,7 @@ BOOL CCommCore::SendNewName(PEER_ID PeerId)			// Отсылает информацию о имени	(се
 	uPeerNum=GetPeerById(PeerId);
 
 	SendNewNamePacket.m_PeerId=PeerId;
-	strcpy(	SendNewNamePacket.m_szUserName,m_PeerList[uPeerNum].m_szUserName);
+	strcpy(	SendNewNamePacket.m_szUserName, m_PeerList[uPeerNum].m_szUserName);
 
 	for(int i=1;i<m_uPeerCount;i++)
 		if(m_PeerList[i].m_Id!=PeerId)
@@ -443,44 +452,53 @@ BOOL CCommCore::SendNewName(PEER_ID PeerId)			// Отсылает информацию о имени	(се
 }
 // ---------------------------------------------------------------------------------------------
 
-BOOL CCommCore::SendNewData(PEER_ID PeerId)			// Отсылает информацию о дате	(сервер)
+BOOL CCommCore::SendNewData(PEER_ID PeerId)  // Sends date information (server)
 {
-	_log_message("SendNewData()");
+    _log_message("SendNewData()");
 
-	LPCC_PK_SEND_NEW_DATA		pSendNewDataPacket=NULL;
-	u_short						uPacketSize=0;
-	u_short						uPeerNum;
+    // Find the peer
+    u_short uPeerNum = GetPeerById(PeerId);
+    if (uPeerNum == BAD_PEER_ID) {
+        return FALSE;
+    }
 
-	uPeerNum=GetPeerById(PeerId);
+    // Calculate packet size and allocate memory
+    u_short uPacketSize = sizeof(CC_PK_SEND_NEW_DATA) + m_PeerList[uPeerNum].m_uUserDataSize;
+    LPCC_PK_SEND_NEW_DATA pSendNewDataPacket = (LPCC_PK_SEND_NEW_DATA)malloc(uPacketSize);
 
-	if(uPeerNum==BAD_PEER_ID)
-		return FALSE;
+    // Check if malloc() failed
+    if (!pSendNewDataPacket) {
+        _log_message("SendNewData(): Memory allocation failed!");
+        return FALSE;
+    }
 
-	uPacketSize=sizeof(CC_PK_SEND_NEW_DATA)+m_PeerList[uPeerNum].m_uUserDataSize;
+    // Fill the packet
+    pSendNewDataPacket->m_PeerId = PeerId;
+    pSendNewDataPacket->m_uUserDataSize = m_PeerList[uPeerNum].m_uUserDataSize;
+    memcpy(
+        pSendNewDataPacket->m_UserData,
+        m_PeerList[uPeerNum].m_lpbUserData,
+        m_PeerList[uPeerNum].m_uUserDataSize
+    );
 
-	pSendNewDataPacket=(LPCC_PK_SEND_NEW_DATA)malloc(uPacketSize);
+    // Send to all peers except the sender
+    for (int i = 1; i < m_uPeerCount; i++) {
+        if (m_PeerList[i].m_Id != PeerId) {
+            SendRawPacket(
+                m_PeerList[i].m_ex_Addr,
+                m_PeerList[i].m_ex_Port,
+                CC_PT_SEND_NEW_DATA,
+                (LPBYTE)pSendNewDataPacket,
+                uPacketSize,
+                TRUE,
+                FALSE
+            );
+        }
+    }
 
-	pSendNewDataPacket->m_PeerId=PeerId;
-	pSendNewDataPacket->m_uUserDataSize=m_PeerList[uPeerNum].m_uUserDataSize;
-	memcpy(	pSendNewDataPacket->m_UserData,
-			m_PeerList[uPeerNum].m_lpbUserData,
-			m_PeerList[uPeerNum].m_uUserDataSize);
-
-	for(int i=1;i<m_uPeerCount;i++)
-		if(m_PeerList[i].m_Id!=PeerId){
-			SendRawPacket(	m_PeerList[i].m_ex_Addr,
-							m_PeerList[i].m_ex_Port,
-							CC_PT_SEND_NEW_DATA,
-							(LPBYTE)pSendNewDataPacket,
-							uPacketSize,
-							TRUE,
-							FALSE);
-
-		};
-
-	free(pSendNewDataPacket);
-
-	return TRUE;					
+    // Free memory
+    free(pSendNewDataPacket);
+    return TRUE;
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -506,7 +524,7 @@ BOOL CCommCore::IsOverNAT(PEER_ID PeerId)
 VOID CCommCore::GetServerAddress(LPSTR lpszServerAddress)
 {
 	if(lpszServerAddress)
-		strcpy(lpszServerAddress,inet_ntoa(m_paServAddr));
+		strcpy(lpszServerAddress, inet_ntoa(m_paServAddr));
 }
 // ---------------------------------------------------------------------------------------------
 

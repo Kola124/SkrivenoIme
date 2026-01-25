@@ -144,6 +144,7 @@ BOOL CCommCore::SendRawPacket(	PEER_ADDR			PeerAddr,
 
 	m_bBlockingCall=FALSE;
 
-	return ((GetTickCount()-dwSendTime)<(RETRY_COUNT*RETRY_TIME));
+	//return ((GetTickCount()-dwSendTime)<(RETRY_COUNT*RETRY_TIME));
+    return ((GetTickCount64() - dwSendTime) < (RETRY_COUNT * RETRY_TIME));
 }
 

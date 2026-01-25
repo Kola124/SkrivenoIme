@@ -382,9 +382,10 @@ public:
         return m_dwNxBytes;
     }
     // Какое число миллисекунд назад был принят последний пакет
-    DWORD	GetRecvTimeOut()
+    ULONGLONG	GetRecvTimeOut()
     {
-        return (GetTickCount() - m_dwLastPacketTime);
+        //return (GetTickCount() - m_dwLastPacketTime);
+        return (GetTickCount64() - m_dwLastPacketTime);
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -404,7 +405,7 @@ protected:
     DWORD		m_dwAddrList[8];					// Список адресов локальной машины в network order формате
     u_short		m_uAddrCount;						// Количество адресов локальной машины
 
-    DWORD		m_dwLastPacketTime;
+    ULONGLONG		m_dwLastPacketTime;
 
     u_short		m_uMaxPeers;
     BOOL		m_bOverNAT;
