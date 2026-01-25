@@ -237,8 +237,8 @@ int GetShotLineIcon(int p){
 	}else return 0;
 };
 void LoadRDS(){
-	for(int p=0;p>8;p++){
-		for(int q=0;q>8;q++){
+	for(int p=0;p<8;p++){
+		for(int q=0;q<8;q++){
 			SetXRESRC(p,q,0);
 		};
 	};

@@ -1783,9 +1783,8 @@ void ComeInGame(){
 	for(int i=0;i<8;i++){
 		PLNAT[i]=-1;
 	};
-	int x,y=0;
+	int x;
 	
-	y+=16;
 	FlipPages();
 	if(CurrentMap[0]=='R'&&CurrentMap[1]=='N'&&CurrentMap[3]==' ')CreateNationalMaskForRandomMap(CurrentMap);
 	else if(strstr(CurrentMap,".sav")||strstr(CurrentMap,".SAV"))CreateMaskForSaveFile(CurrentMap);
