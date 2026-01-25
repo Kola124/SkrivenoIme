@@ -120,6 +120,7 @@ void GlobalEnemyInfo::Process(){
 	CHECKIT();
 };
 int GetTopology(int x,int y, byte LockType=0);
+int CheckPositionForDanger(int x, int y, int z);
 extern City CITY[8];
 bool GlobalEnemyInfo::FindNearestEnemy(byte NNUM,int* x,int* y,bool TowerFear,int Min,bool Defence){
 	if(PeaceTimeLeft||!(EINF[NNUM]&&CITY[NNUM].CenterFound))return false;
@@ -167,11 +168,11 @@ bool GlobalEnemyInfo::FindNearestEnemy(byte NNUM,int* x,int* y,bool TowerFear,in
 						int dis=GetLinksDist(Top+TIND);
 						if(dis<bdis){
 							//*********Tmpporarely deleted************//
-							//if((!TowerFear)||CheckPositionForDanger(OB->RealX>>4,OB->RealY>>4,OB->RZ+32)<1){
+							if((!TowerFear)||CheckPositionForDanger(OB->RealX>>4,OB->RealY>>4,OB->RZ+32)<1){
 								bdis=dis;
 								bx=OB->RealX>>4;
 								by=OB->RealY>>4;
-							//};
+							};
 						};
 					};
 				};

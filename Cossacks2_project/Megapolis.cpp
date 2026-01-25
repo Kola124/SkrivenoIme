@@ -1531,7 +1531,7 @@ int SearchPeasants(int x,int y,bool Workers,byte NI,word* AddTo,int maxpos){
 		MID=GetNMSL(ofs1+i);
 		if(MID!=0xFFFF){
 			OneObject* OB=Group[MID];
-			if(OB&&OB->NNUM==NI&&OB->BrigadeID!=BRID&&(!OB->Sdoxlo)&&OB->newMons->Peasant&&!OB->DoNotCall/*&&OB->DoWalls*/){
+			if(OB&&OB->NNUM==NI&&OB->BrigadeID!=BRID&&(!OB->Sdoxlo)&&OB->newMons->Peasant&&!OB->DoNotCall&&OB->DoWalls){
 				if(!(OB->LocalOrder&&OB->LocalOrder->DoLink==&BuildObjLink)){
 					if(maxpos){
 						AddTo[pos]=OB->Index;
@@ -2570,7 +2570,7 @@ void City::ExecuteBrigades(){
 				rando();
 				AR->MakeBattle();
 				rando();
-			};
+};
 			rando();
 			CalculateFreeUnits(AR);
 			rando();
@@ -3099,7 +3099,7 @@ void City::SendAgressors(){
 			};
 		}else NAgressors=15000;
 	};
-	/*
+	
 	if(N>100){
 		int ID=GetFreeArmy();
 		if(ID!=-1){
@@ -3108,7 +3108,7 @@ void City::SendAgressors(){
 			ARM->MakeBattle();
 		};
 	};
-	*/
+	
 	
 };
 void City::ProtectMine(){
@@ -3203,11 +3203,11 @@ bool CheckGateUpXY(int x,int y){
 	};
 	return false;
 };
-void CreateGates(OneObject* OB);
+bool CreateGates(OneObject* OB);
 void BuildWallLink(OneObject* OB);
 void LeaveMineLink(OneObject* OBJ);
 void BuildWallBrain(Idea* ID){
-	/*
+	
 	BWM_Idea* BI=(BWM_Idea*)ID->IdeaData;
 	MineBase* MBS=&BI->MBAS;
 	//is wall ready now?
@@ -3422,7 +3422,8 @@ BuildWallsNext:
 			BI->Over=Over;
 		};
 	};
-	*/
+	
+
 };
 void CreateWallBar(int tx,int ty,int r,City* CT){
 
@@ -4052,7 +4053,7 @@ void AI_Army::LocalSendTo(int x,int y,byte Prio,byte OrdType){
 	int y0=y-(((Ny-1)*odis)>>1);
 	int ps=0;
 	int nn=0;
-/*	
+	
 	int xs=0;
 	int ys=0;
 	int nu=0;
@@ -4080,7 +4081,7 @@ void AI_Army::LocalSendTo(int x,int y,byte Prio,byte OrdType){
 			dy=(dy*200)/N;
 		};
 	};
-	*/
+	
 	for(int ix=0;ix<Nx;ix++){
 		for(int iy=0;iy<Ny;iy++){
 			if(nn<NExBrigs){
@@ -6326,14 +6327,14 @@ bool CheckUnGroupPossibility(byte NI){
 	};
 	return false;
 };
-/*
+
 int NWallDel;
 int MaxWallDel;
-short
+
 void CreateListOfWallSegmentsToDelete(){
 	if(tmtmt&63!=2)return;
 	int N1=WSys.NClusters;
-	WallCluser** WCLS=WSys.WCL;
+	WallCluster** WCLS=WSys.WCL;
 	for(int i=0;i<N1;i++){
 		WallCluster* WCL=WCLS[i];
 		if(WCL->NI==0){
@@ -6350,7 +6351,7 @@ void CreateListOfWallSegmentsToDelete(){
 		};
 	};
 };
-*/
+
 bool CheckWallForKilling(OneObject* OB){
 	if(OB->Wall&&OB->WallX>0&&OB->WallY>0&&OB->WallX<TopLx-1&&OB->WallY<TopLy-1){
 

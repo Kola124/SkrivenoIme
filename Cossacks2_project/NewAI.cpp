@@ -136,38 +136,86 @@ void CreateInfoMap(){
 };
 //x,y-pixel coordinates
 void CHKS();
-void RenewInfoMap(int x,int y){
-	x=(x>>7)-1;
-	y=(y>>7)-1;
-	for(int dx=0;dx<3;dx++){
-		for(int dy=0;dy<3;dy++){
-			int sx=x+dx;
-			int sy=y+dy;
-			if(sx>=0&&sy>=0){
-				int ofst=sx+sy*VAL_SPRNX;
-				byte ms=InfoMap[ofst];
-				ms&=16;
-				if(!CheckBar(sx<<3,sy<<3,8,8))ms|=8;
-				int N=NSpri[ofst];
-				int NTrees=0;
-				int NStones=0;
-				if((ms&8)&&(ms&16)&&!N)ms|=4;
-				int* spr=SpRefs[ofst];
-				for(int i=0;i<N;i++){
-					word SID=spr[i];
-					OneSprite* OS=&Sprites[SID];
-					SprGroup* SG=OS->SG;
-					ObjCharacter* OC=&SG->ObjChar[OS->SGIndex];
-					if(OC->ResType==TreeID)NTrees++;
-					if(OC->ResType==StoneID)NStones++;
-				};
-				if(NTrees)ms|=1;
-				if(NStones)ms|=2;
-				InfoMap[ofst]=ms;
-			};
-		};
-	};
+#ifdef CRASHTESTFIX
+void RenewInfoMap(int x, int y) {
+    x = (x >> 7) - 1;
+    y = (y >> 7) - 1;
+
+    for (int dx = 0; dx < 3; dx++) {
+        for (int dy = 0; dy < 3; dy++) {
+            int sx = x + dx;
+            int sy = y + dy;
+
+            if (sx >= 0 && sy >= 0) {
+                int ofst = sx + sy * VAL_SPRNX;
+                byte ms = InfoMap[ofst];
+                ms &= 16;
+
+                if (!CheckBar(sx << 3, sy << 3, 8, 8)) ms |= 8;
+
+                int N = NSpri[ofst];
+                int NTrees = 0;
+                int NStones = 0;
+
+                if ((ms & 8) && (ms & 16) && !N) ms |= 4;
+
+                int* spr = SpRefs[ofst];
+                for (int i = 0; i < N; i++) {
+                    word SID = spr[i];
+                    if (SID >= 131072) continue;  // Safety check
+
+                    OneSprite* OS = &Sprites[SID];
+                    if (!OS || !OS->SG) continue;  // Null check
+
+                    // Verify SGIndex is within bounds
+                    if (OS->SGIndex >= OS->SG->ObjCharCount) continue;
+
+                    ObjCharacter* OC = &OS->SG->ObjChar[OS->SGIndex];
+                    if (OC->ResType == TreeID) NTrees++;
+                    if (OC->ResType == StoneID) NStones++;
+                }
+
+                if (NTrees) ms |= 1;
+                if (NStones) ms |= 2;
+                InfoMap[ofst] = ms;
+            }
+        }
+    }
+}
+#else
+void RenewInfoMap(int x, int y) {
+    x = (x >> 7) - 1;
+    y = (y >> 7) - 1;
+    for (int dx = 0; dx < 3; dx++) {
+        for (int dy = 0; dy < 3; dy++) {
+            int sx = x + dx;
+            int sy = y + dy;
+            if (sx >= 0 && sy >= 0) {
+                int ofst = sx + sy * VAL_SPRNX;
+                byte ms = InfoMap[ofst];
+                ms &= 16;
+                if (!CheckBar(sx << 3, sy << 3, 8, 8))ms |= 8;
+                int N = NSpri[ofst];
+                int NTrees = 0;
+                int NStones = 0;
+                if ((ms & 8) && (ms & 16) && !N)ms |= 4;
+                int* spr = SpRefs[ofst];
+                for (int i = 0; i < N; i++) {
+                    word SID = spr[i];
+                    OneSprite* OS = &Sprites[SID];
+                    SprGroup* SG = OS->SG;
+                    ObjCharacter* OC = &SG->ObjChar[OS->SGIndex];
+                    if (OC->ResType == TreeID)NTrees++;
+                    if (OC->ResType == StoneID)NStones++;
+                };
+                if (NTrees)ms |= 1;
+                if (NStones)ms |= 2;
+                InfoMap[ofst] = ms;
+            };
+        };
+    };
 };
+#endif
 void FreeInfoMap(){
 	free(MineList);
 };

@@ -478,7 +478,7 @@ void AssignHint1(char* s,int time);
 //Получить блок для InLineCom
 char* GetAsmBlock(){
 	if(LastAsmRequest>=MaxAsmCount)LastAsmRequest=0;
-    int i;
+    int i=0;
 	for(i=LastAsmRequest;i<MaxAsmCount&&AsmUsage[i];i++);
 	if(i<MaxAsmCount){
 		LastAsmRequest=i+1;
@@ -522,7 +522,7 @@ Order1* GetOrdBlock(){
 	Order1* OR1=new Order1;
 	memset(OR1,0,sizeof Order1);
 	return OR1;
-	int i;
+	int i=0;
 	//ChkOrdSum();
 	if(LastOrdRequest>=MaxOrdCount)LastOrdRequest=0;
 	for(i=LastOrdRequest;i<MaxOrdCount&&OrdUsage[i];i++);
@@ -829,14 +829,14 @@ void DrawHealth(OneObject* OB){
                 boja = GetPaletteColor(163, 0, 0);
             }
 
-        if (OB->BrigadeID != 0xFFFF) {
-            int M = CITY[OB->NNUM].Brigs[OB->BrigadeID].Morale;
-            int MaxM = CITY[OB->NNUM].Brigs[OB->BrigadeID].MaxMorale;
-            hs = div(mhs * (M - 330000), (MaxM - 330000)).quot;
-        }
-        else {
-            hs = div(mhs * (OB->Morale - 330000), (OB->MaxMorale - 330000)).quot;
-        }
+            if (OB->BrigadeID != 0xFFFF) {
+                int M = CITY[OB->NNUM].Brigs[OB->BrigadeID].Morale;
+                int MaxM = CITY[OB->NNUM].Brigs[OB->BrigadeID].MaxMorale;
+                hs = div(mhs * (M - 330000), (MaxM - 330000)).quot;
+            }
+            else {
+                hs = div(mhs * (OB->Morale - 330000), (OB->MaxMorale - 330000)).quot;
+            }
 
             if (OB->newMons->ShowDelay) {
                 Hline(-2 + x + c2 + dc + 1, y + ddy + 4, x + c2 + hs + dc + 1, boja);
@@ -847,7 +847,7 @@ void DrawHealth(OneObject* OB){
                 Hline(-2 + x + c2 + dc + 1, y + ddy + 2, x + c2 + hs + dc + 1, boja);
                 Hline(-2 + x + c2 + dc + 1, y + ddy + 3, x + c2 + hs + dc + 1, boja);
             }
-    };
+        };
 
 
     }
@@ -3075,7 +3075,7 @@ void ShowBrigPosition(){
 #endif
 
 }
-
+CIMPORT
 void CheckDipBuilding(byte NI, int Index);
 CEXPORT
 void SetCurPtr(int v);
@@ -4375,6 +4375,238 @@ Edgetest:;
 PrInfo:;
 };
 extern int LastScrollTime;
+#ifdef CRASHTESTFIX
+//Hardcoded speed of arrow key scrolling = 4
+const int kKeyboardScrollSpeed = 4;
+
+void EDGETEST()
+{
+    int x = mouseX;
+    int y = mouseY;
+
+    if (SHOWSLIDE)
+    {
+        bool MoveX = false;
+        bool MoveY = false;
+        int OLDMX = mapx;
+        int OLDMY = mapy;
+        OneObject* SOB = NULL;
+        //Check arrow keys
+        if (!(EnterChatMode || RESMODE))
+        {
+            OneObject* SOB = NULL;
+            if ((!DrawGroundMode) && EditMapMode && ImNSL[MyNation] && ImSelm[MyNation][0] != 0xFFFF) {
+                int groupIndex = ImSelm[MyNation][0];
+                SOB = Group[groupIndex];
+                if (SOB && SOB->NewBuilding) {
+                    int dx = 0;
+                    int dy = 0;
+                    if (GetKeyState(VK_RIGHT) & 0x8000) {
+                        dx = 16;
+                    };
+                    if (GetKeyState(VK_LEFT) & 0x8000) {
+                        dx = -16;
+                    };
+                    if (GetKeyState(VK_UP) & 0x8000) {
+                        dy = -32;
+                    };
+                    if (GetKeyState(VK_DOWN) & 0x8000) {
+                        dy = 32;
+                    };
+                    ShiftBuilding(SOB, dx, dy);
+                }
+            }
+            else {
+                if (GetKeyState(VK_RIGHT) & 0x8000)
+                {
+                    StepX = kKeyboardScrollSpeed;
+                    MoveX = true;
+                }
+
+                if (GetKeyState(VK_LEFT) & 0x8000)
+                {
+                    StepX = -kKeyboardScrollSpeed;
+                    MoveX = true;
+                }
+
+                if (GetKeyState(VK_UP) & 0x8000)
+                {
+                    StepY = -kKeyboardScrollSpeed;
+                    MoveY = true;
+                }
+
+                if (GetKeyState(VK_DOWN) & 0x8000)
+                {
+                    StepY = kKeyboardScrollSpeed;
+                    MoveY = true;
+                }
+            }
+        }
+
+        //Check mouse scrolling (it has priority over arrow keys)
+        //Left
+        if (x < 6)
+        {
+            if (StepX > 0)
+            {
+                StepX = 0;
+            }
+            StepX--;
+            if (StepX < -ScrollSpeed)
+            {
+                StepX = -ScrollSpeed;
+            }
+            MoveX = true;
+        }
+        //Up
+        if (y < 6)
+        {
+            if (StepY > 0)
+            {
+                StepY = 0;
+            }
+            StepY--;
+            if (StepY < -ScrollSpeed)
+            {
+                StepY = -ScrollSpeed;
+            }
+            MoveY = true;
+        }
+        //Right
+        if (x > RealLx - 6)
+        {
+            if (StepX < 0)
+            {
+                StepX = 0;
+            }
+            StepX++;
+            if (StepX > ScrollSpeed)
+            {
+                StepX = ScrollSpeed;
+            }
+            MoveX = true;
+        }
+        //Down
+        if (y > RealLy - 6)
+        {
+            if (StepY < 0)
+            {
+                StepY = 0;
+            }
+            StepY++;
+            if (StepY > ScrollSpeed)
+            {
+                StepY = ScrollSpeed;
+            }
+            MoveY = true;
+        }
+
+        //Sanity checks?
+        if (StepX && !MoveX)
+        {
+            if (StepX > 0)
+            {
+                StepX--;
+            }
+            if (StepX < 0)
+            {
+                StepX++;
+            }
+        }
+        if (StepY && !MoveY)
+        {
+            if (StepY > 0)
+            {
+                StepY--;
+            }
+            if (StepY < 0)
+            {
+                StepY++;
+            }
+        }
+
+        //Adjust view window position
+        if (StepX < 0)
+        {
+            mapx -= -StepX / 2;
+        }
+        else
+        {
+            mapx += StepX / 2;
+        }
+        if (StepY < 0)
+        {
+            mapy -= -StepY / 2;
+        }
+        else
+        {
+            mapy += StepY / 2;
+        }
+
+        //Stop at map borders
+        if (mapx <= 0)
+        {
+            mapx = 1;
+        }
+        if (mapy <= 0)
+        {
+            mapy = 1;
+        }
+        if (mapx + smaplx > msx + 1)
+        {
+            mapx = msx - smaplx + 1;
+        }
+        if (mapy + smaply > msy + 1)
+        {
+            mapy = msy - smaply + 1;
+        }
+
+        //Jump-scroll via minimap clicking
+        if ((!LockMouse) && (Lpressed) && (mouseX > minix) && (mouseY > miniy) &&
+            (mouseX < minix + (msx / 2)) && (mouseY < miniy + (msy / 2)))
+        {
+            mapx = (x - minix + MiniX - (smaplx >> (ADDSH + 1))) << ADDSH;
+            mapy = (y - miniy + MiniY - (smaply >> (ADDSH + 1))) << ADDSH;
+
+            if (mapx <= 0)
+            {
+                mapx = 1;
+            }
+            if (mapy <= 0)
+            {
+                mapy = 1;
+            }
+
+            if (mapx + smaplx > msx + 1)
+            {
+                mapx = msx - smaplx + 1;
+            }
+            if (mapy + smaply > msy + 1)
+            {
+                mapy = msy - smaply + 1;
+            }
+
+            if (!FullMini)
+            {
+                Lpressed = false;
+            }
+        }
+
+        if (mapx != OLDMX || mapy != OLDMY || Lpressed || Rpressed)
+        {
+            LastScrollTime = GetTickCount();
+        }
+    }
+
+    if (GetKeyState(VK_SHIFT) & 0x8000)
+    {
+        curptr = 0;
+    }
+
+    //Adjust Lpressed and Rpressed
+    MFix();
+}
+#else
 void EDGETEST(){
 	int x=mouseX;
 	int y=mouseY;
@@ -4505,6 +4737,7 @@ void EDGETEST(){
 PrInfo:;
 	
 };
+#endif
 void doooo(){
 	Group[0]->Selected=true;
 	Nsel=1;

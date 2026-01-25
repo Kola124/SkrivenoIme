@@ -2426,7 +2426,7 @@ bool InitRGB640Screen(){
 };
 
 byte NoCD=1;
-DLLEXPORT
+CEXPORT
 void __stdcall CDGINIT_EnCD(){
 	NoCD=0;
 };
@@ -2831,7 +2831,7 @@ unsigned long GetRealTime();
 #else
 int GetRealTime();
 #endif
-
+extern "C" CEXPORT
 void CreateFields(byte NI);
 extern int LastWaterchange;
 extern int LastBrightspot;

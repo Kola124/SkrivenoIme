@@ -418,6 +418,7 @@ void HideDipDialog();
 extern int StartGTime;
 extern int StartVCond;
 void EraseAreas();
+CIMPORT
 void SetGameID(char* ID);
 void ClearAllRoadData();
 extern int DipDlgDX;
