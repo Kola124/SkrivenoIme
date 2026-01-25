@@ -24,4 +24,4 @@ extern CPlayerScript PScript[8];
 class CScript{
 public:
 	byte CurPlayer;
-};
+};  

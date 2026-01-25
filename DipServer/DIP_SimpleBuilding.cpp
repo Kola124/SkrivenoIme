@@ -1,5 +1,4 @@
 #include "CommonDip.h"
-#include "..\common.h"
 
 
 void DIP_SimpleBuilding::InitThisTribe2(char* FileID, char* Dip, char* GDance, char* ZDance){
@@ -19,169 +18,255 @@ void DIP_SimpleBuilding::InitThisTribe2(char* FileID, char* Dip, char* GDance, c
 #endif AC_ADDON
 }
 
-void DIP_SimpleBuilding::InitThisTribe(char* Preffix,char* FirstGroupName,char* CommonID){
-	char CCC[1024];
+void DIP_SimpleBuilding::InitThisTribe(char* Preffix, char* FirstGroupName, char* CommonID) {
+    char CCC[1024];
 #ifdef AC_ADDON
-	EasyTalk=0;
-#endif AC_ADDON
-	Busy=0;
-	Owner=7;
-	DipProposition=0;
-	CounsilNI=7;
-	DIPPAR=NULL;
-	RepType=-1;
-	DefType=-1;
-	MaxRep=0;
-	MaxDef=0;
-	AddDefAttack=0;
-	AddDefShield=0;
-	DanceStage=0;
-	ActorsType=-1;
-	NDipPar=0;
-	strcpy(TellNo,"$TELLNO");
-	strcpy(CongratID,"$WECAN$");
-	memset(ReSellCost,0,sizeof ReSellCost);
-	CurrentStateMessage[0]=0;
-	if(RegisterUnits(&CentralGroup,FirstGroupName)){
-		//SelectUnits(&CentralGroup,0);
-		//SetGroupNMASK(&CentralGroup,0xFF);
-		//reading possibilities
-		
-		char cc[256];
+    EasyTalk = 0;
+#endif // AC_ADDON
+    Busy = 0;
+    Owner = 7;
+    DipProposition = 0;
+    CounsilNI = 7;
+    DIPPAR = NULL;
+    RepType = -1;
+    DefType = -1;
+    MaxRep = 0;
+    MaxDef = 0;
+    AddDefAttack = 0;
+    AddDefShield = 0;
+    DanceStage = 0;
+    ActorsType = -1;
+    NDipPar = 0;
+    strcpy(TellNo, "$TELLNO");
+    strcpy(CongratID, "$WECAN$");
+    memset(ReSellCost, 0, sizeof(ReSellCost));
+    CurrentStateMessage[0] = 0;
 
-		sprintf(cc,"$ACTORS-%s%s",CommonID,Preffix);
-		RegisterUnits(&Actors,cc);
-		UseLikeSkarb=Actors.Type==0;
+    if (RegisterUnits(&CentralGroup, FirstGroupName)) {
+        char cc[256];
 
-		sprintf(cc,"$DZONE-%s%s",CommonID,Preffix);
-		RegisterZone(&DanceZone,cc);
-		DanceStage=0;
-		RegisterDynGroup(&Repairers);
-		OneUnit OU;
-		if(GetUnitInfo(&CentralGroup,0,&OU)){
-			SGP_RepairBuilding(&Repairers,0,OU.Index);
-		};
-		RegisterDynGroup(&Defenders);
-		RegisterDynGroup(&ComeInside);
-		if(GetUnitInfo(&CentralGroup,0,&OU)){
-			SGP_ComeIntoBuilding(&ComeInside,0,OU.Index);
-		};
-		NStartActors=GetNUnits(&Actors);
-		if(NStartActors){
-			OneUnit OU;
-			if(GetUnitInfo(&Actors,0,&OU)){;
-				ActorsType=OU.NIndex;
-			};
-		};
+        // Zero-terminate and validate string operations
+        snprintf(cc, sizeof(cc), "$ACTORS-%s%s", CommonID, Preffix);
+        cc[sizeof(cc) - 1] = '\0';
+        RegisterUnits(&Actors, cc);
+        UseLikeSkarb = Actors.Type == 0;
 
-		sprintf(cc,"Dip\\%s",CommonID);
-		strcpy(cc+strlen(cc)-2,".dat");
-		GFILE* F=Gopen(cc,"r");
-		if(F){
-			bool good=1;
-			do{
-				char str[1024];
-				good=ReadWinString(F,str,1023);
-				if(good){
-					char com[128];
-					sscanf(str,"%s",com);
-					if(!strcmp(com,"$PSB")){
-						DipComParams DPP;
-						int z=sscanf(str,"%s%s%s%s%d%d%d%d%d%d%s",com,DPP.MessageID,DPP.HintID,DPP.ProcessID,DPP.Cost,DPP.Cost+1,DPP.Cost+2,DPP.Cost+3,DPP.Cost+4,DPP.Cost+5,DPP.ComID);
-						if(z==11){
-							DIPPAR=(DipComParams*)realloc(DIPPAR,(NDipPar+1)*sizeof DipComParams);
-							char* s=strstr(str,DPP.ComID);
-							if(s)strcpy(DPP.Params,s+strlen(DPP.ComID)+1);
-							memcpy(DIPPAR+NDipPar,&DPP,sizeof DipComParams);
-							NDipPar++;
-							RegisterDynGroup(&DestGroup);
-							BigZone.Type=0;
-							UnitsCenter(&BigZone,&CentralGroup,800);
-							UnitsCenter(&VeryBigZone,&CentralGroup,750);
-						}else{
-							sprintf(CCC,"%s : Invalid string : %s",cc,str);	
-							MissErrorMessage("Dip error!",CCC);
-						};
-					}else
-					if(!strcmp(com,"$IFTELLNO$")){
-						sscanf(str,"%s%s",com,TellNo);
-					}else
-					if(!strcmp(com,"$CONGRAT")){
-						sscanf(str,"%s%s",com,CongratID);
-					}else
-					if(!strcmp(com,"$FIRSTMEET")){
-						sscanf(str,"%s%s",com,FirstMeetID);
-					}else
-					if(!strcmp(com,"$RESELL")){
-						sscanf(str,"%s%s",com,ReSellID);
-					}else
-					if(!strcmp(com,"$STARTPRICE")){
-						sscanf(str,"%s%d%d%d%d%d%d",com,ReSellCost,ReSellCost+1,ReSellCost+2,ReSellCost+3,ReSellCost+4,ReSellCost+5);
-					}else
-					if(!strcmp(com,"$NAME")){
-						char NID[32];
-						char CCC[128];
-						sscanf(str,"%s%s",com,NID);
-						int idx=0;
-						bool doit=1;
-						do{
-							sprintf(CCC,NID,idx);
-							char* id=GetTextByID(CCC);
-							if(id[0]!='$')idx++;
-							else doit=0;
-						}while(doit);
-						if(idx){
-							sprintf(NameOfTribe,NID,CurIndex%idx);
-							CurIndex++;
-						}else{
-							sprintf(NameOfTribe,NID,0);
-						};
-					}else
-					if(!strcmp(com,"$PIX")){
-						int st=0;
-						int npix=0;
-						sscanf(str,"%s%s%d%d",com,gpPix,&st,&npix);
-						if(npix){
-							gpidx=st+(CurIndex%npix);
-						}else gpidx=-1;
-					}else
-					if(!strcmp(com,"$REPAIR")){
-						int st=0;
-						char cc[128];
-						int z=sscanf(str,"%s%s%d",com,cc,&st);
-						if(z==3){
-							GAMEOBJ UTP;
-							RegisterUnitType(&UTP,cc);
-							if(UTP.Type=='UTYP'){
-								RepType=short(UTP.Index);
-								MaxRep=st;
-							};
-						};
-					}else
-					if(!(strcmp(com,"$DEFEND")&&strcmp(com,"$DEFENCE"))){
-						int max,ads,ada;
-						char cc[128];
-						int z=sscanf(str,"%s%s%d%d%d",com,cc,&max,&ada,&ads);
-						if(z==5){
-							GAMEOBJ UTP;
-							RegisterUnitType(&UTP,cc);
-							if(UTP.Type=='UTYP'){
-								DefType=short(UTP.Index);
-								MaxDef=max;
-								AddDefAttack=ada;
-								AddDefShield=ads;
-							};
-						};
-					};
-				};
-			}while(good);
-			Gclose(F);
-		}else{
-			sprintf(CCC,"Unable to open : %s",cc);
-			MissErrorMessage("Dip error!",CCC);
-		};
-	};
-};
+        snprintf(cc, sizeof(cc), "$DZONE-%s%s", CommonID, Preffix);
+        cc[sizeof(cc) - 1] = '\0';
+        RegisterZone(&DanceZone, cc);
+        DanceStage = 0;
+
+        RegisterDynGroup(&Repairers);
+        OneUnit OU;
+        if (GetUnitInfo(&CentralGroup, 0, &OU)) {
+            SGP_RepairBuilding(&Repairers, 0, OU.Index);
+        }
+
+        RegisterDynGroup(&Defenders);
+        RegisterDynGroup(&ComeInside);
+        if (GetUnitInfo(&CentralGroup, 0, &OU)) {
+            SGP_ComeIntoBuilding(&ComeInside, 0, OU.Index);
+        }
+
+        NStartActors = GetNUnits(&Actors);
+        if (NStartActors) {
+            OneUnit OU;
+            if (GetUnitInfo(&Actors, 0, &OU)) {
+                ActorsType = OU.NIndex;
+            }
+        }
+
+        snprintf(cc, sizeof(cc), "Dip\\%s", CommonID);
+        cc[sizeof(cc) - 1] = '\0';
+
+        // Replace unsafe strcpy with safer alternative
+        size_t len = strlen(cc);
+        if (len >= 2) {
+            strcpy(cc + len - 2, ".dat");
+        }
+        else {
+            // Handle error: string too short
+            strcat(cc, ".dat");
+        }
+
+        GFILE* F = Gopen(cc, "r");
+        if (F) {
+            bool good = true;
+            do {
+                char str[1024];
+                good = ReadWinString(F, str, sizeof(str) - 1);
+                str[sizeof(str) - 1] = '\0'; // Ensure null termination
+                if (good) {
+                    char com[128] = { 0 };
+
+                    // Safe sscanf with length limitation
+                    if (sscanf(str, "%127s", com) == 1) {
+                        if (strcmp(com, "$PSB") == 0) {
+                            DipComParams DPP = { 0 };
+                            int z = sscanf(str, "%127s %127s %127s %127s %d %d %d %d %d %d %127s",
+                                com, DPP.MessageID, DPP.HintID, DPP.ProcessID,
+                                &DPP.Cost[0], &DPP.Cost[1], &DPP.Cost[2],
+                                &DPP.Cost[3], &DPP.Cost[4], &DPP.Cost[5], DPP.ComID);
+
+                            if (z == 11) {
+                                // Ensure all strings are null-terminated
+                                DPP.MessageID[sizeof(DPP.MessageID) - 1] = '\0';
+                                DPP.HintID[sizeof(DPP.HintID) - 1] = '\0';
+                                DPP.ProcessID[sizeof(DPP.ProcessID) - 1] = '\0';
+                                DPP.ComID[sizeof(DPP.ComID) - 1] = '\0';
+
+                                // Safe realloc with null check
+                                DipComParams* temp = (DipComParams*)realloc(DIPPAR, (NDipPar + 1) * sizeof(DipComParams));
+                                if (temp == NULL) {
+                                    MissErrorMessage("Memory error", "Failed to allocate memory for DIPPAR");
+                                    break;
+                                }
+                                DIPPAR = temp;
+
+                                char* s = strstr(str, DPP.ComID);
+                                if (s) {
+                                    size_t comIDLen = strlen(DPP.ComID);
+                                    if (strlen(s) > comIDLen) {
+                                        strncpy(DPP.Params, s + comIDLen + 1, sizeof(DPP.Params) - 1);
+                                        DPP.Params[sizeof(DPP.Params) - 1] = '\0';
+                                    }
+                                    else {
+                                        DPP.Params[0] = '\0';
+                                    }
+                                }
+                                else {
+                                    DPP.Params[0] = '\0';
+                                }
+
+                                memcpy(&DIPPAR[NDipPar], &DPP, sizeof(DipComParams));
+                                NDipPar++;
+
+                                RegisterDynGroup(&DestGroup);
+                                BigZone.Type = 0;
+                                UnitsCenter(&BigZone, &CentralGroup, 800);
+                                UnitsCenter(&VeryBigZone, &CentralGroup, 750);
+                            }
+                            else {
+                                snprintf(CCC, sizeof(CCC), "%s : Invalid string : %s", cc, str);
+                                MissErrorMessage("Dip error!", CCC);
+                            }
+                        }
+                        else if (strcmp(com, "$IFTELLNO$") == 0) {
+                            char tempTellNo[128] = { 0 }; // Initialize and zero-terminate
+                            if (sscanf(str, "%127s %127s", com, tempTellNo) == 2) {
+                                strncpy(TellNo, tempTellNo, sizeof(TellNo) - 1);
+                                TellNo[sizeof(TellNo) - 1] = '\0';
+                            }
+                        }
+                        else if (strcmp(com, "$CONGRAT") == 0) {
+                            char tempCongrat[128] = { 0 }; // Initialize and zero-terminate
+                            if (sscanf(str, "%127s %127s", com, tempCongrat) == 2) {
+                                strncpy(CongratID, tempCongrat, sizeof(CongratID) - 1);
+                                CongratID[sizeof(CongratID) - 1] = '\0';
+                            }
+                        }
+                        else if (strcmp(com, "$FIRSTMEET") == 0) {
+                            char tempFirstMeet[128] = { 0 }; // Initialize and zero-terminate
+                            if (sscanf(str, "%127s %127s", com, tempFirstMeet) == 2) {
+                                strncpy(FirstMeetID, tempFirstMeet, sizeof(FirstMeetID) - 1);
+                                FirstMeetID[sizeof(FirstMeetID) - 1] = '\0';
+                            }
+                        }
+                        else if (strcmp(com, "$RESELL") == 0) {
+                            char tempReSell[128] = { 0 }; // Initialize and zero-terminate
+                            if (sscanf(str, "%127s %127s", com, tempReSell) == 2) {
+                                strncpy(ReSellID, tempReSell, sizeof(ReSellID) - 1);
+                                ReSellID[sizeof(ReSellID) - 1] = '\0';
+                            }
+                        }
+                        else if (strcmp(com, "$STARTPRICE") == 0) {
+                            if (sscanf(str, "%127s %d %d %d %d %d %d", com,
+                                &ReSellCost[0], &ReSellCost[1], &ReSellCost[2],
+                                &ReSellCost[3], &ReSellCost[4], &ReSellCost[5]) != 7) {
+                                // Handle parsing error
+                            }
+                        }
+                        else if (strcmp(com, "$NAME") == 0) {
+                            char NID[128] = { 0 }; // Initialize and zero-terminate
+                            if (sscanf(str, "%127s %127s", com, NID) == 2) {
+                                int idx = 0;
+                                bool doit = true;
+                                do {
+                                    char CCC[128];
+                                    snprintf(CCC, sizeof(CCC), NID, idx);
+                                    CCC[sizeof(CCC) - 1] = '\0';
+                                    char* id = GetTextByID(CCC);
+                                    if (id[0] != '$') {
+                                        idx++;
+                                    }
+                                    else {
+                                        doit = false;
+                                    }
+                                } while (doit && idx < 1000);
+
+                                if (idx > 0) {
+                                    snprintf(NameOfTribe, sizeof(NameOfTribe), NID, CurIndex % idx);
+                                }
+                                else {
+                                    snprintf(NameOfTribe, sizeof(NameOfTribe), NID, 0);
+                                }
+                                NameOfTribe[sizeof(NameOfTribe) - 1] = '\0';
+                                CurIndex++;
+                            }
+                        }
+                        else if (strcmp(com, "$PIX") == 0) {
+                            char tempPix[128] = { 0 }; // Initialize and zero-terminate
+                            int st = 0;
+                            int npix = 0;
+                            if (sscanf(str, "%127s %127s %d %d", com, tempPix, &st, &npix) == 4) {
+                                strncpy(gpPix, tempPix, sizeof(gpPix) - 1);
+                                gpPix[sizeof(gpPix) - 1] = '\0';
+                                if (npix > 0) {
+                                    gpidx = st + (CurIndex % npix);
+                                }
+                                else {
+                                    gpidx = -1;
+                                }
+                            }
+                        }
+                        else if (strcmp(com, "$REPAIR") == 0) {
+                            char cc[128] = { 0 }; // Initialize and zero-terminate
+                            int st = 0;
+                            if (sscanf(str, "%127s %127s %d", com, cc, &st) == 3) {
+                                GAMEOBJ UTP;
+                                RegisterUnitType(&UTP, cc);
+                                if (UTP.Type == 'UTYP') {
+                                    RepType = static_cast<short>(UTP.Index);
+                                    MaxRep = st;
+                                }
+                            }
+                        }
+                        else if (strcmp(com, "$DEFEND") == 0 || strcmp(com, "$DEFENCE") == 0) {
+                            char cc[128] = { 0 }; // Initialize and zero-terminate
+                            int max = 0, ada = 0, ads = 0;
+                            if (sscanf(str, "%127s %127s %d %d %d", com, cc, &max, &ada, &ads) == 5) {
+                                GAMEOBJ UTP;
+                                RegisterUnitType(&UTP, cc);
+                                if (UTP.Type == 'UTYP') {
+                                    DefType = static_cast<short>(UTP.Index);
+                                    MaxDef = max;
+                                    AddDefAttack = ada;
+                                    AddDefShield = ads;
+                                }
+                            }
+                        }
+                    }
+                }
+            } while (good);
+            Gclose(F);
+        }
+        else {
+            snprintf(CCC, sizeof(CCC), "Unable to open : %s", cc);
+            CCC[sizeof(CCC) - 1] = '\0';
+            MissErrorMessage("Dip error!", CCC);
+        }
+    }
+}
 int DIP_SimpleBuilding::GetAmountOfPropositions(){
 	return NDipPar;
 };
@@ -768,7 +853,7 @@ void DIP_SimpleBuilding::ProcessTribe(){
 				};
 				if(OU.NI==GetMyNation()){
 					char cc[512];
-					sprintf(cc,GetTextByID(FirstMeetID),MAXR);
+					sprintf_s(cc,sizeof(cc),GetTextByID(FirstMeetID),MAXR);
 					AssignHint(cc,300);
 				};
 				AlreadyUsedLikeSkarb=1;
@@ -1153,13 +1238,17 @@ void DIP_SimpleBuilding::SetSaveData(byte* buf,int size){
 	sz+=((byte*)&StartRelTime)-((byte*)&NDipPar)+4;
 	if(NDipPar){
 		DIPPAR=(DipComParams*)malloc(NDipPar*sizeof DipComParams);
-		memcpy(DIPPAR,buf+sz,NDipPar*sizeof DipComParams);
+        if (DIPPAR != 0) {
+            memcpy(DIPPAR, buf + sz, NDipPar * sizeof DipComParams);
+        }
 	};
 };
 void DIP_SimpleBuilding::Init(){
 	memset(this,0,((byte*)&DIP)-((byte*)&Owner));
 	DIP=NULL;
-	memset(&DIPPAR,0,((byte*)&StartRelTime)-((byte*)&DIPPAR)+4);
+    if (DIPPAR != 0) {
+        memset(&DIPPAR, 0, ((byte*)&StartRelTime) - ((byte*)&DIPPAR) + 4);
+    }
 };
 void DIP_SimpleBuilding::Free(){
 	if(DIPPAR)free(DIPPAR);

@@ -110,7 +110,7 @@ void HandleBattleCml(char* com,char** params,int npr,ParsedRQ* Result){
 	}
 	
 }
-void SXP_SetVar(int Index, char* Name, char* value);
+
 void RunStartTimer(){
 	word Data[3];
 	Data[0]=2050;
@@ -119,7 +119,7 @@ void RunStartTimer(){
 }
 int CBattle::ShowTimer(){
 	char* var=TimerVarName;
-    //char* oldval=SXP_GetVar(1,var);
+    char* oldval=SXP_GetVar(1,var);
 	long val=(long)StartTimer-(long)GetTickCount();//atoi(oldval);
 	if(val<0){
 		return false;

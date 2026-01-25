@@ -1,5 +1,4 @@
 #include "CommonDip.h"
-#include "DString.h"
 
 DiplomacySystem::DiplomacySystem(){
 	memset(this,0,sizeof(*this));
@@ -145,7 +144,7 @@ void DiplomacySystem::PerformCommand(char* Data,int size){
 };
 
 #pragma warning(disable : 4035)
-CIMPORT int Norma(int x, int y);/* {
+int Norma(int x, int y) {
 	__asm{
 		mov		eax,x
 		cmp		eax,0
@@ -164,7 +163,7 @@ ggg3:	add		ecx,eax
 		shr		ecx,1
 		mov		eax,ecx
 	};
-};*/
+};
 #pragma warning(default : 4035)
 
 void SetZone(GAMEOBJ* Zone, int X, int Y, int R){
@@ -310,7 +309,7 @@ void DiplomacySystem::Process(){
 				
 			}else{
 				// подготовка к штурму
-				if(/*CheckIfNotBusy(&Grp->Group)||*/T0-Grp->LastMoveTime>56){
+				if(/*CheckIfNotBusy(&Grp->Group)||*/T0-Grp->LastMoveTime>100){
 					Grp->LastMoveTime=T0;
 					
 					RemoveGroup(StrGrp,Group);
@@ -626,7 +625,7 @@ void DiplomacySystem::Process(){
 			word SNS=Grp->FBSN;
 			OneUnit OU;
 			GetUnitGlobalInfo(BID,&OU);
-			if(OU.Index!=0xFFFF&&OU.Serial==SNS&&T0-Grp->LastMoveTime>56){
+			if(OU.Index!=0xFFFF&&OU.Serial==SNS&&T0-Grp->LastMoveTime>100){
 				Grp->LastMoveTime=T0;
 				if(OU.Index==0xFFFF || OU.NI==Grp->Owner || CheckIfBuildingIsFired(BID)){
 					int xc,yc;
@@ -642,7 +641,7 @@ void DiplomacySystem::Process(){
 					GrpAttackObject(Grp->Owner,&Grp->Group,BID);
 				}
 			}else{
-				if(/*CheckIfNotBusy(&Grp->Group)||*/T0-Grp->LastMoveTime>80){
+				if(/*CheckIfNotBusy(&Grp->Group)||*/T0-Grp->LastMoveTime>100){
 					Grp->LastMoveTime=T0;
 
 					SetToInternalResourcesZero(Group);
@@ -744,7 +743,7 @@ void DiplomacySystem::Process(){
 		KillersGroup* Grp=KILLERS+i;
 		GAMEOBJ* Group=&Grp->Group;
 		int NUnits=CleanGroup(Group);		
-		if(NUnits&&(/*CheckIfNotBusy(Group)||*/T0-KILLERS[i].LastMoveTime>64)){
+		if(NUnits&&(/*CheckIfNotBusy(Group)||*/T0-KILLERS[i].LastMoveTime>100)){
 			
 			Grp->LastMoveTime=T0;
 
@@ -854,7 +853,7 @@ void DiplomacySystem::Process(){
 			}
 			*/
 			// thinking
-			if(/*CheckIfNotBusy(&Grp->Group)||*/T0-Grp->LastMoveTime>72){
+			if(/*CheckIfNotBusy(&Grp->Group)||*/T0-Grp->LastMoveTime>100){
 
 				Grp->LastMoveTime=T0;
 

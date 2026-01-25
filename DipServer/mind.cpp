@@ -477,7 +477,7 @@ void Mind::Process0(){
 		Squad* SQD=Sqd+i;
 		GAMEOBJ* Group=&SQD->Group;
 		int NMen=CleanGroup(Group);		
-		if(NMen && Time-SQD->LastMoveTime>60){
+		if(NMen && Time-SQD->LastMoveTime>100){
 
 			SQD->LastMoveTime=Time+GetRND(100);
 
@@ -801,7 +801,7 @@ void Mind::Process1(){
 										}
 									}
 									*/
-
+									
 								}
 							}
 						}
@@ -815,7 +815,7 @@ void Mind::Process1(){
 							moving=false;
 						}
 						*/
-
+						
 						// find defend zone
 						int zt=SQD->TarTop[1];
 						if(zt==0xFFFF&&i){
@@ -916,7 +916,7 @@ void Mind::Process1(){
 									dir=getDir(tx-dx,ty-dy);
 								};
 								*/
-
+								
 								if(SQD->Brig!=0xFFFF) SelectUnits(Group,0);
 								SGP_MoveToPoint(NI,Group,dx+16-GetRND(32),dy+16-GetRND(32),dir,0,0,1);
 								
@@ -1730,12 +1730,19 @@ void MindCheats(byte NI, char* com){
 	}else
 	if(strstr(com,"run")){
 		int param;
-		sscanf(com,"%s%d",scom,&param);
+        int result = sscanf(com,"%s%d",scom,&param);
+        if (result != 2) {
+            return;
+        }
 		Player[NI].RunState=param;
 	}else
 	if(strstr(com,"show")){
 		char param[100];
-		sscanf(com,"%s%s",scom,param);
+		int result = sscanf(com,"%s%s",scom,param);
+        if (result < 2) {
+            scom[0] = '\0';  // Clear scom
+            param[0] = '\0'; // Clear param
+        }
 		if(strstr(param,"dang")){
 			int Dang[4096];
 			short* SDan=Player[NI].DangerMap;

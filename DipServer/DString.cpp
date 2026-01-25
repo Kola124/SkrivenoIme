@@ -1,11 +1,10 @@
 #include "..\common.h"
 //#include "IntExplorer.h"
 //#include "ParseRQ.h"
-//#include "dstring.h"
 #include <crtdbg.h>
 #include <assert.h>
 
-class DString{
+class DString {
 public:
 	char* str;
 	int L;
@@ -166,10 +165,16 @@ void DString::Free(){
 	L=0;
 	MaxL=0;
 };
-void DString::Allocate(int LN){
-	if(MaxL<LN){
-		MaxL=((LN+256)&0xFFFF00);
-		str=(char*)realloc(str,MaxL);
-		str[L]=0;
-	};
+void DString::Allocate(int LN) {
+    if (MaxL < LN) {
+        MaxL = ((LN + 256) & 0xFFFF00);
+        char* new_str = (char*)realloc(str, MaxL);
+        if (new_str == nullptr) {
+            // Handle allocation failure - you might want to throw an exception
+            // or set some error state instead of silently failing
+            return;
+        }
+        str = new_str;
+        str[L] = 0; // Assuming L is the current length
+    }
 };
