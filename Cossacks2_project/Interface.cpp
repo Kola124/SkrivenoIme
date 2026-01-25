@@ -1704,7 +1704,7 @@ bool EnterPassword(){
 	LocalGP BARS("Interface\\bor2");
 	DarkScreen();
 #ifdef SCREENFIX
-	DialogsSystem DSS(menu_x_off, menu_y_off);
+    DialogsSystem DSS(menu_x_off, menu_y_off);
 #else
     DialogsSystem DSS(0, 0);
 #endif
@@ -1735,7 +1735,7 @@ void EnterPersonalMessage(char* Nick){
 	LocalGP BARS("Interface\\bor2");
 	DarkScreen();
 #ifdef SCREENFIX
-	DialogsSystem DSS(menu_x_off, menu_y_off);
+    DialogsSystem DSS(menu_x_off, menu_y_off);
 #else
     DialogsSystem DSS(0, 0);
 #endif
@@ -7398,6 +7398,7 @@ void CreateHiMap(){
 	if(!higrad){
 		grsize=24;
 		higrad=znew(byte,grsize);
+        for (int i = 0; i < grsize; i++)higrad[i] = GetPaletteColor(i * 255 / grsize, i * 255 / grsize, i * 255 / grsize);
 	};
 	int mpx=256;
 	int mpy=256;
@@ -10516,7 +10517,7 @@ void ActivateDipDialog(char* request){
 	InformMode=4;
 	OptHidden=1;
 	DIP_DSS_Vis=1;
-	strcpy(CUR_Request,request);
+    strcpy(CUR_Request,request);
 	if(!DIP_DSS_Init){
 		DIP_DSS_Init=1;
 		SetupDIP_DSS();
