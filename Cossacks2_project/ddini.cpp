@@ -1,44 +1,77 @@
-/***********************************************************************
- *Direct Draw initialisation module                    
+﻿/*********************************************************************** 
+ * SDL2 initialisation module (migrated from DirectDraw)                  
  *
- * This module creates the Direct Draw object with the primary surface
- * and a backbuffer and sets 800x600x8 display mode.
+ * This module creates the SDL2 window with renderer
+ * and sets up display modes.
  *
  ***********************************************************************/
 #define __ddini_cpp_
 #include "ddini.h"
 #include "ResFile.h"
-#include "FastDraw.h" 
-#include "mode.h" 
-#include "MapDiscr.h" 
+#include "FastDraw.h"
+#include "mode.h"
+#include "MapDiscr.h"
 #include "fog.h"
 #include "GSound.h"
-#include "fonts.h" 
-#include "VirtScreen.h"    
- 
-void DDLog (LPSTR sz,...)
+#include "fonts.h"
+#include "VirtScreen.h"
+
+#include "include\SDL.h"
+#include "include\SDL_syswm.h"
+#include <vector>
+#include <algorithm>
+//#include <string>
+
+LPDIRECTDRAW lpDD = nullptr;
+LPDIRECTDRAWSURFACE lpDDSPrimary = nullptr;
+LPDIRECTDRAWSURFACE lpDDSBack = nullptr;
+DDSURFACEDESC ddsd;
+
+extern HWND hwnd;
+extern int mouseX;
+extern int mouseY;
+
+#ifdef _WIN32
+    #undef main  // SDL2 redefines main on Windows
+#endif
+
+void DDLog(LPSTR sz, ...)
 {
-	
-        char ach[256];
-        va_list va;
+    char ach[256];
+    va_list va;
 
-        va_start( va, sz );
-        vsprintf ( ach, sz, va );   
-        va_end( va );
-		FILE* f=fopen("DDraw.log","a");
-		fprintf(f,ach);
-		fclose(f);
-	
-};
- 
+    va_start(va, sz);
+    vsprintf(ach, sz, va);
+    va_end(va);
+    FILE* f = fopen("DDraw.log", "a");
+    if (f) {
+        fprintf(f, "%s", ach);
+        fclose(f);
+    }
+}
+CEXPORT
+void DDLog2(LPSTR sz, ...)
+{
+    char ach[256];
+    va_list va;
+
+    va_start(va, sz);
+    vsprintf(ach, sz, va);
+    va_end(va);
+    FILE* f = fopen("ErrorLog.log", "a");
+    if (f) {
+        fprintf(f, "%s", ach);
+        fclose(f);
+    }
+}
+
 #ifdef _USE3D
-
 #include "GP_Draw.h"
 
-IRenderSystem*	IRS;
-float			g_dbgZ;
-int				VBUF;
- 
+IRenderSystem* IRS;
+float g_dbgZ;
+int VBUF;
+
 IRenderSystem* GetRenderSystemDX();
 
 #pragma pack(push)
@@ -47,18 +80,18 @@ extern GP_System GPS;
 #pragma pack(pop)
 #endif
 
-void Rept (LPSTR sz,...);
-CEXPORT int ModeLX[32];
-CEXPORT int ModeLY[32];
-CEXPORT int NModes=0;
+void Rept(LPSTR sz, ...);
+int ModeLX[32];
+int ModeLY[32];
+int NModes = 0;
 void SERROR();
 void SERROR1();
 void SERROR2();
 void PropCopy();
 void InitRLCWindows();
 //#define COPYSCR
-const int InitLx=1024;
-const int InitLy=768;
+const int InitLx = 1024;
+const int InitLy = 768;
 CEXPORT int RealLx;
 CEXPORT int RealLy;
 CEXPORT int SCRSizeX;
@@ -67,971 +100,844 @@ CEXPORT int RSCRSizeX;
 CEXPORT int RSCRSizeY;
 CEXPORT int COPYSizeX;
 CEXPORT int Pitch;
-LPDIRECTDRAW            lpDD=NULL;      // DirectDraw object
-LPDIRECTDRAWSURFACE     lpDDSPrimary;   // DirectDraw primary surface
-LPDIRECTDRAWSURFACE     lpDDSBack;      // DirectDraw back surface
-BOOL                    bActive;        // is application active?
-BOOL                    CurrentSurface; //=FALSE if backbuffer
-                                        // is active (Primary surface is visible)
-										//=TRUE if  primary surface is active
-										// (but backbuffer is visible)
-BOOL                    DDError;        //=FALSE if Direct Draw works normally 
-DDSURFACEDESC           ddsd;
-PALETTEENTRY            GPal[256];
-LPDIRECTDRAWPALETTE     lpDDPal;
 
-extern bool PalDone;
+extern int MaxSizeX;  // Usually 1024 or larger
+extern int MaxSizeY;  // Usually 768 or larger
+
+// SDL2 graphics objects
+SDL_Window* sdlWindow = NULL;
+SDL_Renderer* sdlRenderer = NULL;
+SDL_Texture* sdlTexture = NULL;
+SDL_Surface* sdlSurface = NULL;
+BOOL bActive = TRUE;
+BOOL CurrentSurface = FALSE;
+BOOL DDError = FALSE;
+BOOL DDDebug = FALSE;
+SDL_Color GPal[256];
+bool PalDone = false;
 extern word PlayerMenuMode;
-typedef struct zzz{			
-	BITMAPINFO bmp;
-	PALETTEENTRY XPal[255];
-};
-CEXPORT
-byte GetPaletteColor(int r,int g,int b){
-	int dmax=10000;
-	int bestc=0;
-	for(int i=0;i<256;i++){
-		int d=abs(r-GPal[i].peRed)+abs(g-GPal[i].peGreen)+abs(b-GPal[i].peBlue);
-		if(d<dmax){
-			dmax=d;
-			bestc=i;
-		};
-	};
-	return bestc;
-};
-zzz xxt;
-//typedef byte barr[ScreenSizeX*ScreenSizeY];
-void* offScreenPtr;
-/*
- * Flipping Pages
- */
+extern HWND hwnd;
+extern bool window_mode;
 
-//extern int BestBPP;
-extern int SCRSZY;
-void ClearRGB(){
-	if(!bActive)return;
-	memset(RealScreenPtr,0,RSCRSizeX*SCRSZY);
-};
-//#define TEST16
-#ifndef TEST16
-bool test16=1;
-#endif
-//#ifdef TEST16
-//bool test16=1;
+int desktopWidth = 0;
+int desktopHeight = 0;
+int scaleFactor = 1;
+
+typedef struct zzz {
+    BITMAPINFO bmp;
+    PALETTEENTRY XPal[255];
+} zzz;
+
+zzz xxt;
+void* offScreenPtr = NULL;
+
+int SCRSZY = 0;
+
+int CalculateIntegerScale(int desktopW, int desktopH, int gameW, int gameH) {
+    int scaleX = desktopW / gameW;
+    int scaleY = desktopH / gameH;
+    
+    // Use the smaller scale to ensure the game fits on screen
+    int scale = (scaleX < scaleY) ? scaleX : scaleY;
+    
+    // Ensure at least 1x scaling
+    if (scale < 1) scale = 1;
+    
+    DDLog("Integer scale calculation: Desktop=%dx%d, Game=%dx%d, ScaleX=%d, ScaleY=%d, Final=%dx\n",
+          desktopW, desktopH, gameW, gameH, scaleX, scaleY, scale);
+    
+    return scale;
+}
+
+CEXPORT
+byte GetPaletteColor(int r, int g, int b) {
+    int dmax = 10000;
+    int bestc = 0;
+    for (int i = 0; i < 256; i++) {
+        int d = abs(r - GPal[i].r) + abs(g - GPal[i].g) + abs(b - GPal[i].b);
+        if (d < dmax) {
+            dmax = d;
+            bestc = i;
+        }
+    }
+    return bestc;
+}
+
+void ClearRGB() {
+    if (!bActive) return;
+    if (RealScreenPtr) {
+        memset(RealScreenPtr, 0, RSCRSizeX * SCRSZY);
+    }
+}
+
 word PAL16[256];
-int P16Idx=-1;
+int P16Idx = -1;
 extern int CurPalette;
-void CheckPal16(){
-	//if(CurPalette!=P16Idx&&CurPalette==0){
-		P16Idx=CurPalette;
-		for(int i=0;i<256;i++)PAL16[i]=(GPal[i].peBlue>>3)+((GPal[i].peGreen>>2)<<5)+((GPal[i].peRed>>3)<<11);
-	//};
-};
-int NATT=10;
-void CheckPal16x(){
-	for(int i=0;i<256;i++)PAL16[i]=(GPal[i].peBlue>>3)+((GPal[i].peGreen>>2)<<5)+((GPal[i].peRed>>3)<<11);
-};
-void ChangeColorFF(){
-	if(!RealScreenPtr)return;
-	try{
-		int DD=10000;
-		int c=0xFF;
-		for(int i=0;i<255;i++){
-			int D=255+255+255-GPal[i].peBlue-GPal[i].peGreen-GPal[i].peRed;
-			if(D<DD){
-				c=i;
-				DD=D;
-			};
-		};
-		int sz=RSCRSizeX*RealLy;
-		for(int i=0;i<sz;i++)((byte*)RealScreenPtr)[i]=0;//if(((byte*)RealScreenPtr)[i]==0xFF)((byte*)RealScreenPtr)[i]=c;
-	}catch(...){};
-};
-void Copy16(byte* Src,int SrcPitch,byte* Dst,int DstPitch,int Lx,int Ly){
-	CheckPal16x();
-	int DXR=DstPitch-(Lx<<1);
-	int XDX=(SrcPitch-Lx);
-	int NY=Ly;
-	int NX=Lx>>1;
-	__asm{
-		push esi
-		push edi
-		mov  esi,Src
-		mov  edi,Dst
-LPP0:
-		mov  ecx,NX
-		xor  eax,eax
-LPP1:
-		mov  bx,[esi]
-		mov  al,bl
-		mov  dx,[PAL16+eax*2];
-		rol  edx,16
-		mov  al,bh
-		mov  dx,[PAL16+eax*2];
-		rol  edx,16
-		mov  [edi],edx
-		add  edi,4
-		add  esi,2
-		dec  ecx
-		jnz  LPP1
-		add  edi,DXR
-		add  esi,XDX
-		dec  NY
-		jnz  LPP0
-		pop  edi
-		pop  esi
-	}
-};
-//#endif
+
+void CheckPal16() {
+    P16Idx = CurPalette;
+    for (int i = 0; i < 256; i++) {
+        PAL16[i] = (GPal[i].b >> 3) + ((GPal[i].g >> 2) << 5) + ((GPal[i].r >> 3) << 11);
+    }
+}
+
+void CheckPal16x() {
+    for (int i = 0; i < 256; i++) {
+        PAL16[i] = (GPal[i].b >> 3) + ((GPal[i].g >> 2) << 5) + ((GPal[i].r >> 3) << 11);
+    }
+}
+
+void ChangeColorFF() {
+    if (!RealScreenPtr) return;
+    try {
+        int DD = 10000;
+        int c = 0xFF;
+        for (int i = 0; i < 255; i++) {
+            int D = 255 + 255 + 255 - GPal[i].b - GPal[i].g - GPal[i].r;
+            if (D < DD) {
+                c = i;
+                DD = D;
+            }
+        }
+        int sz = RSCRSizeX * RealLy;
+        for (int i = 0; i < sz; i++) ((byte*)RealScreenPtr)[i] = 0;
+    }
+    catch (...) {}
+}
+
+void UpdateSDLPalette() {
+    if (!sdlSurface || !sdlSurface->format->palette) return;
+    
+    for (int i = 0; i < 256; i++) {
+        GPal[i].a = 255;
+    }
+    
+    SDL_SetPaletteColors(sdlSurface->format->palette, GPal, 0, 256);
+}
+
+bool ProcessMessagesSDL() {
+    SDL_Event event;
+    bool hasMessages = false;
+    
+    SDL_PumpEvents();
+    
+    while (SDL_PollEvent(&event)) {
+        hasMessages = true;
+        
+        switch (event.type) {
+            case SDL_QUIT:
+                DDLog("SDL_QUIT event received\n");
+                PostMessage(hwnd, WM_QUIT, 0, 0);
+                break;
+                
+            case SDL_MOUSEMOTION:
+                // SDL gives us coordinates in logical space (game coordinates)
+                // when using RenderSetLogicalSize, which is perfect!
+                mouseX = event.motion.x;
+                mouseY = event.motion.y;
+                
+                PostMessage(hwnd, WM_MOUSEMOVE, 0, MAKELPARAM(mouseX, mouseY));
+                break;
+                
+            case SDL_MOUSEBUTTONDOWN:
+                mouseX = event.button.x;
+                mouseY = event.button.y;
+                
+                if (event.button.button == SDL_BUTTON_LEFT) {
+                    PostMessage(hwnd, WM_LBUTTONDOWN, MK_LBUTTON, 
+                               MAKELPARAM(event.button.x, event.button.y));
+                } else if (event.button.button == SDL_BUTTON_RIGHT) {
+                    PostMessage(hwnd, WM_RBUTTONDOWN, MK_RBUTTON, 
+                               MAKELPARAM(event.button.x, event.button.y));
+                } else if (event.button.button == SDL_BUTTON_MIDDLE) {
+                    PostMessage(hwnd, WM_MBUTTONDOWN, MK_MBUTTON,
+                               MAKELPARAM(event.button.x, event.button.y));
+                }
+                break;
+                
+            case SDL_MOUSEBUTTONUP:
+                mouseX = event.button.x;
+                mouseY = event.button.y;
+                
+                if (event.button.button == SDL_BUTTON_LEFT) {
+                    PostMessage(hwnd, WM_LBUTTONUP, 0, 
+                               MAKELPARAM(event.button.x, event.button.y));
+                } else if (event.button.button == SDL_BUTTON_RIGHT) {
+                    PostMessage(hwnd, WM_RBUTTONUP, 0, 
+                               MAKELPARAM(event.button.x, event.button.y));
+                } else if (event.button.button == SDL_BUTTON_MIDDLE) {
+                    PostMessage(hwnd, WM_MBUTTONUP, 0,
+                               MAKELPARAM(event.button.x, event.button.y));
+                }
+                break;
+                
+            case SDL_MOUSEWHEEL:
+                {
+                    short delta = (short)(event.wheel.y * 120);
+                    PostMessage(hwnd, WM_MOUSEWHEEL, MAKEWPARAM(0, delta), 
+                               MAKELPARAM(mouseX, mouseY));
+                }
+                break;
+                
+            case SDL_KEYDOWN:
+                {
+                    WPARAM vk = event.key.keysym.scancode;
+                    LPARAM lp = 1 | (event.key.keysym.scancode << 16);
+                    if (event.key.repeat) {
+                        lp |= (1 << 30);
+                    }
+                    PostMessage(hwnd, WM_KEYDOWN, vk, lp);
+                }
+                break;
+                
+            case SDL_KEYUP:
+                {
+                    WPARAM vk = event.key.keysym.scancode;
+                    LPARAM lp = 1 | (event.key.keysym.scancode << 16) | (1 << 30) | (1 << 31);
+                    PostMessage(hwnd, WM_KEYUP, vk, lp);
+                }
+                break;
+                
+            case SDL_WINDOWEVENT:
+                switch (event.window.event) {
+                    case SDL_WINDOWEVENT_FOCUS_GAINED:
+                        DDLog("SDL_WINDOWEVENT_FOCUS_GAINED - setting bActive=TRUE\n");
+                        bActive = TRUE;
+                        PostMessage(hwnd, WM_ACTIVATEAPP, TRUE, 0);
+                        break;
+                        
+                    case SDL_WINDOWEVENT_FOCUS_LOST:
+                        DDLog("SDL_WINDOWEVENT_FOCUS_LOST - setting bActive=FALSE\n");
+                        bActive = FALSE;
+                        PostMessage(hwnd, WM_ACTIVATEAPP, FALSE, 0);
+                        break;
+                        
+                    case SDL_WINDOWEVENT_EXPOSED:
+                        PostMessage(hwnd, WM_PAINT, 0, 0);
+                        break;
+                }
+                break;
+        }
+    }
+    
+    return hasMessages;
+}
+
+CEXPORT void UpdateGlobalHWND(HWND newHwnd) {
+    hwnd = newHwnd;
+}
+
 CEXPORT
 void FlipPages(void)
 {
-
 #ifdef _USE3D
-	void Test3D();
-	Test3D();
-	float fps = Stats::GetFPS(); 
-	char strfps[128];
-	sprintf( strfps, "fps:% 3.f", fps );
-	ShowString( 5, 5, strfps, &BlackFont );
-	ShowString( 4, 4, strfps, &WhiteFont );
-	GPS.OnFrame();
-	IRS->OnFrame();
-	IRS->ClearDeviceZBuffer();
-	return;
-#endif // _USE3D
-
-	if(!bActive)return;
-	if (window_mode){
-		//if(PlayerMenuMode!=1){
-		//	ProcessFog();
-		//	ShowFoggedBattle();
-		//};
-        HDC WH = GetDC(hwnd);
-		//memcpy(xxt.XPal,&GPal[1],sizeof xxt.XPal);
-		for(int i=0;i<256;i++){
-			xxt.bmp.bmiColors[i].rgbRed=GPal[i].peRed;
-			xxt.bmp.bmiColors[i].rgbBlue=GPal[i].peBlue;
-			xxt.bmp.bmiColors[i].rgbGreen=GPal[i].peGreen;
-		};
-		xxt.bmp.bmiHeader.biSize=sizeof BITMAPINFOHEADER;
-		xxt.bmp.bmiHeader.biWidth=SCRSizeX;
-		xxt.bmp.bmiHeader.biHeight=-SCRSizeY;
-		xxt.bmp.bmiHeader.biPlanes=1;
-		xxt.bmp.bmiHeader.biBitCount=8;
-		xxt.bmp.bmiHeader.biCompression=BI_RGB;
-		xxt.bmp.bmiHeader.biSizeImage=0;
-
-		int z=StretchDIBits(WH,
-            0,0,
-            COPYSizeX,RSCRSizeY,
-			0,MaxSizeY-RSCRSizeY,
-            COPYSizeX,RSCRSizeY,
-            RealScreenPtr,
-            &xxt.bmp,
-			DIB_RGB_COLORS,SRCCOPY);
-		ReleaseDC(hwnd,WH);
-
-		//StretchDIBits(WH,smapx,smapy,smaplx*32,smaply*32,
-		//	smapx,smapy,smaplx*32,smaply*32,RealScreenPtr,&xxt.bmp,
-		//	DIB_RGB_COLORS,SRCCOPY);
-		return;
-	};	
-#ifdef COPYSCR
-	/*__asm{
-		push	esi
-		push	edi
-		mov		esi,ScreenPtr
-		mov		edi,RealScreenPtr
-		mov		ecx,120000
-		cld
-		rep		movsd
-		pop		edi
-		pop		esi
-	}*/
-	//if(PlayerMenuMode==1){
-	//return;
-	{
-#ifdef TEST16
-		Copy16();
-		return;
+    void Test3D();
+    Test3D();
+    float fps = Stats::GetFPS();
+    char strfps[128];
+    sprintf(strfps, "fps:% 3.f", fps);
+    ShowString(5, 5, strfps, &BlackFont);
+    ShowString(4, 4, strfps, &WhiteFont);
+    GPS.OnFrame();
+    IRS->OnFrame();
+    IRS->ClearDeviceZBuffer();
+    return;
 #endif
-		int ofs=0;
-		int	lx=COPYSizeX>>2;
-		//int	ly=SCRSizeY;
-		int	ly=RealLy;
-		int	addOf=SCRSizeX-(lx<<2);
-		int RaddOf=RSCRSizeX-(lx<<2);
 
-		__asm{
-			push	esi
-			push	edi	
-			mov		esi,ScreenPtr
-			mov		edi,RealScreenPtr
-			add		esi,ofs
-			add		edi,ofs
-			cld
-			mov		eax,ly
-xxx:
-			mov		ecx,lx
-			rep		movsd
-			add		esi,addOf
-			add		edi,RaddOf
-			dec		eax
-			jnz		xxx
-		};
-		return;
-	};
-	
-	int ofs=smapx+smapy*SCRSizeX;
-	int ofs1=smapx+smapy*RSCRSizeX;
-	int	lx=smaplx<<3;
-	int	ly=smaply<<5;
-	if(lx==0)lx=800;
-	if(ly==0)ly=600;
-	int	addOf=SCRSizeX-(lx<<2);
-	int		RaddOf=RSCRSizeX-(lx<<2);;
-	__asm{
-		push	esi
-		push	edi
-		mov		esi,ScreenPtr
-		mov		edi,RealScreenPtr
-		add		esi,ofs
-		add		edi,ofs1
-		cld
-		mov		eax,ly
-xxxx:
-		mov		ecx,lx
-		rep		movsd
-		add		esi,addOf
-		add		edi,RaddOf
-		dec		eax
-		jnz		xxxx
-	};
-	/*
-	ofs=minix+miniy*SCRSizeX;
-	ofs1=minix+miniy*RSCRSizeX;
-	lx=msx>>3;
-	ly=msy>>1;
-	addOf=SCRSizeX-(lx<<2);
-	RaddOf=RSCRSizeX-(lx<<2);
-	__asm{
-		push	esi
-		push	edi
-		mov		esi,ScreenPtr
-		mov		edi,RealScreenPtr
-		add		esi,ofs
-		add		edi,ofs1
-		cld
-		mov		eax,ly
-yyy:
-		mov		ecx,lx
-		rep		movsd
-		add		esi,addOf
-		add		edi,RaddOf
-		dec		eax
-		jnz		yyy
-	};
-	*/
-	//PropCopy();
-	return;
-#else
-
-	if(window_mode) return;
-	CurrentSurface=!CurrentSurface;
-	while( 1 )
-    {
-        HRESULT ddrval;
-        ddrval = lpDDSPrimary->Flip( NULL, 0 );
-        if( ddrval == DD_OK )
-        {
-            break;
-        }
-        if( ddrval == DDERR_SURFACELOST )
-        {
-            ddrval = lpDDSPrimary->Restore();
-            if( ddrval != DD_OK )
-            {
-                break;
-            }
-        }
-        if( ddrval != DDERR_WASSTILLDRAWING ) 
-        { 
-                break;
+    if (!bActive) {
+        DDLog("FlipPages: Not active, skipping\n");
+        return;
+    }
+    
+    if (!sdlRenderer || !sdlTexture || !sdlSurface || !offScreenPtr) {
+        DDLog("FlipPages: Missing required objects - renderer=%p, texture=%p, surface=%p, offscreen=%p\n",
+              sdlRenderer, sdlTexture, sdlSurface, offScreenPtr);
+        return;
+    }
+    
+    // Lock SDL surface
+    if (SDL_MUSTLOCK(sdlSurface)) {
+        if (SDL_LockSurface(sdlSurface) < 0) return;
+    }
+    
+    // Copy from offscreen buffer to SDL surface
+    byte* src = (byte*)ScreenPtr;
+    byte* dst = (byte*)sdlSurface->pixels;
+    int srcPitch = MaxSizeX;
+    int dstPitch = sdlSurface->pitch;
+    
+    for (int y = 0; y < RealLy; y++) {
+        memcpy(dst + y * dstPitch, src + y * srcPitch, RealLx);
+    }
+    
+    // Unlock SDL surface
+    if (SDL_MUSTLOCK(sdlSurface)) {
+        SDL_UnlockSurface(sdlSurface);
+    }
+    
+    // Update palette
+    if (sdlSurface->format->palette) {
+        SDL_SetPaletteColors(sdlSurface->format->palette, GPal, 0, 256);
+    }
+    
+    // Convert to 32-bit and update texture
+    SDL_PixelFormat* format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888);
+    if (format) {
+        SDL_Surface* rgbSurface = SDL_ConvertSurface(sdlSurface, format, 0);
+        SDL_FreeFormat(format);
+        
+        if (rgbSurface) {
+            SDL_UpdateTexture(sdlTexture, NULL, rgbSurface->pixels, rgbSurface->pitch);
+            SDL_FreeSurface(rgbSurface);
         }
     }
-	LockSurface();
-	UnlockSurface();
-#endif
+    
+    // Render (logical size handles scaling automatically)
+    SDL_RenderClear(sdlRenderer);
+    SDL_RenderCopy(sdlRenderer, sdlTexture, NULL, NULL);
+    SDL_RenderPresent(sdlRenderer);
+    
+    CurrentSurface = !CurrentSurface;
 }
-/*
- * Getting Screen Pointer
- *
- * You will ge the pointer to the invisible area of the screen
- * i.e, if primary surface is visible, then you will obtain the
- * pointer to the backbuffer.
- * You must call UnlockSurface() to allow Windows draw on the screen
- */
-int SCRSZY=0;
+
+
+
 void LockSurface(void)
 {
-	FILE* LR=fopen("lock.report","w");
-	if(LR)fprintf(LR,"DDError:%d\n",DDError);
-	long dderr=0;
-	if (window_mode)
-	{
-		ScreenPtr=(void*)(int(offScreenPtr)+MaxSizeX*32);
-		ddsd.lpSurface=ScreenPtr;
-		RealScreenPtr=ScreenPtr;
-		return;
-	}
-	if (DDError){
-		if(LR)fclose(LR);
-		return;
-	};
-#ifdef COPYSCR
-	if ((dderr=lpDDSPrimary->Lock(NULL,&ddsd,
-							    DDLOCK_SURFACEMEMORYPTR|
-								DDLOCK_WAIT,NULL))!=DD_OK) DDError=0;//true ;
-	DDLog("lpDDSPrimary->Lock:%d\n",dderr);
-	DDLog("Lock result:%d\n",dderr);
-	DDLog("ptr:%d pitch=%d ly=%d\n",ddsd.lpSurface,ddsd.lPitch,ddsd.dwHeight);
-	RSCRSizeX=ddsd.lPitch;
-#else
-	if ((dderr=lpDDSBack->Lock(NULL,&ddsd,
-							    DDLOCK_SURFACEMEMORYPTR|
-								DDLOCK_WAIT,NULL))!=DD_OK) DDError=0;//true ;
-	RSCRSizeX=ddsd.lPitch;
-#endif
-#ifdef COPYSCR
-	ScreenPtr=(void*)(int(offScreenPtr)+MaxSizeX*32);
-	//ddsd.lpSurface=ScreenPtr;
-	RealScreenPtr=ScreenPtr;
-	RealScreenPtr=ddsd.lpSurface;
-	SCRSZY=ddsd.dwHeight;
-	//Rept("RealPtr:%d\n",int(ddsd.lpSurface));
-	ClearScreen();
-#else
-	ScreenPtr=ddsd.lpSurface;
-	offScreenPtr=ScreenPtr;
-	if (lpDDSPrimary->Lock(NULL,&ddsd,
-							    DDLOCK_SURFACEMEMORYPTR|
-								DDLOCK_WAIT,NULL)!=DD_OK) DDError=0;//true ;
-	RealScreenPtr=ScreenPtr;
-#endif
-	if(LR)fclose(LR);
+    if (DDError) return;
+
+    ScreenPtr = (void*)((byte*)offScreenPtr + MaxSizeX * 32);
+    RealScreenPtr = ScreenPtr;
+    
+    SCRSizeX = MaxSizeX;
+    SCRSizeY = MaxSizeY;
+    RSCRSizeX = MaxSizeX;
+    SCRSZY = MaxSizeY;
+    Pitch = MaxSizeX;
 }
-/*
- *  Unlocking the surface 
- *
- *  You must unlock the Video memory for Windows to work properly
- */
+
 void UnlockSurface(void)
 {
-	if(window_mode) return;
-	if (DDError)  return;
-	//Back Buffer is active
-#ifdef COPYSCR
-	if (lpDDSPrimary->Unlock(NULL)!=DD_OK) DDError=true ;
-#else
-	if (lpDDSBack->Unlock(NULL)!=DD_OK) DDError=true ;
-	if (lpDDSPrimary->Unlock(NULL)!=DD_OK) DDError=true ;
-#endif
+    if (DDError) return;
+    // Nothing to unlock for our offscreen buffer
 }
-/*
- * Getting then DC of the active (invisible) area of the screen
- */
+
 HDC GetSDC(void)
 {
-	//if(window_mode) return 0;
-	HDC hdc;
-	if (window_mode) return 0;
-	if (CurrentSurface)
-	{
-		//Back Buffer is active
-		if (lpDDSPrimary->GetDC(&hdc)!=DD_OK) DDError=true ;
-	}else
-	{
-		//Primary Surface is active
-		if (lpDDSBack->GetDC(&hdc)!=DD_OK) DDError=true;
-	}
-	return hdc;
+    if (window_mode) return 0;
+    // SDL2 doesn't provide direct DC access
+    return 0;
 }
-/*
- * Timer Callback 
- */
-bool m640_16=0;
-bool m640_24=0;
-bool m640_32=0;
-bool m1024_768=0;
-int BestVX=640;
-int BestVY=480;
-int BestBPP=32;
-HRESULT CALLBACK ModeCallback(LPDDSURFACEDESC pdds, LPVOID lParam)
+
+void SetDebugMode()
 {
-	//Rept("ModeCallBack\n");
-
-    /*int width = pdds->dwWidth;
-    int height = pdds->dwHeight;
-    int bpp    = pdds->ddpfPixelFormat.dwRGBBitCount;
-	if(width==640&&height==480){
-		if(bpp==32)m640_32=1;
-		if(bpp==24)m640_24=1;
-		if(bpp==16)m640_16=1;
-	};
-	if(bpp==8&&NModes<32&&width>=1024){//1024){
-		if(width==1024&&height==768)m1024_768=1;
-		ModeLX[NModes]=width;
-		ModeLY[NModes]=height;
-		NModes++;
-		//Rept("AddMode: %dx%d \n",width,height);
-	};*/
-
-    if (1024 > pdds->dwWidth || 768 > pdds->dwHeight)
-    {//Don't allow for resolutions less than 1024 x 768 ot bigger than 1920x[...]
-        return S_FALSE;
-    }
-
-    /*if (1920 < pdds->dwWidth)
-    {//Also disable all resolutions above ~1920 px wide for fairness reasons
-        return S_FALSE;
-    }*/
-
-    if (32 == pdds->ddpfPixelFormat.dwRGBBitCount)
-    {
-        ModeLX[NModes] = pdds->dwWidth;
-        ModeLY[NModes] = pdds->dwHeight;
-        NModes++;
-    }
-
-    //return S_TRUE to stop enuming modes, S_FALSE to continue
-    return S_FALSE;
+    DDDebug = true;
 }
-bool EnumModesOnly(){
-	//HRESULT ddrval = DirectDrawCreate( NULL, &lpDD, NULL );
-    HRESULT ddrval = DirectDrawCreate_wrapper( NULL, &lpDD, NULL );
 
-	if(ddrval==DD_OK){
+void NoDebugMode()
+{
+    DDDebug = false;
+}
 
-        lpDD->EnumDisplayModes(0, NULL, NULL, ModeCallback);
-        lpDD->Release();
-        lpDD = NULL;
-        
-        /*lpDD->EnumDisplayModes(0, NULL, NULL, ModeCallback);
-		lpDD->Release();
-		lpDD=NULL;
-		if(m640_32)BestBPP=32;
-		else if(m640_24)BestBPP=24;
-		else if(m640_16)BestBPP=16;
-		if(!m1024_768){
-			if(MessageBox(hwnd,"Dilplay mode 1024x768x8 not found. Cossacks should not run.","Loading error",MB_RETRYCANCEL)!=IDRETRY)
-				exit(0);
-		};*/
+bool m640_16 = 0;
+bool m640_24 = 0;
+bool m640_32 = 0;
+bool m1024_768 = 0;
+int BestVX = 640;
+int BestVY = 480;
+int BestBPP = 32;
 
-
-		return true;
+// Initialize SDL2 if not already initialized
+void InitSDLIfNeeded() {
+    static bool sdl_initialized = false;
+    if (!sdl_initialized) {
+        DDLog("Initializing SDL2...\n");
+        if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+            char error[256];
+            sprintf(error, "Unable to initialize SDL2: %s", SDL_GetError());
+            DDLog("SDL_Init failed: %s\n", SDL_GetError());
+            MessageBox(hwnd, error, "Loading error", MB_ICONSTOP);
+            exit(0);
+        }
+        sdl_initialized = true;
+        DDLog("SDL2 initialized successfully\n");
     }
-    else{
-		MessageBox(hwnd,"Unable to initialise Direct Draw. Cossacks should not run.","Loading error",MB_ICONSTOP);
-		exit(0);
-	};
-};
+}
 
-void DelLog(){
-	DeleteFile("DDraw.log");
-};
+bool EnumModesOnly() {
+    InitSDLIfNeeded();
+    
+    // Get display count
+    int display_count = SDL_GetNumVideoDisplays();
+    if (display_count < 1) {
+        DDLog("No displays found\n");
+        MessageBox(hwnd, "No displays found.", "Error", MB_ICONSTOP);
+        return false;
+    }
+    
+    DDLog("Found %d displays\n", display_count);
+    
+    // Get display modes for primary display
+    int mode_count = SDL_GetNumDisplayModes(0);
+    if (mode_count < 1) {
+        DDLog("No display modes found, using common modes\n");
+        // Fallback to common modes
+        const int common_modes[][2] = {
+            {640, 480},
+            {800, 600},
+            {1024, 768},
+            {1152, 864},
+            {1280, 720},
+            {1280, 1024},
+            {1366, 768},
+            {1400, 1050},
+            {1440, 900},
+            {1600, 900},
+            {1600, 1200},
+            {1680, 1050},
+            {1920, 1080},
+            {1920, 1200},
+            {2560, 1440},
+            {3840, 2160}
+        };
+        
+        NModes = 0;
+        for (int i = 0; i < sizeof(common_modes) / sizeof(common_modes[0]) && NModes < 32; i++) {
+            ModeLX[NModes] = common_modes[i][0];
+            ModeLY[NModes] = common_modes[i][1];
+            NModes++;
+            DDLog("Added mode: %dx%d\n", ModeLX[NModes-1], ModeLY[NModes-1]);
+        }
+        return true;
+    }
+    
+    DDLog("Found %d display modes\n", mode_count);
+    
+    // Get all available modes
+    std::vector<SDL_DisplayMode> modes;
+    for (int i = 0; i < mode_count; i++) {
+        SDL_DisplayMode mode;
+        if (SDL_GetDisplayMode(0, i, &mode) == 0) {
+            modes.push_back(mode);
+            DDLog("Mode %d: %dx%d @ %dHz\n", i, mode.w, mode.h, mode.refresh_rate);
+        }
+    }
+    
+    // Sort by resolution (largest first)
+    std::sort(modes.begin(), modes.end(), [](const SDL_DisplayMode& a, const SDL_DisplayMode& b) {
+        int area_a = a.w * a.h;
+        int area_b = b.w * b.h;
+        if (area_a != area_b) return area_a > area_b;
+        if (a.w != b.w) return a.w > b.w;
+        return a.h > b.h;
+    });
+    
+    // Remove duplicates and add to our array
+    NModes = 0;
+    for (size_t i = 0; i < modes.size() && NModes < 32; i++) {
+        // Skip duplicates
+        bool duplicate = false;
+        for (int j = 0; j < NModes; j++) {
+            if (ModeLX[j] == modes[i].w && ModeLY[j] == modes[i].h) {
+                duplicate = true;
+                break;
+            }
+        }
+        
+        if (!duplicate) {
+            ModeLX[NModes] = modes[i].w;
+            ModeLY[NModes] = modes[i].h;
+            NModes++;
+            DDLog("Added unique mode: %dx%d\n", modes[i].w, modes[i].h);
+        }
+    }
+    
+    return true;
+}
+
+void DelLog() {
+    DeleteFile("DDraw.log");
+}
+
 bool CreateDDObjects(HWND hwnd)
 {
-
 #ifdef _USE3D
-
-	IRS = GetRenderSystemDX(); 
-	assert( IRS );
-
-	IRS->Init( hwnd );
-
-	if (!window_mode)
-	{
-		ScreenProp sp = IRS->GetScreenProperties();
-		sp.fullScreen = true;
-		IRS->SetScreenProperties( sp );
-	}
-
-	GPS.Init( IRS );
-
-	void InitGroundZbuffer();
-	InitGroundZbuffer();
-	DDError=false;
-	SCRSizeX=MaxSizeX;
-	SCRSizeY=MaxSizeY;
-	RSCRSizeX=RealLx;
-	//Pitch=ddsd.lPitch;
-	COPYSizeX=RealLx;
-	RSCRSizeY=RealLy;
-	ScrHeight=SCRSizeY;
-	ScrWidth=SCRSizeX;
-
-#ifdef _USE3D
-	GPS.SetClipArea( 0, 0, RealLx, RealLy );
-#else
-	WindX=0;
-	WindY=0;
-	WindLx=RealLx;
-	WindLy=RealLy;
-	WindX1=WindLx-1;
-	WindY1=WindLy-1;
-#endif // _USE3D
-	
-	BytesPerPixel=2;
-
-	return true;
-#endif // _USE3D
-	HRESULT ddrval;
-	DDSCAPS ddscaps;
-	char    buf[256];
-	DDError=false;
-	CurrentSurface=true;
-	if (window_mode)
-	{
-	
-        SVSC.SetSize(RealLx, RealLy);
-        DDError = false;
-        SCRSizeX = MaxSizeX;
-        SCRSizeY = MaxSizeY;
-        COPYSizeX = RealLx;
-        RSCRSizeX = RealLx;
-        RSCRSizeY = RealLy;
-        ScrHeight = SCRSizeY;
-        ScrWidth = SCRSizeX;
-		InitRLCWindows();
-#ifndef _USE3D
-		WindX=0;
-		WindY=0;
-		WindLx=RealLx;
-		WindLy=RealLy;
-		WindX1=WindLx-1;
-		WindY1=WindLy-1;
-#else
-		GPS.SetClipArea( 0, 0, RealLx, RealLy );
-#endif // _USE3D
-		BytesPerPixel=1;
-		offScreenPtr=(malloc(SCRSizeX*(SCRSizeY+32*4)));
-
-        const int screen_width = GetSystemMetrics(SM_CXSCREEN);
-        const int screen_height = GetSystemMetrics(SM_CYSCREEN);
-
-        const int ModeLX_candidates[] = { 1024, 1152, 1280, 1280, 1366, 1600, 1920 };
-        const int ModeLY_candidates[] = { 768,  864,  720, 1024,  768,  900, 1080 };
-
-        NModes = 0;
-        for (int i = 0; i < 8; i++)
-        {
-            //Only show resolutions up to current screen resolution
-            if (ModeLX_candidates[i] <= screen_width
-                && ModeLY_candidates[i] <= screen_height)
-            {
-                ModeLX[i] = ModeLX_candidates[i];
-                ModeLY[i] = ModeLY_candidates[i];
-                NModes++;
-            }
-        }
-
-		/*NModes = 2;
-		ModeLX[0]=800;
-		ModeLY[0]=600;
-		ModeLX[1]=1024;
-		ModeLY[1]=768;*/
-
-		return true;
-	}
-#ifdef COPYSCR
-
-	//offScreenPtr=offScreenPtr=(malloc(MaxSizeX*(MaxSizeY+32*4)));
-	SVSC.SetSize(RealLx,RealLy);
-	offScreenPtr=offScreenPtr=(malloc(MaxSizeX*(MaxSizeY+32*4)));
+    IRS = GetRenderSystemDX();
+    assert(IRS);
+    IRS->Init(hwnd);
+    if (!window_mode) {
+        ScreenProp sp = IRS->GetScreenProperties();
+        sp.fullScreen = true;
+        IRS->SetScreenProperties(sp);
+    }
+    GPS.Init(IRS);
+    void InitGroundZbuffer();
+    InitGroundZbuffer();
+    DDError = false;
+    SCRSizeX = MaxSizeX;
+    SCRSizeY = MaxSizeY;
+    RSCRSizeX = RealLx;
+    COPYSizeX = RealLx;
+    RSCRSizeY = RealLy;
+    ScrHeight = SCRSizeY;
+    ScrWidth = SCRSizeX;
+    GPS.SetClipArea(0, 0, RealLx, RealLy);
+    BytesPerPixel = 2;
+    return true;
 #endif
-	if(lpDD){
-		lpDDSPrimary->Release();
-		goto SDMOD;
-	};
-	lpDD=NULL;
 
-	/*ddrval = DirectDrawCreate(NULL, &lpDD, NULL);
-	{
-		for(int j=0;j<NModes;j++){
-			DDLog("%dx%dx8\n",ModeLX[j],ModeLY[j]);
-		};
-	};*/
+    InitSDLIfNeeded();
+    
+    DDError = false;
+    CurrentSurface = true;
 
-    ddrval = DirectDrawCreate_wrapper(NULL, &lpDD, NULL);
-
-	DDLog("DirectDrawCreate:%d\n",ddrval);
-    if( ddrval == DD_OK )
-    {
-		//Rept("DD_OK\n");
-        // Get exclusive mode
-SDMOD:;
-        ddrval = lpDD->SetCooperativeLevel( hwnd,
-                                DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN );
-		DDLog("SetCooperativeLevel:%d\n",ddrval);
-        if(ddrval == DD_OK )
-        {
-			//Rept("SetCoopLevel: DD_OK\n");
-#ifndef _USE3D
-		//ShowCursor(false);
-#endif // !_USE3D
-
-			//Rept("SetDisplayMode(%d,%d)\n",RealLx,RealLy);
-            ddrval = lpDD->SetDisplayMode(RealLx,RealLy,8); //COPYSizeX,RSCRSizeY, 8 );
-			DDLog("SetDisplayMode:%d\n",ddrval);
-            if( ddrval == DD_OK ) 
-            {
-				//Rept("SetDisplayMode: DD_OK\n");
-                // Create the primary surface with 1 back buffer
-                ddsd.dwSize = sizeof( ddsd );
-                ddsd.dwFlags = DDSD_CAPS;
-                ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
-                ddrval = lpDD->CreateSurface( &ddsd, &lpDDSPrimary, NULL );
-				DDLog("CreateSurface:%d\n",ddrval);
-                if( ddrval == DD_OK )
-                {
-					//Rept("CreateSurface: DD_OK\n");
-                    // Get a pointer to the back buffer
-                    //ddscaps.dwCaps = DDSCAPS_BACKBUFFER;
-                    //ddrval = lpDDSPrimary->GetAttachedSurface(&ddscaps, 
-                    //                                      &lpDDSBack);
-					//if (ddrval==DD_OK)
-					//{
-						//Rept("GetAttachedSurface: DD_OK\n");
-						DDError=false;
-						SCRSizeX=MaxSizeX;
-						SCRSizeY=MaxSizeY;
-						RSCRSizeX=RealLx;//ddsd.lPitch;
-						Pitch=ddsd.lPitch;
-						COPYSizeX=RealLx;
-						RSCRSizeY=RealLy;
-						ScrHeight=SCRSizeY;
-						ScrWidth=SCRSizeX;
-#ifndef _USE3D
-						WindX=0;
-						WindY=0;
-						WindLx=RealLx;
-						WindLy=RealLy;
-						WindX1=WindLx-1;
-						WindY1=WindLy-1;
-#else
-						GPS.SetClipArea( 0, 0, RealLx, RealLy );
-#endif // !_USE3D
-						BytesPerPixel=1;
-						/*
-						NModes=0;
-						Rept("lpDD=%d\n",int(lpDD));
-						lpDD->EnumDisplayModes(0,NULL,NULL,ModeCallback);
-						if(NModes==0){
-							NModes=1;
-							ModeLX[0]=1024;
-							ModeLY[0]=768;
-						};
-						*/
-						Rept("Enum:OK\n");
-						return true;
-					//}
-                        // Create a timer to flip the pages
-                      /*  if( SetTimer( hwnd, TIMER_ID, 50, NULL ) )
-                        {
-                             return TRUE;
-                        }*/
-                }
-            }
+    // Enumerate modes first
+    EnumModesOnly();
+    
+    DDLog("CreateDDObjects: RealLx=%d, RealLy=%d, window_mode=%d, hwnd=%p\n", 
+          RealLx, RealLy, window_mode, hwnd);
+    
+    // Get desktop resolution for fullscreen scaling
+    if (!window_mode) {
+        SDL_DisplayMode desktopMode;
+        if (SDL_GetDesktopDisplayMode(0, &desktopMode) == 0) {
+            desktopWidth = desktopMode.w;
+            desktopHeight = desktopMode.h;
+            DDLog("Desktop resolution: %dx%d @ %dHz\n", 
+                  desktopWidth, desktopHeight, desktopMode.refresh_rate);
+            
+            // Calculate integer scale factor
+            scaleFactor = CalculateIntegerScale(desktopWidth, desktopHeight, RealLx, RealLy);
+        } else {
+            DDLog("Failed to get desktop display mode: %s\n", SDL_GetError());
+            desktopWidth = RealLx;
+            desktopHeight = RealLy;
+            scaleFactor = 1;
         }
     }
-    wsprintf(buf, "Direct Draw Init Failed (%08lx)\n", ddrval );
-    MessageBox( hwnd, buf, "ERROR", MB_OK );
-	return false;
+    
+    // Clean up existing objects if they exist
+    if (sdlWindow != NULL) {
+        DDLog("SDL objects already exist - performing full cleanup and recreation\n");
+        
+        if (offScreenPtr) {
+            free(offScreenPtr);
+            offScreenPtr = NULL;
+        }
+        
+        if (sdlTexture) {
+            SDL_DestroyTexture(sdlTexture);
+            sdlTexture = NULL;
+        }
+        
+        if (sdlSurface) {
+            SDL_FreeSurface(sdlSurface);
+            sdlSurface = NULL;
+        }
+        
+        if (sdlRenderer) {
+            SDL_DestroyRenderer(sdlRenderer);
+            sdlRenderer = NULL;
+        }
+        
+        if (sdlWindow) {
+            SDL_DestroyWindow(sdlWindow);
+            sdlWindow = NULL;
+        }
+        
+        DDLog("Cleanup complete, recreating from scratch\n");
+    }
+    
+    // Initialize virtual screen FIRST - this sets MaxSizeX/MaxSizeY
+    SVSC.SetSize(RealLx, RealLy);
+    DDLog("After SVSC.SetSize: MaxSizeX=%d, MaxSizeY=%d\n", MaxSizeX, MaxSizeY);
+    
+    if (MaxSizeX == 0 || MaxSizeY == 0) {
+        DDLog("ERROR: MaxSizeX or MaxSizeY is 0 after SVSC.SetSize!\n");
+        DDError = true;
+        return false;
+    }
+    
+    // Create window from HWND
+    DDLog("Creating SDL window from HWND\n");
+    sdlWindow = SDL_CreateWindowFrom((void*)hwnd);
+    
+    if (!sdlWindow) {
+        char buf[256];
+        sprintf(buf, "SDL_CreateWindowFrom failed: %s\n", SDL_GetError());
+        DDLog("%s", buf);
+        MessageBox(hwnd, buf, "ERROR", MB_OK);
+        return false;
+    }
+    
+    DDLog("Successfully attached SDL to existing window\n");
+    
+    // Handle fullscreen mode - use desktop fullscreen for integer scaling
+    if (!window_mode) {
+        DDLog("Setting up desktop fullscreen mode for integer scaling\n");
+        
+        // Use desktop fullscreen (borderless window at native resolution)
+        if (SDL_SetWindowFullscreen(sdlWindow, SDL_WINDOW_FULLSCREEN_DESKTOP) == 0) {
+            DDLog("Desktop fullscreen enabled - will use %dx integer scaling\n", scaleFactor);
+        } else {
+            DDLog("Desktop fullscreen failed: %s\n", SDL_GetError());
+        }
+    } else {
+        DDLog("Window mode - using normal windowed state\n");
+        SDL_SetWindowFullscreen(sdlWindow, 0);
+        SDL_SetWindowSize(sdlWindow, RealLx, RealLy);
+        scaleFactor = 1; // No scaling in windowed mode
+    }
+    
+    // Show and raise window
+    SDL_ShowWindow(sdlWindow);
+    SDL_RaiseWindow(sdlWindow);
+    
+    // Create renderer with specific flags
+    DDLog("Creating SDL renderer\n");
+    Uint32 rendererFlags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
+    
+    sdlRenderer = SDL_CreateRenderer(sdlWindow, -1, rendererFlags);
+    
+    if (!sdlRenderer) {
+        DDLog("Accelerated renderer failed: %s, trying software\n", SDL_GetError());
+        sdlRenderer = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_SOFTWARE);
+        if (!sdlRenderer) {
+            char buf[256];
+            sprintf(buf, "SDL2 CreateRenderer Failed: %s\n", SDL_GetError());
+            DDLog("%s", buf);
+            MessageBox(hwnd, buf, "ERROR", MB_OK);
+            SDL_DestroyWindow(sdlWindow);
+            sdlWindow = NULL;
+            return false;
+        }
+        DDLog("Created software renderer\n");
+    } else {
+        DDLog("Created accelerated renderer\n");
+    }
+    
+    // Set integer scaling hint BEFORE setting logical size
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest"); // Pixel-perfect scaling
+    SDL_RenderSetIntegerScale(sdlRenderer, SDL_TRUE); // Force integer scaling
+    
+    // Set logical size to game resolution
+    if (SDL_RenderSetLogicalSize(sdlRenderer, RealLx, RealLy) != 0) {
+        DDLog("Failed to set logical size: %s\n", SDL_GetError());
+    } else {
+        DDLog("Set logical size: %dx%d (will be integer scaled)\n", RealLx, RealLy);
+    }
+    
+    // Get actual viewport to verify integer scaling
+    SDL_Rect viewport;
+    SDL_RenderGetViewport(sdlRenderer, &viewport);
+    DDLog("Renderer viewport: x=%d, y=%d, w=%d, h=%d\n", 
+          viewport.x, viewport.y, viewport.w, viewport.h);
+    
+    // Disable relative mouse mode
+    SDL_SetRelativeMouseMode(SDL_FALSE);
+    
+    // Configure mouse/window behavior for fullscreen
+    if (!window_mode) {
+        SDL_SetWindowGrab(sdlWindow, SDL_TRUE);
+        DDLog("Window grab enabled for fullscreen\n");
+    }
+    
+    // Create software buffer
+    CreateSoftwareBuffer();
+    
+    if (DDError) {
+        char buf[256];
+        sprintf(buf, "Failed to create software buffer\n");
+        DDLog("%s", buf);
+        MessageBox(hwnd, buf, "ERROR", MB_OK);
+        return false;
+    }
+    
+    // Set up screen dimensions
+    SCRSizeX = MaxSizeX;
+    SCRSizeY = MaxSizeY;
+    RSCRSizeX = MaxSizeX;
+    COPYSizeX = RealLx;
+    RSCRSizeY = RealLy;
+    ScrHeight = SCRSizeY;
+    ScrWidth = SCRSizeX;
+    InitRLCWindows();
+    
+#ifndef _USE3D
+    WindX = 0;
+    WindY = 0;
+    WindLx = RealLx;
+    WindLy = RealLy;
+    WindX1 = WindLx - 1;
+    WindY1 = WindLy - 1;
+#else
+    GPS.SetClipArea(0, 0, RealLx, RealLy);
+#endif
+    
+    BytesPerPixel = 1;
+    
+    SDL_ShowCursor(SDL_ENABLE);
+    
+    // Initial lock to set up screen pointers
+    LockSurface();
+    
+    // Force window activation in fullscreen mode
+    if (!window_mode) {
+        SDL_Delay(100);
+        SDL_RaiseWindow(sdlWindow);
+        SDL_SetWindowInputFocus(sdlWindow);
+        ProcessMessagesSDL();
+        bActive = TRUE;
+        DDLog("Forced bActive=TRUE for fullscreen mode\n");
+    }
+    
+    DDLog("CreateDDObjects completed successfully with %dx integer scaling\n", scaleFactor);
+    return true;
+}
+
+// CreateSoftwareBuffer - creates the rendering surfaces
+void CreateSoftwareBuffer() {
+    DDLog("CreateSoftwareBuffer called\n");
+    DDLog("RealLx=%d, RealLy=%d, MaxSizeX=%d, MaxSizeY=%d\n", 
+          RealLx, RealLy, MaxSizeX, MaxSizeY);
+    
+    if (MaxSizeX == 0 || MaxSizeY == 0) {
+        DDLog("ERROR: MaxSizeX or MaxSizeY is 0!\n");
+        DDError = true;
+        return;
+    }
+    
+    if (sdlSurface) {
+        SDL_FreeSurface(sdlSurface);
+        sdlSurface = NULL;
+    }
+    
+    // Create 8-bit surface
+    sdlSurface = SDL_CreateRGBSurface(0, RealLx, RealLy, 8, 0, 0, 0, 0);
+    
+    if (!sdlSurface) {
+        DDLog("Failed to create 8-bit surface: %s\n", SDL_GetError());
+        DDError = true;
+        return;
+    }
+    
+    BytesPerPixel = 1;
+    DDLog("Created 8-bit display surface: %dx%d\n", RealLx, RealLy);
+    
+    // Initialize palette
+    if (sdlSurface->format->palette) {
+        for (int i = 0; i < 256; i++) {
+            GPal[i].r = i;
+            GPal[i].g = i;
+            GPal[i].b = i;
+            GPal[i].a = 255;
+        }
+        SDL_SetPaletteColors(sdlSurface->format->palette, GPal, 0, 256);
+        DDLog("Initialized default palette\n");
+    }
+    
+    // Allocate offscreen buffer
+    if (offScreenPtr) {
+        free(offScreenPtr);
+        offScreenPtr = NULL;
+    }
+    
+    offScreenPtr = malloc(MaxSizeX * (MaxSizeY + 32 * 4));
+    if (!offScreenPtr) {
+        DDLog("Failed to allocate offscreen buffer\n");
+        DDError = true;
+        return;
+    }
+    memset(offScreenPtr, 0, MaxSizeX * (MaxSizeY + 32 * 4));
+    DDLog("Allocated offscreen buffer: %d bytes\n", MaxSizeX * (MaxSizeY + 32 * 4));
+    
+    // Create streaming texture
+    if (sdlTexture) {
+        SDL_DestroyTexture(sdlTexture);
+        sdlTexture = NULL;
+    }
+    
+    sdlTexture = SDL_CreateTexture(sdlRenderer, 
+                                    SDL_PIXELFORMAT_RGBA8888,
+                                    SDL_TEXTUREACCESS_STREAMING,
+                                    RealLx, RealLy);
+    
+    if (!sdlTexture) {
+        DDError = true;
+        DDLog("Failed to create texture: %s\n", SDL_GetError());
+    } else {
+        DDLog("Created streaming texture: %dx%d\n", RealLx, RealLy);
+    }
 }
 
 #ifndef _USE3D
-
-BOOL CreateRGBDDObjects(HWND hwnd)
+bool CreateRGBDDObjects(HWND hwnd)
 {
-	HRESULT ddrval;
-	DDSCAPS ddscaps;
-	char    buf[256];
-	DDError=false;
-	CurrentSurface=true;
-	if (window_mode)
-	{
-		
-		DDError=false;
-		SCRSizeX=MaxSizeX;
-		SCRSizeY=MaxSizeY;
-		COPYSizeX=RealLx;
-		RSCRSizeX=RealLx;
-		RSCRSizeY=RealLy;
-		ScrHeight=SCRSizeY;
-		ScrWidth=SCRSizeX;
-		InitRLCWindows();
-		WindX=0;
-		WindY=0;
-		WindLx=RealLx;
-		WindLy=RealLy;
-		WindX1=WindLx-1;
-		WindY1=WindLy-1;
-		BytesPerPixel=1;
-		offScreenPtr=(malloc(SCRSizeX*(SCRSizeY+32*4)));
-		return true;
-	}
-#ifdef COPYSCR
-	offScreenPtr=offScreenPtr=(malloc(MaxSizeX*(MaxSizeY+32*4)));
-#endif
-	if(lpDD){
-		lpDDSPrimary->Release();
-		goto SDMOD;
-	};
-	ddrval = DirectDrawCreate_wrapper( NULL, &lpDD, NULL );
-	DDLog("RGB: DirectDrawCreate:%d\n",ddrval);
-    if( ddrval == DD_OK )
-    {
-        // Get exclusive mode
-        ddrval = lpDD->SetCooperativeLevel( hwnd,
-                                DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN );
-		DDLog("RGB: SetCooperativeLevel:%d\n",ddrval);
-        if(ddrval == DD_OK )
-        {
-SDMOD:;
-            ddrval = lpDD->SetDisplayMode(800,600,32); //COPYSizeX,RSCRSizeY, 8 );
-			DDLog("RGB: SetDisplayMode:%d\n",ddrval);
-            if( ddrval == DD_OK )
-            {
-                // Create the primary surface with 1 back buffer
-                ddsd.dwSize = sizeof( ddsd );
-                ddsd.dwFlags = DDSD_CAPS;
-                ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
-                ddrval = lpDD->CreateSurface( &ddsd, &lpDDSPrimary, NULL );
-				DDLog("RGB: CreateSurface:%d\n",ddrval);
-                if( ddrval == DD_OK )
-                {
-					DDError=false;
-					SCRSizeX=MaxSizeX;
-					SCRSizeY=MaxSizeY;
-					RSCRSizeX=RealLx;//ddsd.lPitch;
-					Pitch=ddsd.lPitch;
-					COPYSizeX=RealLx;
-					RSCRSizeY=RealLy;
-					ScrHeight=SCRSizeY;
-					ScrWidth=SCRSizeX;
-					WindX=0;
-					WindY=0;
-					WindLx=SCRSizeX;
-					WindLy=SCRSizeY;
-					WindX1=WindLx-1;
-					WindY1=WindLy-1;
-					BytesPerPixel=1;
-					return true;
-				}
-            }
-        }
-    }
-    wsprintf(buf, "Direct Draw Init Failed (%08lx)\n", ddrval );
-    MessageBox( hwnd, buf, "ERROR", MB_OK );
-	return false;
+    RealLx = 800;
+    RealLy = 600;
+    SCRSizeX = 800;
+    SCRSizeY = 600;
+    RSCRSizeX = 800;
+    RSCRSizeY = 600;
+    COPYSizeX = 800;
+    SCRSZY = SCRSizeY;
+    return CreateDDObjects(hwnd) ? 1 : 0;
 }
-
 #endif // _!USE3D
 
-BOOL CreateRGB640DDObjects(HWND hwnd)
+bool CreateRGB640DDObjects(HWND hwnd)
 {
-	HRESULT ddrval;
-	DDSCAPS ddscaps;
-	char    buf[256];
-	DDError=false;
-	CurrentSurface=true;
-	if (window_mode)
-	{
-		
-		DDError=false;
-		SCRSizeX=MaxSizeX;
-		SCRSizeY=MaxSizeY;
-		COPYSizeX=RealLx;
-		RSCRSizeX=RealLx;
-		RSCRSizeY=RealLy;
-		ScrHeight=SCRSizeY;
-		ScrWidth=SCRSizeX;
-		InitRLCWindows();
-#ifndef _USE3D
-		WindX=0;
-		WindY=0;
-		WindLx=SCRSizeX;
-		WindLy=SCRSizeY;
-		WindX1=WindLx-1;
-		WindY1=WindLy-1;
-#else
-		GPS.SetClipArea( 0, 0, SCRSizeX, SCRSizeY );
-#endif // _USE3D
-		BytesPerPixel=1;
-		offScreenPtr=(malloc(SCRSizeX*(SCRSizeY+32*4)));
-		return true;
-	}
-#ifdef COPYSCR
-	offScreenPtr=offScreenPtr=(malloc(MaxSizeX*(MaxSizeY+32*4)));
-#endif
-	if(lpDD){
-		lpDDSPrimary->Release();
-		goto SDMOD;
-	};
-	ddrval = DirectDrawCreate_wrapper( NULL, &lpDD, NULL );
-	DDLog("RGB640: DirectDrawCreate:%d\n",ddrval);
-    if( ddrval == DD_OK )
-    {
-SDMOD:;
-        // Get exclusive mode
-        ddrval = lpDD->SetCooperativeLevel( hwnd,
-                                DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN );
-		DDLog("RGB640: SetCooperativeLevel:%d\n",ddrval);
-        if(ddrval == DD_OK )
-        {
-            ddrval = lpDD->SetDisplayMode(640,480,BestBPP); //COPYSizeX,RSCRSizeY, 8 );
-			DDLog("RGB640: SetDisplayMode:%d\n",ddrval);
-            if( ddrval == DD_OK )
-            {
-                // Create the primary surface with 1 back buffer
-                ddsd.dwSize = sizeof( ddsd );
-                ddsd.dwFlags = DDSD_CAPS;
-                ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
-                ddrval = lpDD->CreateSurface( &ddsd, &lpDDSPrimary, NULL );
-				DDLog("RGB640: CreateSurface:%d\n",ddrval);
-                if( ddrval == DD_OK )
-                {
-					DDError=false;
-					SCRSizeX=MaxSizeX; 
-					SCRSizeY=MaxSizeY;
-					RSCRSizeX=RealLx;//ddsd.lPitch;
-					Pitch=ddsd.lPitch;
-					COPYSizeX=RealLx;
-					RSCRSizeY=RealLy;
-					ScrHeight=SCRSizeY;
-					ScrWidth=SCRSizeX; 
-#ifndef _USE3D 
-					WindX=0; 
-					WindY=0;
-					WindLx=SCRSizeX;
-					WindLy=SCRSizeY;
-					WindX1=WindLx-1;
-					WindY1=WindLy-1;
-#else
-					GPS.SetClipArea( 0, 0, SCRSizeX, SCRSizeY );
-#endif // _USE3D
-					BytesPerPixel=1;
-					return true;
-                }
-            }
-        }
-    }
-    wsprintf(buf, "Direct Draw Init Failed (%08lx)\n", ddrval );
-    MessageBox( hwnd, buf, "ERROR", MB_OK );
-	return false;
+    RealLx = 640;
+    RealLy = 480;
+    SCRSizeX = 640;
+    SCRSizeY = 480;
+    RSCRSizeX = 640;
+    RSCRSizeY = 480;
+    COPYSizeX = 640;
+    SCRSZY = SCRSizeY;
+    return CreateDDObjects(hwnd) ? 1 : 0;
+    return false;
 }
 
-/*   Direct Draw palette loading*/
 int clrRed;
 int clrGreen;
 int clrBlue;
 int clrYello;
+int clrWhite;
 
-void LoadPalette(LPCSTR lpFileName)
+CEXPORT
+void LoadPalette(const char* lpFileName)
 {
-	if(!lpDD)return;
-	AFile((char*)lpFileName);
-	if (window_mode) return;
-	if (DDError) return;
-	ResFile pf=RReset(lpFileName);
-	memset(&GPal,0,1024);
-	if (pf!=INVALID_HANDLE_VALUE)
-	{
-		for(int i=0;i<256;i++){
-			RBlockRead(pf,&GPal[i],3);
-			//RBlockRead(pf,&xx.bmp.bmiColors[i],3);
-		};
-		RClose(pf);
-		if(!strcmp(lpFileName,"agew_1.pal")){
-			int DCL=6;
-			int C0=65;//128-DCL*4;
-			for(int i=0;i<12;i++){
-				int gray=0;
-				if(i>2)gray=(i-2)*2;
-				if(i>7)gray+=(i-7)*8;
-				if(i>9)gray+=(i-10)*10;
-				if(i>10)gray+=50;
-				gray=gray*6/3;
-				//gray=(i+5)*6;
-				int rr=0*C0/150+gray*8/2;
-				int gg=80*C0/150+gray*6/2;//80
-				int bb=132*C0/150+gray*4/2;
-				if(rr>255)rr=255;
-				if(gg>255)gg=255;
-				if(bb>255)bb=255;
-				if(i<5){
-					rr=rr-((rr*(5-i))/6);
-					gg=gg-((rr*(5-i))/6);
-					bb=bb-((rr*(5-i))/6);
-				};
-				if(i<3){
-					rr=rr-((rr*(3-i))/4);
-					gg=gg-((rr*(3-i))/4);
-					bb=bb-((rr*(3-i))/4);
-				};
-				if(i<2){
-					rr=rr-((rr*(2-i))/3);
-					gg=gg-((rr*(2-i))/3);
-					bb=bb-((rr*(2-i))/3);
-				};
-				//if(!i){
-				//	rr=rr*10/11;
-				//	gg=gg*10/11;
-				//	bb=bb*10/11;
-				//};
-				GPal[0xB0+i].peBlue=bb;
-				GPal[0xB0+i].peRed=rr;
-				GPal[0xB0+i].peGreen=gg;
-				C0+=5; 
-			};
-			ResFile pf=RRewrite(lpFileName);
-			for(int i=0;i<256;i++)RBlockWrite(pf,&GPal[i],3);
-			RClose(pf);
-		};
-		if(!window_mode){
-#ifndef _USE3D
-			if(!PalDone){
-				lpDD->CreatePalette(DDPCAPS_8BIT,&GPal[0],&lpDDPal,NULL);
-				PalDone=true;
-				lpDDSPrimary->SetPalette(lpDDPal);
-				//lpDDSBack->SetPalette(lpDDPal);
-			}else{
-				lpDDPal->SetEntries(0,0,256,GPal);
-			};
-#else
-			CheckPal16();
-#endif //_USE3D
-			
-		};
-        /*if (window_mode) {
-            if (!PalDone) {
-                lpDD->CreatePalette(DDPCAPS_8BIT, &GPal[0], &lpDDPal, NULL);
-                PalDone = true;
-                lpDDSPrimary->SetPalette(lpDDPal);
-                //lpDDSBack->SetPalette(lpDDPal);
-            }
-            else {
-                lpDDPal->SetEntries(0, 0, 256, GPal);
-            };
-        }*/
-	}
-	clrRed = 0xD0;
-	clrGreen=GetPaletteColor(0,255,0);
-	clrBlue=GetPaletteColor(0,0,255);
-	clrYello=GetPaletteColor(255,255,0);
+    if (DDError) return;
+    
+    ResFile pf = RReset(lpFileName);
+    memset(&GPal, 0, sizeof(GPal));
+    
+    if (pf != INVALID_HANDLE_VALUE) {
+        for (int i = 0; i < 256; i++) {
+            byte rgb[3];
+            RBlockRead(pf, rgb, 3);
+            GPal[i].r = rgb[0];
+            GPal[i].g = rgb[1];
+            GPal[i].b = rgb[2];
+            GPal[i].a = 255;
+        }
+        RClose(pf);
+        
+        UpdateSDLPalette();
+        PalDone = true;
+        
+        DDLog("Loaded palette from %s\n", lpFileName);
+    }
+    
+    clrRed = 0xD0;
+    clrWhite= GetPaletteColor(255,255,255);
+    clrGreen = GetPaletteColor(0,255,0);
+    clrBlue = GetPaletteColor(0, 0, 255);
+    clrYello = GetPaletteColor(255, 255, 0);
 }
-void CBar(int x,int y,int Lx,int Ly,byte c);
+
+void CBar(int x, int y, int Lx, int Ly, byte c);
 void Susp(char* str){
 	return;
 	if(!window_mode){
@@ -1062,186 +968,133 @@ void Susp(char* str){
 			
 	};
 };
-void SetDarkPalette(){
+void SetDarkPalette() {
 #ifndef _USE3D
-	if (DDError) return;
-	ChangeColorFF();
-	memset(&GPal,0,1024);
-	if(!window_mode){
-		if(!PalDone){
-			lpDD->CreatePalette(DDPCAPS_8BIT,&GPal[0],&lpDDPal,NULL);
-			PalDone=true;
-			lpDDSPrimary->SetPalette(lpDDPal);
-		}else{
-			lpDDPal->SetEntries(0,0,256,GPal); 
-		};
-	}
-#endif //_USE3D 
-};
+    if (DDError) return;
+    ChangeColorFF();
+    memset(&GPal, 0, sizeof(GPal));
+    
+    // Apply dark palette
+    UpdateSDLPalette();
+#endif //_USE3D
+}
+
 CEXPORT
 void SlowLoadPalette(LPCSTR lpFileName)
 {
 #ifdef _USE3D
-	LoadPalette(lpFileName);
-	return;
+    LoadPalette(lpFileName);
+    return;
 #endif
-	PALETTEENTRY            NPal[256];
-	if (DDError) return;
-	SetDarkPalette();
-	ResFile pf=RReset(lpFileName);
-	memset(&GPal,0,1024);
-	if (pf!=INVALID_HANDLE_VALUE)
-	{
-		for(int i=0;i<256;i++){
-			RBlockRead(pf,&GPal[i],3);
-			//RBlockRead(pf,&xx.bmp.bmiColors[i],3);
-		};
-		RClose(pf);
-		
-		if(!strcmp(lpFileName,"agew_1.pal")){
-			int DCL=6;
-			int C0=65;//128-DCL*4;
-			for(int i=0;i<12;i++){
-				int gray=0;
-				if(i>2)gray=(i-2)*2;
-				if(i>7)gray+=(i-7)*8;
-				if(i>9)gray+=(i-10)*10;
-				if(i>10)gray+=50;
-				gray=gray*6/3;
-				//gray=(i+5)*6;
-				int rr=0*C0/150+gray*8/2;
-				int gg=80*C0/150+gray*6/2;//80
-				int bb=132*C0/150+gray*4/2;
-				if(rr>255)rr=255;
-				if(gg>255)gg=255;
-				if(bb>255)bb=255;
-				if(i<5){
-					rr=rr-((rr*(5-i))/6);
-					gg=gg-((rr*(5-i))/6);
-					bb=bb-((rr*(5-i))/6);
-				};
-				if(i<3){
-					rr=rr-((rr*(3-i))/4);
-					gg=gg-((rr*(3-i))/4);
-					bb=bb-((rr*(3-i))/4);
-				};
-				if(i<2){
-					rr=rr-((rr*(2-i))/3);
-					gg=gg-((rr*(2-i))/3);
-					bb=bb-((rr*(2-i))/3);
-				};
-				//if(!i){
-				//	rr=rr*10/11;
-				//	gg=gg*10/11;
-				//	bb=bb*10/11;
-				//};
-				GPal[0xB0+i].peBlue=bb;
-				GPal[0xB0+i].peRed=rr;
-				GPal[0xB0+i].peGreen=gg;
-				C0+=5;
-			};
-			ResFile pf=RRewrite(lpFileName);
-			for(int i=0;i<256;i++)RBlockWrite(pf,&GPal[i],3);
-			RClose(pf);
-		};
-		
-		if(!window_mode){
-			byte* pal=(byte*)NPal;
-			byte* pal0=(byte*) GPal;
-			int mul=0;
-			int t0=GetTickCount();
-			int mul0=0;
-			do{
-				mul=(GetTickCount()-t0)*2;
-				if(mul>255)mul=255;
-				if(mul!=mul0){
-					for(int j=0;j<1024;j++){
-						pal[j]=byte((int(pal0[j])*mul)>>8);
-					};
-					pal[1023]=0;
-					pal[1022]=0;
-					pal[1021]=0;
-					pal[1020]=0;
-					lpDDPal->SetEntries(0,0,255,NPal);
-				};
-				mul0=mul;
-			}while(mul!=255);
-		};
-	}
-	clrRed = 0xD0;
-	clrGreen=GetPaletteColor(0,255,0);
-	clrBlue=GetPaletteColor(0,0,255);
-	clrYello=GetPaletteColor(255,255,0);
+    
+    SDL_Color NPal[256];
+    if (DDError) return;
+    SetDarkPalette();
+    
+    ResFile pf = RReset(lpFileName);
+    memset(&GPal, 0, sizeof(GPal));
+    
+    if (pf != INVALID_HANDLE_VALUE) {
+        for (int i = 0; i < 256; i++) {
+            byte rgb[3];
+            RBlockRead(pf, rgb, 3);
+            GPal[i].r = rgb[0];
+            GPal[i].g = rgb[1];
+            GPal[i].b = rgb[2];
+        }
+        RClose(pf);
+
+        // Fade in palette
+        if (sdlSurface && sdlSurface->format->palette) {
+            DWORD t0 = GetTickCount();
+            int mul0 = 0;
+            
+            do {
+                int mul = (GetTickCount() - t0) * 2;
+                if (mul > 255) mul = 255;
+                
+                if (mul != mul0) {
+                    for (int j = 0; j < 256; j++) {
+                        NPal[j].r = (GPal[j].r * mul) >> 8;
+                        NPal[j].g = (GPal[j].g * mul) >> 8;
+                        NPal[j].b = (GPal[j].b * mul) >> 8;
+                    }
+                    
+                    SDL_SetPaletteColors(sdlSurface->format->palette, NPal, 0, 256);
+                    mul0 = mul;
+                }
+                
+                SDL_Delay(10);
+            } while (mul0 < 255);
+        }
+    }
+    clrRed = 0xD0;
+    clrWhite= GetPaletteColor(255,255,255);
+    clrGreen = GetPaletteColor(0,255,0);
+    clrBlue = GetPaletteColor(0, 0, 255);
+    clrYello = GetPaletteColor(255, 255, 0);
 }
+
 CEXPORT
 void SlowUnLoadPalette(LPCSTR lpFileName)
 {
-	PALETTEENTRY            NPal[256];
-	if (DDError) return;
-	ChangeColorFF();
-	//ResFile pf=RReset(lpFileName);
-	//memset(&GPal,0,1024);
-	//if (pf!=INVALID_HANDLE_VALUE)
-	//{
-		//for(int i=0;i<256;i++){
-		//	RBlockRead(pf,&GPal[i],3);
-		//	//RBlockRead(pf,&xx.bmp.bmiColors[i],3);
-		//};
-		//RClose(pf);
-		if(!window_mode){
-			byte* pal=(byte*)NPal;
-			byte* pal0=(byte*) GPal;
-			int mul=0;
-			int t0=GetTickCount();
-			int mul0=0;
-			do{
-				mul=(GetTickCount()-t0)*2;
-				if(mul>255)mul=255;
-				if(mul!=mul0){
-					for(int j=0;j<1024;j++){
-						pal[j]=byte((int(pal0[j])*(255-mul))>>8);
-					};
-					pal[1023]=0;
-					pal[1022]=0;
-					pal[1021]=0;
-					pal[1020]=0;
-					lpDDPal->SetEntries(0,0,255,NPal);
-				};
-				mul0=mul;
-			}while(mul!=255);
-		};
-	//}
-}	
-/*     Closing all Direct Draw objects
- *
- * This procedure must be called before the program terminates,
- * otherwise Windows can occur some problems.
- */
-void FreeDDObjects( void )
-{
-	free(offScreenPtr);
-	offScreenPtr=NULL;
-	if (window_mode)
-	{
-		//free(offScreenPtr);
-		return;
-	}
-    if( lpDD != NULL )
-    {
-		/*if( lpDDSBack != NULL )
-        {
-            lpDDSBack->Release();
-            lpDDSBack = NULL;
-        };*/
-		//ClearScreen();
-        if( lpDDSPrimary != NULL )
-        {
-            lpDDSPrimary->Release();
-            lpDDSPrimary = NULL;
-        };
-		lpDD->Release();
-        lpDD = NULL;
+    SDL_Color NPal[256];
+    if (DDError) return;
+    ChangeColorFF();
+    
+    if (sdlSurface && sdlSurface->format->palette) {
+        DWORD t0 = GetTickCount();
+        int mul0 = 0;
+        
+        do {
+            int mul = (GetTickCount() - t0) * 2;
+            if (mul > 255) mul = 255;
+            
+            if (mul != mul0) {
+                for (int j = 0; j < 256; j++) {
+                    NPal[j].r = (GPal[j].r * (255 - mul)) >> 8;
+                    NPal[j].g = (GPal[j].g * (255 - mul)) >> 8;
+                    NPal[j].b = (GPal[j].b * (255 - mul)) >> 8;
+                }
+                
+                SDL_SetPaletteColors(sdlSurface->format->palette, NPal, 0, 256);
+                mul0 = mul;
+            }
+            
+            SDL_Delay(10);
+        } while (mul0 < 255);
     }
+}
+void FreeDDObjects(void)
+{
+    DDLog("FreeDDObjects called\n");
+    
+    if (offScreenPtr) {
+        free(offScreenPtr);
+        offScreenPtr = NULL;
+    }
+    
+    if (sdlTexture) {
+        SDL_DestroyTexture(sdlTexture);
+        sdlTexture = NULL;
+    }
+    
+    if (sdlSurface) {
+        SDL_FreeSurface(sdlSurface);
+        sdlSurface = NULL;
+    }
+    
+    if (sdlRenderer) {
+        SDL_DestroyRenderer(sdlRenderer);
+        sdlRenderer = NULL;
+    }
+    
+    if (sdlWindow) {
+        SDL_DestroyWindow(sdlWindow);
+        sdlWindow = NULL;
+    }
+    
+    SDL_Quit();
 }
 /*void SetDebugMode()
 {
@@ -1253,11 +1106,13 @@ void NoDebugMode()
 }*/
 
 CEXPORT
-void GetPalColor(byte idx,byte* r,byte* g,byte* b){
-	*r=GPal[idx].peRed;
-	*g=GPal[idx].peGreen;
-	*b=GPal[idx].peBlue;
-};
+
+void GetPalColor(byte idx, byte* r, byte* g, byte* b) {
+    *r = GPal[idx].r;
+    *g = GPal[idx].g;
+    *b = GPal[idx].b;
+}
+
 
 /*
     DirectDraw substitute.
@@ -1266,14 +1121,15 @@ void GetPalColor(byte idx,byte* r,byte* g,byte* b){
     No idea what the mdraw.dll funtion does, but you end up with a working
     IDirectDraw interface and no legacy bugs.
 */
+#ifdef WRAPPER
 HRESULT DirectDrawCreate_wrapper(GUID FAR* lpGUID, LPDIRECTDRAW FAR* lplpDD, IUnknown FAR* pUnkOuter)
 {
     HMODULE mdrawHandle = LoadLibrary("mdraw.dll");
-    if (nullptr != mdrawHandle)
+    if (NULL != mdrawHandle)
     {
         typedef HRESULT(__stdcall* mdrawProcType)(GUID FAR* lpGUID, LPDIRECTDRAW FAR* lplpDD, IUnknown FAR* pUnkOuter);
         mdrawProcType mdrawProc = (mdrawProcType)GetProcAddress(mdrawHandle, "DirectDrawCreate");
-        if (nullptr != mdrawProc)
+        if (NULL != mdrawProc)
         {
             HRESULT mdrawResult = mdrawProc(lpGUID, lplpDD, pUnkOuter);
             return mdrawResult;
@@ -1282,6 +1138,7 @@ HRESULT DirectDrawCreate_wrapper(GUID FAR* lpGUID, LPDIRECTDRAW FAR* lplpDD, IUn
     }
     return DDERR_GENERIC;
 }
+#endif
 //OVO SAM UKRAO OD COSSACK REVAMPA
 
 #ifdef _USE3D

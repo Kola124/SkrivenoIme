@@ -1,0 +1,49 @@
+// Hint files help the Visual Studio IDE interpret Visual C++ identifiers
+// such as names of functions and macros.
+// For more information see https://go.microsoft.com/fwlink/?linkid=865984
+#define DIALOGS_API __declspec(dllexport)
+#define DIALOGS_API __declspec(dllimport)
+// Hint files help the Visual Studio IDE interpret Visual C++ identifiers
+// such as names of functions and macros.
+// For more information see https://go.microsoft.com/fwlink/?linkid=865984
+#define CEXPORT __declspec(dllexport)
+#define NULL
+#define NULL ((void *)0)
+#define FASTDRAW_API __declspec(dllexport)
+#define FASTDRAW_API __declspec(dllimport)
+#define CEXPORT extern "C" __declspec(dllexport)
+#define MyNation (MYNATION^133)
+#define NRLPAR
+#define rando() RandNew(__FILE__,__LINE__)
+#define MortiraID
+#define CIMPORT __declspec(dllimport)
+#define M4CellLX
+#define M4CellLY
+#define zoom(x) (LMode?(x>>2):x)
+#define zoom(x) (x>>zoomsh)
+#define ZBF_LO
+#define memset(a, b, c) try{memset(a,b,c);}catch(...){}
+#define znew(t, s) (t*)_ExMalloc((s)*sizeof(t))
+#define CONQUEST
+#define addname(v)
+#define addrand(v)
+#define MinRot
+#define APPLY_TIRING(OB) ApplyTiring(OB)
+#define APPLY_TIRING(OB)
+#define CreatePath(x1, y1) CreatePath(x1,y1);addrand(99);
+#define TowerID
+#define GM(x) (1<<x)
+#define GFILE_API __declspec(dllexport)
+#define GFILE_API __declspec(dllimport)
+#define NBPERSONAL
+#define NewMonsterSendTo(x, y, Prio, OrdType) NewMonsterSendTo(x,y,Prio,OrdType);addrand(33)
+#define MaxArm
+#define NewMonsterSmartSendTo(x, y, dx, dy, Prio, OrdType) NewMonsterSmartSendTo(x,y,dx,dy,Prio,OrdType);addrand(55)
+#define PeasantID
+#define GrenaderID
+#define ArcherID
+#define ULIMIT
+#define XRESRC(i, j) (URESRC[i][j]^134525)
+#define AddXRESRC(i, j, k) URESRC[i][j]=(((URESRC[i][j]^134525)+k)^134525)
+#define PushkaID
+#define NAttTypes

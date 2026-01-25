@@ -10,7 +10,7 @@
 //#define VIEW_TOP
 //#define WIN32_LEAN_AND_MEAN
 #include "ddini.h"
-//#include "./Steam/steam_api.h"
+#include "./Steam/steam_api.h"
 
 bool window_mode;
 int screen_width;
@@ -170,9 +170,9 @@ bool Fixed;
 const int kCtrlStickyTime = 50;
 
 //Minimal delay between two PostDrawGameProcess() returns, in ms
-const unsigned int kPostDrawInterval = 16;//~60 Hz
+const unsigned int kPostDrawInterval = 33;//~60 Hz
 
-//Time of the last PostDrawGameProcess() return
+//Time of the last PostDrawGameProcess() return 
 unsigned long prev_postdraw_time = 0;
 
 #endif
@@ -902,6 +902,7 @@ void AddKey(byte Key,byte Ascii){
 	NKeys++;
 };
 byte LastAscii=0;
+wchar_t last_unicode = 0;
 int ReadKey(){
 	if(NKeys){
 		byte c=KeyStack[0];
@@ -1214,6 +1215,7 @@ void TestGenMap();
 bool ShowStatistics();
 bool EnterChatMode=0;
 char ChatString[128];
+wchar_t unicode_chat_string[128];
 void ProcessChatKeys();
 extern int WaitState;
 bool RetryVideo=0;
@@ -2322,7 +2324,7 @@ void EditorKeyCheck(){
 void SERROR();
 void SERROR1();
 void SERROR2();
-bool PalDone;
+//bool PalDone;
 bool InitScreen(){
 #ifdef _USE3D
 	SVSC.SetSize(RealLx,RealLy);
@@ -2369,7 +2371,7 @@ bool InitScreen(){
 };
 
 #ifndef _USE3D
-BOOL CreateRGBDDObjects(HWND hwnd);
+bool CreateRGBDDObjects(HWND hwnd);
 bool InitRGBScreen(){
 	PalDone=false;
 	CreateRGBDDObjects(hwnd); 
@@ -2399,7 +2401,7 @@ bool InitRGBScreen(){
 };
 #endif // !_USE3D 
 
-BOOL CreateRGB640DDObjects(HWND hwnd);
+bool CreateRGB640DDObjects(HWND hwnd);
 bool InitRGB640Screen(){
 	CreateRGB640DDObjects(hwnd); 
     if(!DDError)
@@ -2578,13 +2580,10 @@ void FilesExit();
 void ShowLoading();
 static BOOL doInit( HINSTANCE hInstance, int nCmdShow )
 {
+    WNDCLASS wc;
+    char buf[256];
 
-    WNDCLASS            wc;
-    char                buf[256];
-
-    /*
-     * set up and register window class
-     */
+    // Set up and register window class
     wc.style = CS_HREDRAW | CS_VREDRAW;
     wc.lpfnWndProc = WindowProc;
     wc.cbClsExtra = 0;
@@ -2595,7 +2594,7 @@ static BOOL doInit( HINSTANCE hInstance, int nCmdShow )
     wc.hbrBackground = NULL;
     wc.lpszMenuName = NULL;
     wc.lpszClassName = NAME;
-    RegisterClass( &wc );
+    RegisterClass(&wc);
     
     if (window_mode)
     {
@@ -2615,14 +2614,16 @@ static BOOL doInit( HINSTANCE hInstance, int nCmdShow )
     }
     else
     {
+        // For fullscreen, create a window at the GAME resolution, not desktop resolution
+        // SDL will handle the actual fullscreen mode switching
         hwnd = CreateWindowEx(
             WS_EX_APPWINDOW,
             NAME,
             TITLE,
             WS_POPUP,
             0, 0,
-            screen_width,
-            screen_height,
+            RealLx,  // Use game resolution instead of screen_width
+            RealLy,  // Use game resolution instead of screen_height
             NULL,
             NULL,
             hInstance,
@@ -2630,159 +2631,116 @@ static BOOL doInit( HINSTANCE hInstance, int nCmdShow )
         );
     }
 
-    /*
-     * create a window
-     */
-    /*
-    hwnd = CreateWindowEx(
-        WS_EX_APPWINDOW /*TOPMOST
-        NAME,
-        TITLE,
-        WS_POPUP,
-        0, 0,
-        GetSystemMetrics( SM_CXSCREEN ),
-        GetSystemMetrics( SM_CYSCREEN ),
-        NULL,
-        NULL,
-        hInstance,
-        NULL );
-	*/
-    if( !hwnd )
+    if (!hwnd)
     {
         return FALSE;
-    };
+    }
 
-	
-	//UpdateWindow( hwnd );
-    ShowWindow( hwnd, SW_SHOWNORMAL);//nCmdShow );
-    UpdateWindow( hwnd );
+    ShowWindow(hwnd, SW_SHOWNORMAL);
+    UpdateWindow(hwnd);
 
-	//void ov_Init(HWND hExtWnd);
-	//ov_Init(hwnd);
+    CDIRSND.CreateDirSound(hwnd);
+    CDS = &CDIRSND;
+    LoadSounds("SoundList.txt");
+    MemReport("LoadSounds");
+    
+    ResFile F = RReset("version.dat");
+    if (F != INVALID_HANDLE_VALUE) {
+        word B = 0;
+        RBlockRead(F, &B, 2);
+        RClose(F);
+        if (B > 102) {
+            MessageBox(hwnd, "Unable to use this testing version.", "WARNING!", 0);
+            FilesExit();
+            PostMessage(hwnd, WM_CLOSE, 0, 0);
+            return 0;
+        }
+    }
+    
+    if (!Loading()) {
+        FilesExit();
+        PostMessage(hwnd, WM_CLOSE, 0, 0);
+        return 0;
+    }
 
-	CDIRSND.CreateDirSound(hwnd);
-	CDS=&CDIRSND;
-	LoadSounds("SoundList.txt");
-	MemReport("LoadSounds");
-	//SetCapture(hwnd);
-	ResFile F=RReset("version.dat");
-	if(F!=INVALID_HANDLE_VALUE){
-		word B=0;
-		RBlockRead(F,&B,2);
-		RClose(F);
-		if(B>102){
-			MessageBox(hwnd,"Unable to use this testing version.","WARNING!",0);
-			FilesExit();
-			PostMessage(hwnd, WM_CLOSE, 0, 0);
-			return 0;
-		};
-	};
-	if(!Loading()){
-		FilesExit();
-		PostMessage(hwnd, WM_CLOSE, 0, 0);
-		return 0;
-	};
-
-	//mpv_Play("Video\\1.wmv");
-	//mpv_Play("Video\\2.wmv");
-	//mpv_Play("Video\\3.wmv");
-	//mpv_Play("Video\\4.wmv");
-	//mpv_Play("Video\\5.wmv");
-	//mpv_Done();
-
-	//HCURSOR mcr=LoadCursorFromFile("curs1.cur");
-	//SetCursor(mcr);
-	//ShowCursor(true);
-	SetCursorPos(512,300);//!!!!!!!!!!!!!!!!
+    SetCursorPos(512, 300);
 #ifndef _USE3D
-	ShowCursor(false);
-#endif //!_USE3D
+    ShowCursor(false);
+#endif
 
-	//HANDLE hh1=LoadImage(NULL,"mcur.bmp",IMAGE_BITMAP,32,32,LR_LOADFROMFILE);
-	CurrentSurface=FALSE;
-	
-    /*
-     * create the main DirectDraw object
-     */
-	PalDone=false;
-/*	InitScreen();
-	InitRGBScreen();
-	xLockMouse=true;
-	ResFile ff1=RReset("war2000.raw");
-	for(int i=0;i<600;i++){
-		RBlockRead(ff1,(char*)(int(RealScreenPtr)+4*800*i),4*800);
-	};
-	RClose(ff1);
-	do{
-		ProcessMessages();
-	}while(!(Lpressed||KeyPressed));
-	xLockMouse=false;
-	FreeDDObjects();*/
-	KeyPressed=false;
+    CurrentSurface = FALSE;
+    KeyPressed = false;
 
-    //Fullscreen? Prepare for small not stretched menu
+#ifdef SCREENFIX
+    // Fullscreen? Prepare for small not stretched menu
     if (!window_mode)
-    {//Set initial window resolution to native screen resolution
+    {
+        // Set initial window resolution to native screen resolution
         if (1920 < screen_width)
-        {//Limit max resolution for menu screen to fullhd
-            //Also necessary for correct offsets in stats screen
+        {
+            // Limit max resolution for menu screen to fullhd
             screen_width = 1920;
             screen_height = 1080;
         }
         RealLx = screen_width;
         RealLy = screen_height;
     }
+#endif
 
-	CreateDDObjects(hwnd); 
-	MemReport("CreateDDObjects");
-	//LoadPalette("darkw.pal");
-	CHKALL();
-    if(!DDError)
+    CreateDDObjects(hwnd); 
+    MemReport("CreateDDObjects");
+    
+    CHKALL();
+    
+    if (!DDError)
     {
 #ifndef _USE3D
-		LockSurface();
-		UnlockSurface();
-		LockSurface();
-		UnlockSurface();
-		if(!RealScreenPtr){
-			MessageBox(hwnd,"Unable to initialise Direct Draw. It is possible that hardware acceleration is turned off.","Loading error[2]",MB_ICONSTOP);
-			exit(0);
-		};
-#endif //_USE3D
-#ifndef _USE3D
-		ShowCursor(false);
-#endif // !_USE3D
+        LockSurface();
+        UnlockSurface();
+        LockSurface();
+        UnlockSurface();
+        if (!RealScreenPtr) {
+            MessageBox(hwnd, "Unable to initialise Direct Draw. It is possible that hardware acceleration is turned off.", "Loading error[2]", MB_ICONSTOP);
+            exit(0);
+        }
+#endif
 
-		RECT OOO;
-		OOO.left=-16;
-		OOO.top=-16;
-		OOO.right=1500;
-		OOO.bottom=1200;
-		ClipCursor(&OOO);
-		SetCursorPos(512,300);//!!!!!!!!!!!!!!!!
 #ifndef _USE3D
-		ShowCursor(false);
-#endif // !_USE3D
+        ShowCursor(false);
+#endif
 
-		OOO.left=0;
-		OOO.top=0;
-		OOO.right=RealLx-1;
-		OOO.bottom=RealLy-1;
-		ClipCursor(&OOO);
-		InVideo=1;
-		//ShowLoading();
-        if( SetTimer(hwnd, TIMER_ID, 20, NULL ) )
+        // Set up cursor clipping
+        RECT OOO;
+        OOO.left = 0;
+        OOO.top = 0;
+        OOO.right = RealLx - 1;
+        OOO.bottom = RealLy - 1;
+        
+        // Don't use ClipCursor in fullscreen - SDL handles this
+        if (window_mode) {
+            ClipCursor(&OOO);
+        }
+        
+        SetCursorPos(512, 300);
+#ifndef _USE3D
+        ShowCursor(false);
+#endif
+
+        InVideo = 1;
+        
+        if (SetTimer(hwnd, TIMER_ID, 20, NULL))
         {
             return TRUE;
         }
-		//FlipPages();
     }
+    
     wsprintf(buf, "Direct Draw Init Failed\n");
-    MessageBox( hwnd, buf, "ERROR", MB_OK );
+    MessageBox(hwnd, buf, "ERROR", MB_OK);
     finiObjects();
-    DestroyWindow( hwnd );
+    DestroyWindow(hwnd);
     return FALSE;
-}; /* doInit */
+}
+/* doInit */
 void AddDestn(byte x,byte y);
 void ProcessNewMonsters();
 int PrevTime=0;
@@ -2836,6 +2794,7 @@ void CreateFields(byte NI);
 extern int LastWaterchange;
 extern int LastBrightspot;
 void RESEARCH_WAVES();
+bool ProcessMessagesSDL();
 void PreDrawGameProcess() {
 	//RunPF(19);
 	if(EditMapMode){
@@ -2853,6 +2812,10 @@ void PreDrawGameProcess() {
 	ProcessMapAutosave();
 	AddRandomBlobs();
 	CDS->ProcessSoundSystem();
+	
+	// REMOVED the timing control from PreDraw - let it run every frame
+	// Only control the actual game time increment
+	
 	if(NOPAUSE){
 		for(int w=0;w<8;w++){
 			WasInGold[w]=NInGold[w];
@@ -3771,7 +3734,7 @@ int Alert(const char* lpCaption, const char* lpText)
 #endif
 }
 
-/*
+
 int SteamInitialisation() {
     if (SteamAPI_RestartAppIfNecessary(k_uAppIdInvalid))
     {
@@ -3800,11 +3763,15 @@ int SteamInitialisation() {
         return EXIT_FAILURE;
     }
 }
-*/
-int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                        LPSTR lpCmdLine, int nCmdShow)
+
+void SetDebugMode();
+void NoDebugMode();
+extern BOOL DDDebug;
+//int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+//   LPSTR lpCmdLine, int nCmdShow)
+int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
+    _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
 {
-	
 	//TestHash();
     //SteamInitialisation();
 	DelLog();
@@ -3817,7 +3784,10 @@ int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	FILE* F7=fopen("ai.log","r");
 	if(F7){
-		fscanf(F7,"%s",AI_Log);
+        if (fscanf(F7, "%s", AI_Log) != 1) {
+            // Handle error (file read failed)
+            AI_Log[0] = '\0'; // Ensure null termination
+        }
 		fclose(F7);
 	};
 	//SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
@@ -4011,12 +3981,12 @@ int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	MemReport("SetupGates");
 
 	// debug
-	//NoDebugMode();
+	NoDebugMode();
 	//SetDebugMode();
 #if defined(VITAL_DEBUG)
-	//SetDebugMode();
+	SetDebugMode();
 #elif defined(VITAL_NO_DEBUG)
-	//NoDebugMode();
+	NoDebugMode();
 #endif
 
 	// -- Inserted by Silver ---21.04.2003
@@ -4024,7 +3994,7 @@ int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	FILE* fp = fopen( "c:\\dumps\\file_you_do_not_have_on_your_computer.txt", "rt" );
 	if (fp)
 	{
-		//SetDebugMode();
+		SetDebugMode();
 	}
 	// -- end of change -- 21.04.2003
 
@@ -4065,7 +4035,7 @@ int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     if( !doInit( hInstance, nCmdShow ) )
     {
         return FALSE;
-    }
+    };
 
 #ifdef _USE3D
 	extern IRenderSystem* IRS;
@@ -4104,87 +4074,84 @@ int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 #endif //_USE3D
 	//if(PlayMode)PlayRandomTrack();
 	while (TRUE)
-	{
-		while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-		{
-			if (msg.message == WM_QUIT)
-			{
-				PostQuitMessage(msg.wParam);
-				return 1;
-			}
+{
+    // CRITICAL: Process SDL events FIRST before Windows messages
+    // This ensures mouse/keyboard input is properly converted to Windows messages
+    ProcessMessagesSDL();
+    
+    // Now process Windows messages
+    while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+    {
+        if (msg.message == WM_QUIT)
+        {
+            PostQuitMessage(msg.wParam);
+            return 1;
+        }
 
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
 
-		if(bActive){
-			//int Ticki=GetRealTime();	
-			//while(GetRealTime()-Ticki<MsPerFrame);
-			//StartTest();
-            StartExplorer();
-			InVideo=0;
-			AllGame();
-			ClearScreen();
-			UnLoading();
-			CloseExplosions();
-			ShutdownMultiplayer(1);
-			//for(int i=0;i<30000000;i++)if(BLOBA[i]!=0x41)assert(false);
-			//free(BLOBA);
-			SaveAllFiles();
-            //Distinguish between last window adn fullscreen resolutions
-            int ex_window_x, ex_window_y, ex_x, ex_y;
+    if(bActive){
+        StartExplorer();
+        InVideo=0;
+        AllGame();
+        ClearScreen();
+        UnLoading();
+        CloseExplosions();
+        ShutdownMultiplayer(1);
+        SaveAllFiles();
+        
+        // Save settings...
+        int ex_window_x, ex_window_y, ex_x, ex_y;
         int FPSTimeSF;
+        
+        if (window_mode)
+        {
+            ex_window_x = exRealLx;
+            ex_window_y = exRealLy;
+            ex_x = ex_other_RealLx;
+            ex_y = ex_other_RealLy;
+        }
+        else
+        {
+            ex_x = exRealLx;
+            ex_y = exRealLy;
+            ex_window_x = ex_other_RealLx;
+            ex_window_y = ex_other_RealLy;
+        }
 
-            //Set last 'global resolution' according to current mode
-            if (window_mode)
-            {
-                ex_window_x = exRealLx;
-                ex_window_y = exRealLy;
-                ex_x = ex_other_RealLx;
-                ex_y = ex_other_RealLy;
-            }
-            else
-            {
-                ex_x = exRealLx;
-                ex_y = exRealLy;
-                ex_window_x = ex_other_RealLx;
-                ex_window_y = ex_other_RealLy;
-            }
-
-			GFILE* fff=Gopen("mode.dat","wt");
-			if(fff){
-				//Gprintf(fff, "%d %d %d %d %d %d %d %d %d %d", exRealLx, exRealLy, WarSound, OrderSound, OrderSound, MidiSound, FPSTime, ScrollSpeed, exFMode, PlayMode);
-				//Gclose(fff);
+        GFILE* fff=Gopen("mode.dat","wt");
+        if(fff){
 #ifdef SPEEDFIX
             Gprintf(fff, "%d %d %d %d %d %d %d %d %d %d %d %d %d",
-                    ex_window_x, ex_window_y, ex_x, ex_y,
-                    WarSound, OrderSound, OrderSound,
+                ex_window_x, ex_window_y, ex_x, ex_y,
+                WarSound, OrderSound, OrderSound,
                 MidiSound, 0, FPSTimeSF, ScrollSpeed, exFMode, PlayMode);
 #else
-                Gprintf(fff, "%d %d %d %d %d %d %d %d %d %d %d %d &d",
-                    ex_window_x, ex_window_y, ex_x, ex_y,
-                    WarSound, OrderSound, OrderSound,
-                    MidiSound, 0, FPSTime, ScrollSpeed, exFMode, PlayMode);
+            Gprintf(fff, "%d %d %d %d %d %d %d %d %d %d %d %d %d",
+                ex_window_x, ex_window_y, ex_x, ex_y,
+                WarSound, OrderSound, OrderSound,
+                MidiSound, 0, FPSTime, ScrollSpeed, exFMode, PlayMode);
 #endif
-                Gclose(fff);
-			};
-			//CDS->~CDirSound();
-			FilesExit();
-			StopPlayCD();
-            //SteamAPI_Shutdown();
-			if(TOTALEXIT)
-				ShellExecute(NULL,"open","http://www.goa.com/goa/z-home.asp?gotogame=8247",NULL,NULL,SW_MAXIMIZE);
+            Gclose(fff);
+        };
+        
+        FilesExit();
+        StopPlayCD();
+        if(TOTALEXIT)
+            ShellExecute(NULL,"open","http://www.goa.com/goa/z-home.asp?gotogame=8247",NULL,NULL,SW_MAXIMIZE);
 #ifdef STARFORCE
-			if(PTR_AI)GlobalFree(PTR_AI);
-			if(PTR_MISS)GlobalFree(PTR_MISS);
+        if(PTR_AI)GlobalFree(PTR_AI);
+        if(PTR_MISS)GlobalFree(PTR_MISS);
 #endif
-			ClearMessages();
-			void FreeAll();
-			FreeAll();
-		    PostMessage(hwnd, WM_CLOSE, 0, 0);
-			FinExplorer();
-		};
-	};
+        ClearMessages();
+        void FreeAll();
+        FreeAll();
+        PostMessage(hwnd, WM_CLOSE, 0, 0);
+        FinExplorer();
+        };
+    };
 	FEX_END();
     return msg.wParam;
 

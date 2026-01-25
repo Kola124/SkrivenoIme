@@ -1192,19 +1192,7 @@
     <Library Include="..\bin\CommCore.lib">
       <Filter>LIB</Filter>
     </Library>
-    <Library Include="..\bin\DipServer.lib">
-      <Filter>LIB</Filter>
-    </Library>
-    <Library Include="..\bin\IChat.lib">
-      <Filter>LIB</Filter>
-    </Library>
-    <Library Include="..\bin\IntExplorer.lib">
-      <Filter>LIB</Filter>
-    </Library>
     <Library Include="..\bin\gMotor.lib">
-      <Filter>LIB</Filter>
-    </Library>
-    <Library Include="..\bin\LF_Server.lib">
       <Filter>LIB</Filter>
     </Library>
     <Library Include="..\lib\steam_api.lib">
@@ -1214,6 +1202,21 @@
       <Filter>LIB</Filter>
     </Library>
     <Library Include="..\lib\d3d8.lib">
+      <Filter>LIB</Filter>
+    </Library>
+    <Library Include="include\SDL2.lib">
+      <Filter>LIB</Filter>
+    </Library>
+    <Library Include="..\lib\IChat.lib">
+      <Filter>LIB</Filter>
+    </Library>
+    <Library Include="..\lib\DipServer.lib">
+      <Filter>LIB</Filter>
+    </Library>
+    <Library Include="..\lib\IntExplorer.lib">
+      <Filter>LIB</Filter>
+    </Library>
+    <Library Include="..\lib\LF_Server.lib">
       <Filter>LIB</Filter>
     </Library>
   </ItemGroup>
@@ -1230,6 +1233,7 @@
     <None Include="Steam\steam_api.json">
       <Filter>Steam\Steam Header</Filter>
     </None>
+    <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Script1.rc">

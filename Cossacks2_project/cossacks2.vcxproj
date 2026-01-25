@@ -187,12 +187,12 @@
       <ObjectFileName>.\../_release/</ObjectFileName>
       <ProgramDataBaseFileName>.\../_release/</ProgramDataBaseFileName>
       <BrowseInformation>false</BrowseInformation>
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <LanguageStandard>Default</LanguageStandard>
+      <LanguageStandard>stdcpp14</LanguageStandard>
       <LanguageStandard_C>Default</LanguageStandard_C>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;COPYSCR;SPEEDFIX;VIEW_TOP;HASH_TOP;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;CRASHTESTFIX;AIFIX;VIEW_TOP;HASH_TOP;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <ShowIncludes>false</ShowIncludes>
@@ -206,8 +206,8 @@
       <ResourceOutputFileName>$(IntDir)%Script1.res</ResourceOutputFileName>
     </ResourceCompile>
     <Link>
-      <AdditionalOptions>/FIXED:NO /MAPINFO:EXPORTS /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>msvcrt.lib;libcmtd.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;oldnames.lib;dsound.lib;dxguid.lib;dplayx.lib;strmiids.lib;ddraw.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/FIXED:NO /MAPINFO:EXPORTS %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>msvcrt.lib;libcmtd.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;oldnames.lib;dsound.lib;dxguid.lib;dplayx.lib;strmiids.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;libcmt.lib;ddraw.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\bin\dmcr.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>../lib;../../lib;../bin;../../bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -223,6 +223,7 @@
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <IgnoreSpecificDefaultLibraries>libc.lib;</IgnoreSpecificDefaultLibraries>
       <EnableUAC>false</EnableUAC>
+      <ImportLibrary>.\../lib/dmcr.lib</ImportLibrary>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -753,7 +754,7 @@
     <ClInclude Include="Icons.h" />
     <ClInclude Include="IconTool.h" />
     <ClInclude Include="InetRaiting\darray.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">true</ExcludedFromBuild>
@@ -761,23 +762,35 @@
     </ClInclude>
     <ClInclude Include="InetRaiting\gp.h" />
     <ClInclude Include="InetRaiting\hashtable.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">true</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="InetRaiting\md5.h" />
+    <ClInclude Include="InetRaiting\md5.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="InetRaiting\nonport.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">true</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="InetRaiting\stats\gbucket.h" />
-    <ClInclude Include="InetRaiting\stats\gpersist.h" />
-    <ClInclude Include="InetRaiting\stats\gstats.h" />
+    <ClInclude Include="InetRaiting\stats\gbucket.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="InetRaiting\stats\gpersist.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="InetRaiting\stats\gstats.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="IR.h" />
     <ClInclude Include="Limitations.h" />
     <ClInclude Include="Lines.h" />
@@ -992,30 +1005,41 @@
     <ClCompile Include="Http\HttpComm.cpp" />
     <ClCompile Include="IconTool.cpp" />
     <ClCompile Include="InetRaiting\darray.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="InetRaiting\hashtable.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="InetRaiting\IR_Main.cpp" />
-    <ClCompile Include="InetRaiting\md5c.c" />
+    <ClCompile Include="InetRaiting\IR_Main.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="InetRaiting\md5c.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="InetRaiting\nonport.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="InetRaiting\stats\gbucket.c" />
-    <ClCompile Include="InetRaiting\stats\gstats.c" />
+    <ClCompile Include="InetRaiting\stats\gbucket.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="InetRaiting\stats\gstats.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="InteractiveScenario.cpp" />
     <ClCompile Include="Interface.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">Disabled</Optimization>
@@ -1332,30 +1356,20 @@
   <ItemGroup>
     <Library Include="..\bin\CommCore.lib">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">false</ExcludedFromBuild>
     </Library>
-    <Library Include="..\bin\DipServer.lib">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+    <Library Include="..\bin\gMotor.lib">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">false</ExcludedFromBuild>
     </Library>
-    <Library Include="..\bin\gMotor.lib" />
-    <Library Include="..\bin\IChat.lib">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">false</ExcludedFromBuild>
-    </Library>
-    <Library Include="..\bin\IntExplorer.lib" />
-    <Library Include="..\bin\LF_Server.lib" />
     <Library Include="..\lib\d3d8.lib" />
     <Library Include="..\lib\d3dx8.lib" />
+    <Library Include="..\lib\DipServer.lib" />
+    <Library Include="..\lib\IChat.lib" />
+    <Library Include="..\lib\IntExplorer.lib" />
+    <Library Include="..\lib\LF_Server.lib" />
     <Library Include="..\lib\steam_api.lib" />
     <Library Include="Bink\binkw32.lib">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
@@ -1364,8 +1378,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">false</ExcludedFromBuild>
     </Library>
+    <Library Include="include\SDL2.lib" />
     <Library Include="InetRaiting\GP.lib">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">true</ExcludedFromBuild>
@@ -1417,6 +1432,7 @@
   <ItemGroup>
     <None Include="..\Bat\all.bat" />
     <None Include="..\lib\steam_api.dll" />
+    <None Include="cpp.hint" />
     <None Include="mode.dat" />
     <None Include="Steam\steam_api.json" />
   </ItemGroup>
