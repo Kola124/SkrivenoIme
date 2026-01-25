@@ -438,7 +438,7 @@ DLLEXPORT
 void AssignNation(byte Src,byte Dst){
 	if(Src<8&&Dst<8)AssignTBL[Src]=Dst;
 };
-DLLEXPORT 
+DLLEXPORT
 bool RegisterUnits(GAMEOBJ* GOBJ,char* Name){
 	for(int i=0;i<NAGroups;i++)if(!strcmp(AGroups[i].Name,Name)){
 		GOBJ->Type='UNIT';
@@ -468,7 +468,7 @@ bool RegisterUnits(GAMEOBJ* GOBJ,char* Name){
 	return false;
 };
 char* GetTextByID(char* ID);
-DLLEXPORT 
+DLLEXPORT
 bool RegisterString(GAMEOBJ* GOBJ,char* ID){
 	char* id=GetTextByID(ID);
 	if(!strcmp(id,ID)){
@@ -541,7 +541,7 @@ void RegisterZone(GAMEOBJ* GOBJ,char* Name){
 		SCENINF.NErrors++;
 	};
 };
-DLLEXPORT 
+DLLEXPORT
 void RegisterVisibleZone(GAMEOBJ* GOBJ,char* Name){
 	int NZON=0;
 	word ZIDS[64];
@@ -1841,7 +1841,7 @@ void SelAttackGroup(byte Nat,GAMEOBJ* Enemy){
 };
 void ComOpenGates(byte NI);
 void ComCloseGates(byte NI);
-DLLEXPORT 
+DLLEXPORT
 bool SelOpenGates(byte Nat){
 	Nat=AssignTBL[Nat];
 	if(Nat>=8){
@@ -2249,7 +2249,7 @@ void ProduceOneUnit(byte Nat,GAMEOBJ* UnitType){
 	};
 	ProduceObject(Nat,UnitType->Index);
 };
-DLLEXPORT 
+DLLEXPORT
 bool SelCloseGates(byte Nat){
 	Nat=AssignTBL[Nat];
 	if(Nat>=8){
@@ -2261,7 +2261,7 @@ bool SelCloseGates(byte Nat){
 	return true;
 };
 void SendSelectedToXY(byte NI,int xx,int yy,short Dir,byte Prio,byte Type);
-DLLEXPORT 
+DLLEXPORT
 bool SelSendTo(byte Nat,GAMEOBJ* Zone,byte Dir,byte Type){
 	Nat=AssignTBL[Nat];
 	if(Nat>=8){
@@ -2282,7 +2282,7 @@ bool SelSendTo(byte Nat,GAMEOBJ* Zone,byte Dir,byte Type){
 	SendSelectedToXY(Nat,AZ->x<<4,AZ->y<<4,Dir,16,Type);
 	return true;
 };
-DLLEXPORT 
+DLLEXPORT
 bool SelSendAndKill(byte Nat,GAMEOBJ* Zone,byte Dir,byte Type){
 	Nat=AssignTBL[Nat];
 	if(Nat>=8){
@@ -2304,7 +2304,7 @@ bool SelSendAndKill(byte Nat,GAMEOBJ* Zone,byte Dir,byte Type){
 	return true;
 };
 void PatrolGroup(byte NI,int x1,int y1,byte Dir);
-DLLEXPORT 
+DLLEXPORT
 bool Patrol(byte Nat,GAMEOBJ* Zone,byte Dir){
 	Nat=AssignTBL[Nat];
 	if(Nat>=8){
@@ -2429,7 +2429,7 @@ void AllowAttack(byte Nat,byte val){
 	else SetSearchVictim(Nat,3);
 };
 //-----------------------INFORMATION COMMANDS----------------------------//
-DLLEXPORT 
+DLLEXPORT
 void HINT(GAMEOBJ* Hint,int time){
 	if(Hint->Type!='STRI'){
 		IntErr("HINT(Hint,Time) : invalid parameter <Hint>");
@@ -2843,7 +2843,7 @@ RegUni:;
 		};
 	};
 };
-DLLEXPORT 
+DLLEXPORT
 void RunAIWithPeasants(byte Nat,char* P_Name){
 	Nat=AssignTBL[Nat];
 	if(Nat<1||Nat>7){
@@ -3207,7 +3207,7 @@ void SetStartPoint(GAMEOBJ* Zone){
 void AttackObjLink(OneObject* OBJ);
 int GetTopDistance(int xa,int ya,int xb,int yb);
 bool CheckVisibility(int x1,int y1,int x2,int y2,word MyID);
-DLLEXPORT 
+DLLEXPORT
 void AttackEnemyInZone(GAMEOBJ* Grp,GAMEOBJ* Zone,byte EnmNation){
 	int xc,yc,R;
 	if((Zone->Type&0xFF000000)==('@   '-0x202020)){
@@ -3357,7 +3357,7 @@ void AttackEnemyInZone(GAMEOBJ* Grp,GAMEOBJ* Zone,byte EnmNation){
 		};
 	};
 };
-DLLEXPORT 
+DLLEXPORT
 bool AttackEnemyPeasantsInZone(GAMEOBJ* Grp,GAMEOBJ* Zone,byte EnmNation){
 	int xc,yc,R;
 	if((Zone->Type&0xFF000000)==('@   '-0x202020)){
@@ -5565,7 +5565,7 @@ char* GetUnitID(int Type){
 		return NATIONS->Mon[Type]->MonsterID;
 	}else return NULL;
 };
-DLLEXPORT 
+DLLEXPORT
 bool GetUnitExCaps(int Index,UnitExCaps* CAPS,bool NeedOrderType){
 	if(Index>=0&&Index<MAXOBJECT){
 		OneObject* OB=Group[Index];
@@ -6801,45 +6801,67 @@ void SetDangerMap(int* Map){
 	memcpy(DMap,Map,NA<<2);
 };
 DLLEXPORT
-bool CreateFormation(byte NI,GAMEOBJ* Officers,GAMEOBJ* Drummers,GAMEOBJ* FlagBearers,GAMEOBJ* Soldiers,GAMEOBJ* DestGroup,char* FormID){
-	if(Officers->Type=='UNIT'&&Drummers->Type=='UNIT'&&FlagBearers->Type=='UNIT'&&DestGroup->Type=='UNIT'){
-		CleanGroup(Officers);
-		CleanGroup(Drummers);
-		CleanGroup(FlagBearers);
-		CleanGroup(Soldiers);
-		for(int i=0;i<NEOrders;i++){
-			OrderDescription* ODS=ElementaryOrders+i;
-			if(!strcmp(ODS->ID,FormID)){
-				EraseGroup(DestGroup);
-				if(GetNUnits(Soldiers)>=ODS->NUnits){
-					CopyUnits(Officers,DestGroup,0,1,1,1);
-					if(GetNUnits(DestGroup)==1){
-						CopyUnits(Drummers,DestGroup,0,1,1,1);
-						if(GetNUnits(DestGroup)==2){
-							CopyUnits(Soldiers,DestGroup,0,ODS->NUnits,1,1);
-							if(GetNUnits(DestGroup)==ODS->NUnits+2){
-								CopyUnits(FlagBearers,DestGroup,0,1,1,1);
-								bool HaveFlagBearer=GetNUnits(DestGroup)==ODS->NUnits+3;
-								UnitsGroup* UG=SCENINF.UGRP+DestGroup->Index;
-								int BID=CITY[NI].GetFreeBrigade();
-								if(BID!=-1){
-									Brigade* BR=CITY[NI].Brigs+BID;
-									BR->Enabled=1;
-									return BR->CreateFromGroup(UG,i);
-								};
-							}else{
-								CopyUnits(DestGroup,Soldiers,2,ODS->NUnits,1,1);
-							};
-						}else{
-							CopyUnits(DestGroup,Officers,0,1,1,1);
-						};
-					};
-				};
-				return false;
-			};
-		};
-	};
-	return false;
+bool CreateFormation(byte NI,
+    GAMEOBJ* Officers,
+    GAMEOBJ* Drummers,
+    GAMEOBJ* FlagBearers,
+    GAMEOBJ* Soldiers,
+    GAMEOBJ* DestGroup,
+    char* FormID)
+{
+    if (Officers && Soldiers && DestGroup &&
+        Officers->Type == 'UNIT' &&
+        DestGroup->Type == 'UNIT')
+    {
+        CleanGroup(Officers);
+        CleanGroup(Soldiers);
+        if (Drummers && Drummers->Type == 'UNIT') CleanGroup(Drummers);
+        if (FlagBearers && FlagBearers->Type == 'UNIT') CleanGroup(FlagBearers);
+
+        for (int i = 0; i < NEOrders; i++) {
+            OrderDescription* ODS = ElementaryOrders + i;
+            if (!strcmp(ODS->ID, FormID)) {
+                EraseGroup(DestGroup);
+
+                if (GetNUnits(Soldiers) >= ODS->NUnits) {
+                    // Officer always required
+                    CopyUnits(Officers, DestGroup, 0, 1, 1, 1);
+
+                    if (GetNUnits(DestGroup) == 1) {
+                        // Optional drummer
+                        if (Drummers && Drummers->Type == 'UNIT') {
+                            CopyUnits(Drummers, DestGroup, 0, 1, 1, 1);
+                        }
+
+                        // Core soldiers
+                        CopyUnits(Soldiers, DestGroup, 0, ODS->NUnits, 1, 1);
+
+                        // Optional flagbearer
+                        if (FlagBearers && FlagBearers->Type == 'UNIT') {
+                            CopyUnits(FlagBearers, DestGroup, 0, 1, 1, 1);
+                        }
+
+                        // Validate final group size
+                        int expected = 1 + ODS->NUnits;
+                        if (Drummers && Drummers->Type == 'UNIT') expected++;
+                        if (FlagBearers && FlagBearers->Type == 'UNIT') expected++;
+
+                        if (GetNUnits(DestGroup) == expected) {
+                            UnitsGroup* UG = SCENINF.UGRP + DestGroup->Index;
+                            int BID = CITY[NI].GetFreeBrigade();
+                            if (BID != -1) {
+                                Brigade* BR = CITY[NI].Brigs + BID;
+                                BR->Enabled = 1;
+                                return BR->CreateFromGroup(UG, i);
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+        }
+    }
+    return false;
 };
 DLLEXPORT
 int CreateListOfResourceSprites(byte ResID,int* Xi,int* Yi,int NMax){
