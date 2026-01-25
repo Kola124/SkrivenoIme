@@ -2435,7 +2435,8 @@ RoomInfo GlobalRIF;
 int GetGSC_Profile(){
 	return GlobalRIF.Profile;
 };
-
+CIMPORT
+int Process_GSC_ChatWindow(bool Active,RoomInfo* RIF);
 int ProcessInternetConnection(bool Active){
     return Process_GSC_ChatWindow(Active, &GlobalRIF);
     if(UseGSC_Login){
@@ -10459,7 +10460,7 @@ void SetupDIP_DSS(){
 	DIP_DSS.BaseY=y0+31;
 	//DIP_DSS.addBorder(0,-31,InfDX-10,RealLy-380,0,1);
 	DIP_DSS.addTextButton(NULL,10,-29,GetTextByID("DIP_HDR"),&YellowFont,&YellowFont,&YellowFont,0);
-	RunExplorer(1,CUR_Request,DIP_DSS.BaseX-2,DIP_DSS.BaseY-2,DIP_DSS.BaseX+InfDX-10+3,RealLy-298);
+	RunExplorer(1,CUR_Request,DIP_DSS.BaseX-2,DIP_DSS.BaseY-2,DIP_DSS.BaseX+InfDX-10,RealLy-298);
 };
 void ExplorerResize(int Index,int x,int y,int x1,int y1);
 extern int InformMode;

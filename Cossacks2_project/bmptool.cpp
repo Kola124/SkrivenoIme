@@ -8,7 +8,7 @@
 #define CEXPORT __declspec(dllexport)
 CEXPORT void* _ExMalloc(int Size);
 #define znew(t,s) (t*)_ExMalloc((s)*sizeof(t))
-CEXPORT
+
 void SaveToBMP24(char* Name,int Lx,int Ly,byte* data){
 	ResFile f1=RRewrite(Name);
 	BMPformat BM;
@@ -36,7 +36,7 @@ void SaveToBMP24(char* Name,int Lx,int Ly,byte* data){
 	};
 	RClose(f1);
 };
-CEXPORT
+
 bool ReadBMP24(char* Name,BMPformat* BM,byte** data){
 	ResFile f1=RReset(Name);
 	if(f1!=INVALID_HANDLE_VALUE){
@@ -55,7 +55,7 @@ bool ReadBMP24(char* Name,BMPformat* BM,byte** data){
 		return true;
     }else return false;
 };
-CEXPORT
+
 bool ReadBMP8(char* Name,BMPformat* BM,byte** data){
 	ResFile f1=RReset(Name);
 	if(f1!=INVALID_HANDLE_VALUE){
@@ -74,7 +74,7 @@ bool ReadBMP8(char* Name,BMPformat* BM,byte** data){
 		return true;
     }else return false;
 };
-CEXPORT
+
 bool ReadBMP8TOBPX(char* Name,byte** data){
 	BMPformat BM;
 	ResFile f1=RReset(Name);
@@ -96,7 +96,7 @@ bool ReadBMP8TOBPX(char* Name,byte** data){
 		return true;
     }else return false;
 };
-CEXPORT
+
 bool LoadBitmapLikeGrayscale(char* Name,int* Lx,int* Ly,byte** res){
 	byte* data;
 	BMPformat BM;
@@ -119,7 +119,7 @@ bool LoadBitmapLikeGrayscale(char* Name,int* Lx,int* Ly,byte** res){
 	};
 	return false;
 };
-CEXPORT
+
 int GetResVal(byte* res,int LX,int LY,int RLX,int RLY,int x,int y){
 	int vx=(x*LX)/RLX;
 	int vy=(y*LY)/RLY;
@@ -143,8 +143,8 @@ int GetResVal(byte* res,int LX,int LY,int RLX,int RLY,int x,int y){
 	int z4=res[vx1+LX*vy1];
 	return z1+((x-rx)*(z2-z1))/(rx1-rx)+((y-ry)*(z3-z1))/(ry1-ry)-(((z2+z3-z1-z4)*(x-rx)*(y-ry))/(rx1-rx)/(ry1-ry));
 };
-CEXPORT byte* DATA;
-CEXPORT
+byte* DATA;
+
 DWORD GetSumm(char* Name){
 	ResFile F=RReset(Name);
 	if(F!=INVALID_HANDLE_VALUE){

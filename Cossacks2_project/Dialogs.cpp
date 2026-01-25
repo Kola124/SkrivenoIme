@@ -37,7 +37,7 @@ int ReadKey();
 void AddKey(byte Key,byte Ascii);
 extern int CurPalette;
 
-void ErrD(LPCSTR s)
+static void ErrD(LPCSTR s)
 {
 	char pal[128];
 	sprintf(pal,"%d\\agew_1.pal",CurPalette);
@@ -88,13 +88,13 @@ void DialogsSystem::SetFonts(RLCFont* fActive,
 	Message=fMessage;
 };
 //-----------------class Picture
-bool Picture_OnMouseOver(SimpleDialog* SD){
+static bool Picture_OnMouseOver(SimpleDialog* SD){
 	Picture* Pic=(Picture*)SD;
 	if(Pic->ActivePicture!=Pic->PassivePicture)
 		SD->NeedToDraw=true;
 	return false;
 };
-bool Picture_OnDraw(SimpleDialog* SD){
+static bool Picture_OnDraw(SimpleDialog* SD){
 	if(!SD)return false;
 	if(!SD->Visible)return false;
 	Picture* pic=(Picture*)SD;
@@ -141,7 +141,7 @@ Picture* DialogsSystem::addPicture(SimpleDialog* Parent,
 	return NULL;
 };
 //-----------------class Canvas----------//
-bool CanvasDestroy(SimpleDialog* SD){
+static bool CanvasDestroy(SimpleDialog* SD){
 	Canvas* CAN=(Canvas*)SD;
 	if(CAN->DrawData){
 		free(CAN->DrawData);
@@ -152,7 +152,7 @@ bool CanvasDestroy(SimpleDialog* SD){
 #define CV_BYTE(x) CAN->DrawData[pos+x]
 CEXPORT void CBar(int x,int y,int Lx,int Ly,byte c);
 void xLine(int x,int y,int x1,int y1,byte c);
-bool CanvasDraw(SimpleDialog* SD){
+static bool CanvasDraw(SimpleDialog* SD){
 	if(!SD->Visible)return false;
 	TempWindow TW;
 	PushWindow(&TW);
@@ -319,10 +319,10 @@ Canvas* DialogsSystem::AddCanvas(int x,int y,int Lx,int Ly){
 	return 0;
 };
 //-----------------class GPPicture
-bool GPPicture_OnMouseOver(SimpleDialog* SD){
+static bool GPPicture_OnMouseOver(SimpleDialog* SD){
 	return false;
 };
-bool GPPicture_OnDraw(SimpleDialog* SD){
+static bool GPPicture_OnDraw(SimpleDialog* SD){
 	if(!SD)return false;
 	if(!SD->Visible)return false;
 	GPPicture* pic=(GPPicture*)SD;
@@ -355,7 +355,7 @@ GPPicture* DialogsSystem::addGPPicture(SimpleDialog* Parent,
 	return NULL;
 };
 //-----------------class RLCPicture
-bool RLCPicture_OnDraw(SimpleDialog* SD){
+static bool RLCPicture_OnDraw(SimpleDialog* SD){
 	if(!SD)return false;
 	if(!SD->Visible)return false;
 	RLCPicture* pic=(RLCPicture*)SD;
@@ -417,7 +417,7 @@ int GetRLen(char* s,RLCFont* font){
 	};
 	return x;
 };
-void DrawString(int x,int y,char* str,RLCFont* fnt,byte Align){
+static void DrawString(int x,int y,char* str,RLCFont* fnt,byte Align){
 	int xx;
 	if(!str)return;
 	switch(Align){
@@ -432,7 +432,7 @@ void DrawString(int x,int y,char* str,RLCFont* fnt,byte Align){
 			ShowString(xx,y,str,fnt);
 	};
 };
-bool TextButton_OnDraw(SimpleDialog* SD){
+static bool TextButton_OnDraw(SimpleDialog* SD){
 	if(!SD)return false;
 	if(!SD->Visible)return false;
 	TextButton* tb=(TextButton*)SD;
@@ -456,13 +456,13 @@ bool TextButton_OnDraw(SimpleDialog* SD){
 	};
 	return false;
 };
-bool TextButton_OnMouseOver(SimpleDialog* SD){
+static bool TextButton_OnMouseOver(SimpleDialog* SD){
 	TextButton* tb=(TextButton*)SD;
 	if(tb->PassiveFont!=tb->ActiveFont)
 		SD->NeedToDraw=true;
 	return false;
 };
-bool TextButton_Destroy(SimpleDialog* SD){
+static bool TextButton_Destroy(SimpleDialog* SD){
 	TextButton* tb=(TextButton*)SD;
 	if(tb->Message)free(tb->Message);
 	return true;
@@ -512,7 +512,7 @@ TextButton* DialogsSystem::addTextButton(SimpleDialog* Parent,
 	return NULL;
 };
 //------------end of the class TextButton
-bool GP_TextButton_OnDraw(SimpleDialog* SD){
+static bool GP_TextButton_OnDraw(SimpleDialog* SD){
 	if(!SD)return false;
 	if(!SD->Visible)return false;
 	GP_TextButton* tb=(GP_TextButton*)SD;
@@ -544,7 +544,7 @@ bool GP_TextButton_OnDraw(SimpleDialog* SD){
 	PopWindow(&TW);
 	return false;
 };
-bool GP_TextButton_Destroy(SimpleDialog* SD){
+static bool GP_TextButton_Destroy(SimpleDialog* SD){
 	GP_TextButton* tb=(GP_TextButton*)SD;
 	if(tb->Message)free(tb->Message);
 	return true;
@@ -622,7 +622,7 @@ GP_TextButton* DialogsSystem::addGP_TextButtonLimited(SimpleDialog* Parent,int x
 	};
 	return NULL;
 };
-bool GP_StdTextButton_OnDraw(SimpleDialog* SD){
+static bool GP_StdTextButton_OnDraw(SimpleDialog* SD){
 	if(!SD)return false;
 	if(!SD->Visible)return false;
 	GP_TextButton* tb=(GP_TextButton*)SD;
@@ -693,7 +693,7 @@ GP_TextButton* DialogsSystem::addStdGP_TextButton(int x,int y,int Lx,char* str,
 	};
 	return NULL;
 };
-bool UniversalButton_OnDraw(SimpleDialog* SD){
+static bool UniversalButton_OnDraw(SimpleDialog* SD){
 	if(!SD->Visible)return false;
 	UniversalButton* UB=(UniversalButton*)SD;
 	int StartIDX=0;
@@ -756,12 +756,12 @@ bool UniversalButton_OnDraw(SimpleDialog* SD){
 	};
 	return true;
 };
-bool UniversalButton_Destroy(SimpleDialog* SD){
+static bool UniversalButton_Destroy(SimpleDialog* SD){
 	UniversalButton* UB=(UniversalButton*)SD;
 	free(UB->Message);
 	return true;
 };
-bool UniversalButton_OnKlick(SimpleDialog* SD){
+static bool UniversalButton_OnKlick(SimpleDialog* SD){
 	UniversalButton* UB=(UniversalButton*)SD;
 	DialogsSystem* DSS=UB->ParentDS;
 	if(!DSS)return false;
@@ -831,7 +831,7 @@ UniversalButton* DialogsSystem::addTextureStrip(int x,int y,int Lx,int GP_File,
 	return addUniversalButton(x,y,Lx,"",GP_File,PATTERN,-1,0,Tiling,NULL,NULL,NULL);
 };
 //-------class : button with text-----------
-bool BpxTextButton_OnDraw(SimpleDialog* SD){
+static bool BpxTextButton_OnDraw(SimpleDialog* SD){
 	if(!SD)return false;
 	if(!SD->Visible)return false;
 	BpxTextButton* tb=(BpxTextButton*)SD;
@@ -858,7 +858,7 @@ bool BpxTextButton_OnDraw(SimpleDialog* SD){
 	};
 	return false;
 };
-bool BpxTextButton_OnMouseOver(SimpleDialog* SD){
+static bool BpxTextButton_OnMouseOver(SimpleDialog* SD){
 	if(SD->MouseOver)SD->NeedToDraw=true;
 	return false;
 };
@@ -902,7 +902,7 @@ BpxTextButton* DialogsSystem::addBpxTextButton(SimpleDialog* Parent,
 	return NULL;
 };
 //--------end of button with text----------//
-bool Video_OnDraw(SimpleDialog* SD){
+static bool Video_OnDraw(SimpleDialog* SD){
 	VideoButton* tb=(VideoButton*)SD;
 	if(!SD->Visible)return 0;
 	int dt=GetTickCount()-tb->LastTime;
@@ -970,7 +970,7 @@ VideoButton* DialogsSystem::addVideoButton(SimpleDialog* Parent,int x,int y,int 
 	return NULL;
 };
 //---------------GP_Button-----------------//
-bool GP_Button_OnDraw(SimpleDialog* SD){
+static bool GP_Button_OnDraw(SimpleDialog* SD){
 	GP_Button* tb=(GP_Button*)SD;
 	if(!tb->Visible)return false;
 	if(tb->MouseOver){
@@ -1007,14 +1007,14 @@ GP_Button* DialogsSystem::addGP_Button(SimpleDialog* Parent,int x,int y,int GP_F
 };
 
 //------class : Vertical scroll bar--------//
-bool MouseIns(int x,int y,int x1,int y1){
+static bool MouseIns(int x,int y,int x1,int y1){
 	if(mouseX>=x&&mouseY>=y&&mouseX<=x1&&mouseY<=y1)return true;
 	else return false;
 };
-bool MouseInsL(int x,int y,int lx,int ly){
+static bool MouseInsL(int x,int y,int lx,int ly){
 	return MouseIns(x,y,x+lx-1,y+ly-1);
 };
-bool VScrollBar_Draw(SimpleDialog* SD){
+static bool VScrollBar_Draw(SimpleDialog* SD){
 	if(!SD->Visible)return false;
 	VScrollBar* tb=(VScrollBar*)SD;
 	if(tb->GetMaxPos()>0){
@@ -1033,7 +1033,7 @@ bool VScrollBar_Draw(SimpleDialog* SD){
 	};
 	return true;
 };
-bool VScrollBar_MouseOver(SimpleDialog* SD){
+static bool VScrollBar_MouseOver(SimpleDialog* SD){
 	VScrollBar* tb=(VScrollBar*)SD;
 	int dt=GetTickCount()-tb->LastTime;
 	if(tb->SMaxPos>0){
@@ -1138,7 +1138,7 @@ VScrollBar* DialogsSystem::addVScrollBar(SimpleDialog* Parent,
 };
 //-------end of vertical Scroll bar--------//
 //------class : Horizontal scroll bar--------//
-bool HScrollBar_Draw(SimpleDialog* SD){
+static bool HScrollBar_Draw(SimpleDialog* SD){
 	if(!SD->Visible)return false;
 	VScrollBar* tb=(VScrollBar*)SD;
 	if(tb->SMaxPos>0){
@@ -1159,7 +1159,7 @@ bool HScrollBar_Draw(SimpleDialog* SD){
 	};
 	return true;
 };
-bool HScrollBar_MouseOver(SimpleDialog* SD){
+static bool HScrollBar_MouseOver(SimpleDialog* SD){
 	VScrollBar* tb=(VScrollBar*)SD;
 	int dt=GetTickCount()-tb->LastTime;
 	if(tb->SMaxPos>0){
@@ -1263,7 +1263,7 @@ VScrollBar* DialogsSystem::addHScrollBar(SimpleDialog* Parent,
 };
 //-------end of horizontal Scroll bar--------//
 //--------------GP_Scrollbar-----------------//
-bool GP_ScrollBar_OnDraw(SimpleDialog* SD){
+static bool GP_ScrollBar_OnDraw(SimpleDialog* SD){
 	VScrollBar* SB=(VScrollBar*)SD;
 	if(!(SB->Enabled&&SB->Visible&&SB->SMaxPos>0)){
 		SB->Zaxvat=false;
@@ -1352,7 +1352,7 @@ VScrollBar* DialogsSystem::addGP_ScrollBar(SimpleDialog* Parent,int x,int y,int 
 	};
 	return NULL;
 };
-bool NewGP_VScrollBar_OnDraw(SimpleDialog* SD){
+static bool NewGP_VScrollBar_OnDraw(SimpleDialog* SD){
 	VScrollBar* SB=(VScrollBar*)SD;
 	if(!(SB->Enabled&&SB->Visible&&SB->SMaxPos>0)){
 		//SB->Zaxvat=false;
@@ -1494,7 +1494,7 @@ VScrollBar* DialogsSystem::addGP_ScrollBarL(SimpleDialog* Parent,int x,int y,
 //-----------end of GP_ScrollBar-------------//
 
 //-------------class : ComplexBox------------//
-bool ComplexBox_OnMouseOver(SimpleDialog* SD){
+static bool ComplexBox_OnMouseOver(SimpleDialog* SD){
 	//if(!Lpressed)return false;
 	ComplexBox* LB=(ComplexBox*)SD;
 	SD->NeedToDraw=true;
@@ -1509,7 +1509,7 @@ bool ComplexBox_OnMouseOver(SimpleDialog* SD){
 	}else LB->M_OvrItem=-1;
 	return true;
 };
-bool ComplexBox_OnDraw(SimpleDialog* SD){
+static bool ComplexBox_OnDraw(SimpleDialog* SD){
 	if(!SD->Visible)return false; 
 	ComplexBox* LB=(ComplexBox*)SD;
 	if(!LB->MouseOver)LB->M_OvrItem=-1;
@@ -1581,7 +1581,7 @@ ComplexBox* DialogsSystem::addComplexBox(int x,int y,int Ny,int OneLy,
 };
 //-------------end of ComplexBox-------------//
 //-------------class : CustomBox------------//
-bool CustomBox_OnDraw(SimpleDialog* SD){
+static bool CustomBox_OnDraw(SimpleDialog* SD){
 	CustomBox* LB=(CustomBox*)SD;
 	if(LB->Visible)
 		LB->DRAWPROC(LB->x,LB->y,LB->x1-LB->x+1,LB->y1-LB->y+1,0,LB->MouseOver,LB->param);
@@ -1702,7 +1702,7 @@ void ListBox::SetCurrentItem(int n){
 	if(!NItems)CurItem=-1;
 	if(CurItem<FLItem)FLItem=CurItem;
 };
-bool ListBox_OnDraw(SimpleDialog* SD){
+static bool ListBox_OnDraw(SimpleDialog* SD){
 	if(!SD->Visible)return false;
 	ListBox* LB=(ListBox*)SD;
 	if(LB){
@@ -1777,7 +1777,7 @@ bool ListBox_OnDraw(SimpleDialog* SD){
 	};
 	return true;
 };
-bool ListBox_OnMouseOver(SimpleDialog* SD){
+static bool ListBox_OnMouseOver(SimpleDialog* SD){
 	if(!Lpressed)return false;
 	ListBox* LB=(ListBox*)SD;
 	SD->NeedToDraw=true;
@@ -1794,7 +1794,7 @@ bool ListBox_OnMouseOver(SimpleDialog* SD){
 	};
 	return true;
 };
-bool GPListBox_OnMouseOver(SimpleDialog* SD){
+static bool GPListBox_OnMouseOver(SimpleDialog* SD){
 	//if(!Lpressed)return false;
 	ListBox* LB=(ListBox*)SD;
 	LB->CurMouseOver=-1;
@@ -1816,7 +1816,7 @@ bool GPListBox_OnMouseOver(SimpleDialog* SD){
 	};
 	return true;
 };
-bool ListBox_Refresh(SimpleDialog* SD){
+static bool ListBox_Refresh(SimpleDialog* SD){
 	ListBox* LB=(ListBox*)SD;
 	if(LB->VS){
 		VScrollBar* VS=LB->VS;
@@ -1957,7 +1957,7 @@ ListBox* DialogsSystem::addGP_ListBox(SimpleDialog* Parent,int x,int y,int Ny,
 };
 //-------------end of List Box---------------//
 //-----------class : InputBox----------------//
-void CutStringToLength(char* str,RLCFont* Fnt,int Lx){
+static void CutStringToLength(char* str,RLCFont* Fnt,int Lx){
 	int L;
 	do{
 		L=GetRLCStrWidth(str,Fnt);
@@ -1965,7 +1965,7 @@ void CutStringToLength(char* str,RLCFont* Fnt,int Lx){
 	}while(L>Lx);
 
 };
-bool InputBox_OnDraw(SimpleDialog* SD){
+static bool InputBox_OnDraw(SimpleDialog* SD){
 	InputBox* IB=(InputBox*)SD;
 	if(!SD->Visible)return false;
 	if(SD){
@@ -1979,7 +1979,7 @@ bool InputBox_OnDraw(SimpleDialog* SD){
 		};
 		int xx=0;
 		if(IB->CursPos>strlen(IB->Str))IB->CursPos=strlen(IB->Str);
-		for(unsigned int j=0;j<IB->CursPos;j++){
+		for(int j=0;j<IB->CursPos;j++){
 			xx+=GetRLCWidth(IB->Font->RLC,base[j]);
 		};
 		if(xx<IB->totdx){
@@ -2011,7 +2011,7 @@ bool InputBox_OnDraw(SimpleDialog* SD){
 	};
 	return true;
 };
-bool InputBox_OnClick(SimpleDialog* SD){
+static bool InputBox_OnClick(SimpleDialog* SD){
 	if(!SD->Active)SD->NeedToDraw=true;
 	SD->Active=true;
 	int j;
@@ -2035,7 +2035,7 @@ bool InputBox_OnClick(SimpleDialog* SD){
 	return true;
 };
 extern int NKeys;
-bool InputBox_OnKeyDown(SimpleDialog* SD){
+static bool InputBox_OnKeyDown(SimpleDialog* SD){
 	SD->NeedToDraw=true;
 	InputBox* IB=(InputBox*)SD;
 	if(LastKey==VK_LEFT){
@@ -2077,7 +2077,7 @@ bool InputBox_OnKeyDown(SimpleDialog* SD){
 	}else{
 		if(LastAsciiKey&&LastAsciiKey>=32){
 			LastKey=LastAsciiKey;
-			char xx[2];
+            char xx[2] = { 0 };
 			xx[1]=0;
 			xx[0]=char(LastKey);
 				if(strlen(IB->Str)+1<DWORD(IB->StrMaxLen)){
@@ -2198,7 +2198,7 @@ InputBox* DialogsSystem::addInputBox(SimpleDialog* Parent,
 };
 //------end of class InputBox----------------//
 //----------class : CheckBox-----------------//
-bool CheckBox_OnDraw(SimpleDialog* SD){
+static bool CheckBox_OnDraw(SimpleDialog* SD){
 	if(!SD->Visible)return false;
 	CheckBox* CB=(CheckBox*)SD;
 	if(CB->GP_File!=-1){
@@ -2258,7 +2258,7 @@ bool CheckBox_OnDraw(SimpleDialog* SD){
 	};
 	return true;
 };
-bool CheckBox_OnClick(SimpleDialog* SD){
+static bool CheckBox_OnClick(SimpleDialog* SD){
 	SD->NeedToDraw=true;
 	CheckBox* CB=(CheckBox*)SD;
 	if(CB->GroupIndex){
@@ -2278,12 +2278,12 @@ bool CheckBox_OnClick(SimpleDialog* SD){
 	};
 	return false;
 };
-bool CheckBox_Destroy(SimpleDialog* SD){
+static bool CheckBox_Destroy(SimpleDialog* SD){
 	CheckBox* CB=(CheckBox*)SD;
 	free(CB->Message);
 	return true;
 };
-bool CheckBox_OnMouseOver(SimpleDialog* SD){
+static bool CheckBox_OnMouseOver(SimpleDialog* SD){
 	SD->NeedToDraw=true;
 	return false;
 };
@@ -2423,7 +2423,7 @@ qwr:	mov		ecx,Lx4
 	};
 #endif // _USE3D
 };
-bool ColoredBar_OnDraw(SimpleDialog* SD){
+static bool ColoredBar_OnDraw(SimpleDialog* SD){
 	if(!SD->Visible)return false;
 	ColoredBar* PIC=(ColoredBar*)SD;
 	if(PIC->Style)Xbar(SD->x,SD->y,SD->x1-SD->x+1,SD->y1-SD->y+1,PIC->color);
@@ -2448,7 +2448,7 @@ ColoredBar* DialogsSystem::addColoredBar(int x,int y,int Lx,int Ly,byte c){
 	};
 	return NULL;
 };
-bool ColoredBar_OnDraw2(SimpleDialog* SD){
+static bool ColoredBar_OnDraw2(SimpleDialog* SD){
 	if(!(SD->Visible&&SD->MouseOver))return false;
 	ColoredBar* PIC=(ColoredBar*)SD;
 	Xbar(SD->x,SD->y,SD->x1-SD->x+1,SD->y1-SD->y+1,PIC->color);
@@ -2473,7 +2473,7 @@ ColoredBar* DialogsSystem::addViewPort2(int x,int y,int Lx,int Ly,byte c){
 	return NULL;
 };
 //---------------Text Viewer-----------------//
-//---------Service functions---------
+//---------Service functions---------//
 void TextViewer::AssignScroll(VScrollBar* SB){
 	VS=SB;
 	SB->SMaxPos=-1;
@@ -2617,7 +2617,7 @@ void TextViewer::CreateLinesList(){
 		LINF.Offset=LINF.NextOffset;
 	}while(LINF.NextOffset<TextSize);
 };
-bool TextViewer_OnDestroy(SimpleDialog* SD){
+static bool TextViewer_OnDestroy(SimpleDialog* SD){
 	TextViewer* TV=(TextViewer*)SD;
 	if(TV->TextPtr){
 		free(TV->TextPtr);
@@ -2630,7 +2630,7 @@ bool TextViewer_OnDestroy(SimpleDialog* SD){
 	};
 	return true;
 };
-bool TextViewer_OnDraw(SimpleDialog* SD){
+static bool TextViewer_OnDraw(SimpleDialog* SD){
 	if(!SD->Visible)return false;
 	TextViewer* TV=(TextViewer*)SD;
 	char c;
@@ -2698,7 +2698,7 @@ bool TextViewer_OnDraw(SimpleDialog* SD){
 	};
 	return true;
 };
-bool TextView_OnKeyDown(SimpleDialog* SD){
+static bool TextView_OnKeyDown(SimpleDialog* SD){
 	TextViewer* TV=(TextViewer*)SD;
 	if(!TV->TextPtr)return false;
 	if(KeyPressed){
@@ -2728,7 +2728,7 @@ bool TextView_OnKeyDown(SimpleDialog* SD){
 	};
 	return false;
 };
-bool TextView_OnClick(SimpleDialog* SD){
+static bool TextView_OnClick(SimpleDialog* SD){
 	if(!SD->Active)SD->NeedToDraw=true;
 	SD->Active=true;
 	return true;
@@ -2798,7 +2798,7 @@ TextViewer* DialogsSystem::addTextViewer(SimpleDialog* Parent,int x,int y,int Lx
 	return NULL;
 }; 
 CEXPORT char LASTCLICKCHATNAME[128]="";
-bool ChatViewer_OnDraw(SimpleDialog* SD){
+static bool ChatViewer_OnDraw(SimpleDialog* SD){
 	if(!SD->Visible)return false;
 	if(!SD->Visible)return false;
 	ChatViewer* CV=(ChatViewer*)SD;
@@ -2874,7 +2874,7 @@ ChatViewer* DialogsSystem::addChatViewer(SimpleDialog* Parent,int x,int y,int Ny
 //-----------------Bit Pictures Viewer-------------
 extern byte InvBrFog[8192];
 void CopyTo16(int x,int y,byte* Src,int Pitch,int Lx,int Ly);
-bool BPXView_OnDraw(SimpleDialog* SD){
+static bool BPXView_OnDraw(SimpleDialog* SD){
 	if(!SD->Visible)return false;
 	BPXView* BV=(BPXView*)SD;
 	if(BV->VSC){
@@ -3005,7 +3005,7 @@ ppp:		mov		ecx,Lx
 		};
 	return true;
 };
-bool BPXView_OnKeyDown(SimpleDialog* SD){
+static bool BPXView_OnKeyDown(SimpleDialog* SD){
 	/*
 	BPXView* BV=(BPXView*)SD;
 	switch(LastKey){
@@ -3028,7 +3028,7 @@ bool BPXView_OnKeyDown(SimpleDialog* SD){
 	*/
 	return false;
 };
-bool BPXView_OnMouseOver(SimpleDialog* SD){
+static bool BPXView_OnMouseOver(SimpleDialog* SD){
 	BPXView* BV=(BPXView*)SD;
 	if(!BV->EnableSelection)return false;
 	if(Lpressed||Rpressed){
@@ -3055,7 +3055,7 @@ bool BPXView_OnMouseOver(SimpleDialog* SD){
 	};
 	return false;
 };
-bool BPXView_OnDestroy(SimpleDialog* SD){
+static bool BPXView_OnDestroy(SimpleDialog* SD){
 	BPXView* BV=(BPXView*)SD;
 	free(BV->Choosed);
 	return true;
@@ -3103,7 +3103,7 @@ BPXView* DialogsSystem::addBPXView(SimpleDialog* Parent,int x,int y,int OneLx,in
 };
 //---------------end of BPXView--------------//
 //-----------------RLCListBox----------------//
-bool RLCListBox_OnDraw(SimpleDialog* SD){
+static bool RLCListBox_OnDraw(SimpleDialog* SD){
 	if(!SD->Visible)return false;
 	RLCListBox* RB=(RLCListBox*)SD;
 #ifndef _USE3D
@@ -3136,11 +3136,11 @@ bool RLCListBox_OnDraw(SimpleDialog* SD){
 	SetRLCWindow(WX,WY,WLX,WLY,ScrWidth);
 	return true;
 };
-bool RLCListBox_OnKeyDown(SimpleDialog* SD){
+static bool RLCListBox_OnKeyDown(SimpleDialog* SD){
 	RLCListBox* RB=(RLCListBox*)SD;
 	return false;
 };
-bool RLCListBox_OnMouseOver(SimpleDialog* SD){
+static bool RLCListBox_OnMouseOver(SimpleDialog* SD){
 	RLCListBox* RB=(RLCListBox*)SD;
 	if(!RB->NItems)return false;
 	if(Lpressed){
@@ -3169,7 +3169,7 @@ bool RLCListBox_OnMouseOver(SimpleDialog* SD){
 	};
 	return true;
 };
-bool RLCListBox_OnDestroy(SimpleDialog* SD){
+static bool RLCListBox_OnDestroy(SimpleDialog* SD){
 	RLCListBox* RB=(RLCListBox*)SD;
 	if(RB->Choosed)free(RB->Choosed);
 	return true;
@@ -3216,7 +3216,7 @@ RLCListBox* DialogsSystem::addRLCListBox(SimpleDialog* Parent,
 };
 //--------------end of RLCListBox------------//
 //-------------------ComboBox----------------//
-bool ComboBox_OnDraw(SimpleDialog* SD){
+static bool ComboBox_OnDraw(SimpleDialog* SD){
 	if(!SD->Visible)return false;
 	ComboBox* CB=(ComboBox*)SD;
 	if(!CB->NLines)return false;
@@ -3256,10 +3256,10 @@ bool ComboBox_OnDraw(SimpleDialog* SD){
 	return true;
 };
 extern short randoma[8192];
-#define PTPERDEAL 2
-#define STARTOTS 12
-#define RULCOLOR 71
-bool ComboBox_OnDrawActiveRuler(SimpleDialog* SD){
+constexpr int PTPERDEAL = 2;
+constexpr int STARTOTS = 12;
+constexpr int RULCOLOR = 71;
+static bool ComboBox_OnDrawActiveRuler(SimpleDialog* SD){
 	ComboBox* CB=(ComboBox*)SD;
 	if(!CB->NLines)return false;
 	if(CB->CurLine>=CB->NLines)CB->CurLine=0;
@@ -3355,7 +3355,7 @@ bool ComboBox_OnDrawActiveRuler(SimpleDialog* SD){
 	};
 	return true;
 };
-bool ComboBox_MouseOverActiveRuler(SimpleDialog* SD,int x,int y,int ID){
+static bool ComboBox_MouseOverActiveRuler(SimpleDialog* SD,int x,int y,int ID){
 	if(!SD->Enabled)return false;
 	ComboBox* CB=(ComboBox*)SD;
 	if(CB->CurLine>=CB->NLines)CB->CurLine=0;
@@ -3408,7 +3408,7 @@ bool ComboBox_MouseOverActiveRuler(SimpleDialog* SD,int x,int y,int ID){
 	};
 	return true;
 };
-bool ComboBox_OnDrawActive(SimpleDialog* SD){
+static bool ComboBox_OnDrawActive(SimpleDialog* SD){
 	ComboBox* CB=(ComboBox*)SD;
 	if(CB->rulermode)return ComboBox_OnDrawActiveRuler(SD);
 	if(!CB->NLines)return false;
@@ -3494,7 +3494,7 @@ bool ComboBox_OnDrawActive(SimpleDialog* SD){
 	};
 	return true;
 };
-bool ComboBox_OnMouseOver(SimpleDialog* SD){
+static bool ComboBox_OnMouseOver(SimpleDialog* SD){
 	if(!(SD->Enabled&&SD->Visible))return false;
 	ComboBox* CB=(ComboBox*)SD;
 	if(CB->CurLine>=CB->NLines)CB->CurLine=0;
@@ -3529,7 +3529,7 @@ bool ComboBox_OnMouseOver(SimpleDialog* SD){
 	return true;
 };
 
-bool ComboBox_MouseOverActiveZone(SimpleDialog* SD,int x,int y,int ID){
+static bool ComboBox_MouseOverActiveZone(SimpleDialog* SD,int x,int y,int ID){
 	if(!SD->Enabled)return false;
 	ComboBox* CB=(ComboBox*)SD;
 	if(CB->CurLine>=CB->NLines)CB->CurLine=0;
@@ -3573,7 +3573,7 @@ bool ComboBox_MouseOverActiveZone(SimpleDialog* SD,int x,int y,int ID){
 	};
 	return true;
 };
-bool ComboBox_OnDestroy(SimpleDialog* SD){
+static bool ComboBox_OnDestroy(SimpleDialog* SD){
 	ComboBox* CB=(ComboBox*)SD;
 	CB->Clear();
 	return true;
@@ -3791,7 +3791,7 @@ void ComboBox::AddComplexLine(char* Text){
 };
 //---------------end of ComboBox-------------//
 //-----------------WinComboBox---------------//
-bool WinComboBox_OnDraw(SimpleDialog* SD) {
+static bool WinComboBox_OnDraw(SimpleDialog* SD) {
     WinComboBox* CB = (WinComboBox*)SD;
     if (!CB->Visible)return false;
     if (!CB->NLines)return false;
@@ -3868,7 +3868,7 @@ bool WinComboBox_OnDraw(SimpleDialog* SD) {
     };
     return false;
 };
-bool WinComboBox_OnDestroy(SimpleDialog* SD){
+static bool WinComboBox_OnDestroy(SimpleDialog* SD){
 	WinComboBox* CB=(WinComboBox*)SD;
 	CB->Clear();
 	return true;
@@ -3936,7 +3936,7 @@ void WinComboBox::Clear(){
 };
 //--------------end of WinComboBox-----------//
 //-----------------PageControl---------------//
-bool GP_PageControl_OnDraw(SimpleDialog* SD){
+static bool GP_PageControl_OnDraw(SimpleDialog* SD){
 	GP_PageControl* PC=(GP_PageControl*)SD;
 	if(PC->MouseOver&&Lpressed){
 		for(int i=0;i<PC->NPages;i++){
@@ -3985,7 +3985,7 @@ void GP_PageControl::AddPage(int x0,int y0,int x1,int y1,int Index){
 extern int BordGP2;
 void DrawHdrTable(int x0,int y0,int x1,int y1);
 void DrawScrollDoubleTableF(int x0,int y0,int x1,int y1,int ym);
-bool BorderEx_OnDraw(SimpleDialog* SD){
+static bool BorderEx_OnDraw(SimpleDialog* SD){
 	BorderEx* BR=(BorderEx*)SD;
 	switch(BR->Style){
 	case 0://simple
@@ -4028,7 +4028,7 @@ BorderEx* DialogsSystem::addBorder(int x,int y,int x1,int y1,int Ymid,byte Style
 		return BR;
 	}else return NULL;
 };
-bool CustomBorder_OnDraw(SimpleDialog* SD){
+static bool CustomBorder_OnDraw(SimpleDialog* SD){
 	if(!SD->Visible)return false;
 	CustomBorder* BR=(CustomBorder*)SD;
 	Corners CR;
@@ -4132,6 +4132,10 @@ void SimpleDialog::AssignSound(char* Name,int Usage){
 	AssignSound(ID,Usage);
 };
 //----copy rectangle to screen----//
+extern int menu_x_off;
+extern int menu_y_off;
+
+
 void CopyToScreen(int zx,int zy,int zLx,int zLy){
 #ifdef _USE3D
 	return;
@@ -4551,7 +4555,7 @@ SQPicture::SQPicture(char* Name) : GPBitmap( Name )
 //--------------Handling dialog system----------------//
 void MFix();
 void RedrawGameBackground();
-void DrawSD(SimpleDialog* SD){
+static void DrawSD(SimpleDialog* SD){
 	int DY=0;
 	try{
 		if(SD->ParentSB&&SD->ParentSB->Visible)DY=SD->ParentSB->SPos;
@@ -4565,6 +4569,7 @@ void DrawSD(SimpleDialog* SD){
 void UnPress();
 
 extern int menu_x_off;
+extern int menu_y_off;
 
 void DialogsSystem::ProcessDialogs(){
 	if(!bActive)return;
@@ -4589,6 +4594,7 @@ void DialogsSystem::ProcessDialogs(){
 	};
 	if(ActiveParent)ActiveParent->NeedToDraw=true;
 	SimpleDialog* SD_Hinted=NULL;
+    int i;
 	for(int i=0;i<MAXDLG;i++){
 		SimpleDialog* SD=DSS[i];
 		if(SD&&SD->Enabled){
@@ -4679,7 +4685,7 @@ void DialogsSystem::ProcessDialogs(){
 	};
 	*/
 	Hint=NULL;
-	for(int i=0;i<MAXDLG;i++){
+	for(i=0;i<MAXDLG;i++){
 		SimpleDialog* SD=DSS[i];
 		if(SD){
 			if(SD->OnDrawActive){
@@ -4851,6 +4857,7 @@ extern int ItemChoose;
 extern int MouseNext[256];
 int PrevCHhange=0;
 extern bool test16;
+
 void DialogsSystem::RefreshView(){
     if (!InMainMenuLoop)
     {
@@ -4884,6 +4891,7 @@ void DialogsSystem::RefreshView(){
         RedrawOffScreenMouse();
         CopyToScreen(0, 0, RealLx, RSCRSizeY);
         PostRedrawMouse();
+        FlipPages();
     }
 };
 void DialogsSystem::CloseDialogs(){
@@ -4919,7 +4927,7 @@ DialogsSystem::~DialogsSystem(){
 byte* TransPtr=NULL;
 int TransLx=0;
 int TransLy=0;
-void MakeTranspSnapshot(){
+static void MakeTranspSnapshot(){
     if (RealLx != TransLx || RealLy != TransLy)
     {
         TransPtr = (byte*)realloc(TransPtr, RealLx * RealLy);
@@ -4931,13 +4939,13 @@ void MakeTranspSnapshot(){
         memcpy(TransPtr + i * RealLx, (byte*)ScreenPtr + i * ScrWidth, RealLx);
     };
 };
-void FreeTransBuffer(){
+static void FreeTransBuffer(){
 	if(TransPtr)free(TransPtr);
 	TransPtr=NULL;
 	TransLx=0;
 	TransLy=0;
 };
-void EncodeLine(byte* src,byte* dst,byte* scr,byte* tbl,byte* oddtbl){
+static void EncodeLine(byte* src,byte* dst,byte* scr,byte* tbl,byte* oddtbl){
 	int N=TransLx>>1;
 	__asm{
 		push esi
@@ -4971,7 +4979,7 @@ LPP1:
 		pop  esi
 	};
 };
-void EncodeLine1(byte* src,byte* dst,byte* scr,byte* tbl){
+static void EncodeLine1(byte* src,byte* dst,byte* scr,byte* tbl){
 	int N=TransLx>>1;
 	__asm{
 		push esi
@@ -5003,7 +5011,7 @@ LPP1:
 		pop  esi
 	};
 };
-void EncodeLine2(byte* src,byte* dst,byte* scr,byte* tbl){
+static void EncodeLine2(byte* src,byte* dst,byte* scr,byte* tbl){
 	int N=TransLx>>1;
 	__asm{
 		push esi
@@ -5037,7 +5045,7 @@ LPP1:
 };
 extern byte trans4[65536];
 extern byte trans8[65536];
-void PerformTransMix(int degree){
+static void PerformTransMix(int degree){
 #ifndef _USE3D
 	int N=TransLy>>1;
 	switch(degree){

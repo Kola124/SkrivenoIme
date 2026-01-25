@@ -36,7 +36,7 @@ extern int LightDX;
 extern int LightDY;
 extern int LightDZ;
 extern word NNewMon;
-extern NewMonster NewMon[350];
+extern NewMonster NewMon[750];
 extern word NucList[128];
 extern word NucSN[128];
 extern bool NDone[128];

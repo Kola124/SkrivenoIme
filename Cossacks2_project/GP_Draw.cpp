@@ -33,7 +33,7 @@ void __stdcall CDGINIT_INIT3(){
 extern int COUNTER;
 typedef short* lpShort;
 typedef DWORD* lpDWORD ;
-//#define znew(t,s) (t*)malloc((s)*sizeof(t))
+#define znew(t,s) (t*)malloc((s)*sizeof(t))
 #define GPX(x,y) ((GP_Header*)(int(x)+x##->##y))
 int startTrans=0;
 byte NatPal[64]={0xD0,0xD1,0xD2,0xD3,0xD4,0xD5,0xD6,0xD7,0xD8,0xD9,0xDA,0xDB,0xDC,0xDD,0xDE,0xDF,
@@ -405,10 +405,10 @@ int GP_System::PreLoadGPImage(char* Name){
 	if(fidx==NGP)NGP++;
 #ifndef _USE3D
 	//char cc3[256];
-	/*if (!strstr(Name, "\\")) {
+	if (!strstr(Name, "\\")) {
 		sprintf(cc3,"L_Mode\\%s",Name);
 		GP_L_IDXS[fidx]=PreLoadGPImage(cc3);
-	};*/
+	};
 #endif //_USE3D
 	return fidx;
 };
@@ -9874,80 +9874,90 @@ int UNI_HINTDLY1=0;
 int UNI_HINTDY2=0;
 int UNI_HINTDLY2=0;
 
-void UNIFONTS::LoadFonts(){
-	GFILE* F=Gopen("Unicode.dat","r");
-	if(!F)return;
-	int N;
-	int z=Gscanf(F,"%d",&N);
-    //THIS IS PROBABLY ROOT CAUSE OF ISSUES FOR FONTS NOT LOADING CORRECTLY SOMETHING HAS TO BE CHANGED
-    int i;
-	if(z==1){
-		for(i=0;i<N;i++){
-			char ccc[128];
-			int z=Gscanf(F,"%s",ccc);
-			GPS.PreLoadGPImage(ccc);
-		};
-	};
-	z=Gscanf(F,"%d",&N);
-	if(z==1){
-		NFonts=0;
-		UFONTS=new OneUniFont[N];
-		for(i=0;i<N;i++){
-			int q;
-			z=Gscanf(F,"%s%d",UFONTS[i].FontName,&q);
-			if(z!=2)FONERR();
-			if(q>4)FONERR();
-			UFONTS[i].UTBL.NTables=q;
-			for(int p=0;p<q;p++){
-				char FNM[64];
-				int uc=0;
-				int z=Gscanf(F,"%d%d%d%d%d%d%s",&UFONTS[i].UTBL.USET[p].DX,
-										&UFONTS[i].UTBL.USET[p].DY,
-										&UFONTS[i].UTBL.USET[p].Start,
-										&UFONTS[i].UTBL.USET[p].NSymbols,
-										&UFONTS[i].UTBL.USET[p].GP_Start,&uc,
-										FNM);
-				UFONTS[i].UTBL.USET[p].UseColor=uc;
-				if(z!=7)FONERR();
-				UFONTS[i].UTBL.USET[p].GPID=GPS.PreLoadGPImage(FNM);
-			};
-		};
-		NFonts=N;
-		z=Gscanf(F,"%d",&N);
-		int v;
-		char ccc[64];
-		for(i=0;i<N;i++){
-			z=Gscanf(F,"%s%d",ccc,&v);
-			if(z==2){
-				if(!strcmp(ccc,"UNI_LINEDLY1")){
-					UNI_LINEDLY1=v;
-				}else
-				if(!strcmp(ccc,"UNI_LINEDLY2")){
-					UNI_LINEDLY2=v;
-				}else
-				if(!strcmp(ccc,"UNI_LINEDY1")){
-					UNI_LINEDY1=v;
-				}else
-				if(!strcmp(ccc,"UNI_LINEDY2")){
-					UNI_LINEDY2=v;
-				}else
-				if(!strcmp(ccc,"UNI_HINTDY1")){
-					UNI_HINTDY1=v;
-				}else
-				if(!strcmp(ccc,"UNI_HINTDLY1")){
-					UNI_HINTDLY1=v;
-				}else
-				if(!strcmp(ccc,"UNI_HINTDY2")){
-					UNI_HINTDY2=v;
-				}else
-				if(!strcmp(ccc,"UNI_HINTDLY2")){
-					UNI_HINTDLY2=v;
-				};
-			};
-		};
-	};
-	Gclose(F);
-};
+void UNIFONTS::LoadFonts() {
+    GFILE* F = Gopen("Unicode.dat", "r");
+    if (!F) return;
+
+    int N;
+    int z = Gscanf(F, "%d", &N);
+
+    if (z == 1) {
+        for (int i = 0; i < N; i++) {
+            char ccc[128] = { 0 };  // Initialize to zero
+            z = Gscanf(F, "%s", ccc);
+            ccc[127] = 0;  // Ensure termination
+            GPS.PreLoadGPImage(ccc);
+        }
+    }
+
+    z = Gscanf(F, "%d", &N);
+    if (z == 1) {
+        NFonts = 0;
+        UFONTS = new OneUniFont[N];
+        for (int i = 0; i < N; i++) {
+            int q;
+            UFONTS[i].FontName[0] = 0;  // Initialize first char to null
+            z = Gscanf(F, "%s%d", UFONTS[i].FontName, &q);
+            UFONTS[i].FontName[47] = 0;  // Ensure termination
+            if (z != 2) FONERR();
+            if (q > 4) FONERR();
+
+            UFONTS[i].UTBL.NTables = q;
+            for (int p = 0; p < q; p++) {
+                char FNM[64] = { 0 };  // Initialize to zero
+                int uc = 0;
+                z = Gscanf(F, "%d%d%d%d%d%d%s",
+                    &UFONTS[i].UTBL.USET[p].DX,
+                    &UFONTS[i].UTBL.USET[p].DY,
+                    &UFONTS[i].UTBL.USET[p].Start,
+                    &UFONTS[i].UTBL.USET[p].NSymbols,
+                    &UFONTS[i].UTBL.USET[p].GP_Start,
+                    &uc,
+                    FNM);
+                FNM[63] = 0;  // Ensure termination
+                UFONTS[i].UTBL.USET[p].UseColor = uc;
+                if (z != 7) FONERR();
+                UFONTS[i].UTBL.USET[p].GPID = GPS.PreLoadGPImage(FNM);
+            }
+        }
+        NFonts = N;
+
+        z = Gscanf(F, "%d", &N);
+        int v;
+        char ccc[64] = { 0 };  // Initialize to zero
+        for (int i = 0; i < N; i++) {
+            z = Gscanf(F, "%s%d", ccc, &v);
+            ccc[63] = 0;  // Ensure termination
+            if (z == 2) {
+                if (!strcmp(ccc, "UNI_LINEDLY1")) {
+                    UNI_LINEDLY1 = v;
+                }
+                else if (!strcmp(ccc, "UNI_LINEDLY2")) {
+                    UNI_LINEDLY2 = v;
+                }
+                else if (!strcmp(ccc, "UNI_LINEDY1")) {
+                    UNI_LINEDY1 = v;
+                }
+                else if (!strcmp(ccc, "UNI_LINEDY2")) {
+                    UNI_LINEDY2 = v;
+                }
+                else if (!strcmp(ccc, "UNI_HINTDY1")) {
+                    UNI_HINTDY1 = v;
+                }
+                else if (!strcmp(ccc, "UNI_HINTDLY1")) {
+                    UNI_HINTDLY1 = v;
+                }
+                else if (!strcmp(ccc, "UNI_HINTDY2")) {
+                    UNI_HINTDY2 = v;
+                }
+                else if (!strcmp(ccc, "UNI_HINTDLY2")) {
+                    UNI_HINTDLY2 = v;
+                }
+            }
+        }
+    }
+    Gclose(F);
+}
 UNICODETABLE* UNIFONTS::FindFont(char* Name){
 	for(int i=0;i<NFonts;i++)if(!_stricmp(UFONTS[i].FontName,Name))
 		return &UFONTS[i].UTBL;
