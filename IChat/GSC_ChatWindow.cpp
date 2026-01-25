@@ -6,6 +6,7 @@
 //#include "StdAfx.h"
 //#include <stdio.h>
 #include <stdarg.h>
+//#include "..\Cossacks2_project\Fonts.h"
 
 #include <cstring>
 #include <cstdlib>
@@ -98,12 +99,12 @@ void ReportIt(char* s,...){
 		fclose(F);
 	};
 };
-__declspec(dllimport) int GetSound(char* Name);
-__declspec(dllimport) void PlayEffect(int n,int pan,int vol);
+CIMPORT int GetSound(char* Name);
+CIMPORT void PlayEffect(int n,int pan,int vol);
 void PlayStart(){
 	PlayEffect(GetSound("START"),0,0);
 };
-/*bool ReadWinString(GFILE* F, char* STR, int Max) {
+bool ReadWinString(GFILE* F, char* STR, int Max) {
 	STR[0]=0;
 	int cc=0;
 	//int z1=0;
@@ -119,7 +120,7 @@ void PlayStart(){
 	STR[nn]=0;
 	return (cc!=EOF)||STR[0];
 	//DosToWin(STR);
-};*/
+};
 
 class IniFile{
 	char** Vars;
@@ -181,21 +182,21 @@ public:
 	};
 };
 
-__declspec(dllimport) void ExplorerBack(int Index);
-__declspec(dllimport) void ExplorerForw(int Index);
-__declspec(dllimport) void ExplorerRefresh(int Index);
-__declspec(dllimport) void ExplorerSetVar(int Index, char* Name, char* value);
-__declspec(dllimport) char* ExplorerGetVar(int Index, char* Name);
-__declspec(dllimport) char LobbyVersion[32];
-__declspec(dllimport) word dwVersion;
-__declspec(dllimport) void RunExplorer(int Index, char* ref, int x, int y, int x1, int y1);
-__declspec(dllimport) void ProcessExplorer(int Index);
-__declspec(dllimport) void ProcessExplorerDSS(int Index, DialogsSystem* DSS);
-__declspec(dllimport) void ExplorerOpenRef(int Index, char* ref);
-__declspec(dllimport) void ExplorerResize(int Index, int x, int y, int x1, int y1);
+CIMPORT void ExplorerBack(int Index);
+CIMPORT void ExplorerForw(int Index);
+CIMPORT void ExplorerRefresh(int Index);
+CIMPORT void ExplorerSetVar(int Index, char* Name, char* value);
+CIMPORT char* ExplorerGetVar(int Index, char* Name);
+CIMPORT char LobbyVersion[32];
+CIMPORT word dwVersion;
+CIMPORT void RunExplorer(int Index, char* ref, int x, int y, int x1, int y1);
+CIMPORT void ProcessExplorer(int Index);
+CIMPORT void ProcessExplorerDSS(int Index, DialogsSystem* DSS);
+CIMPORT void ExplorerOpenRef(int Index, char* ref);
+CIMPORT void ExplorerResize(int Index, int x, int y, int x1, int y1);
 ChatSystem CSYS;
-__declspec(dllimport) byte GetPaletteColor(int r, int g, int b);
-__declspec(dllimport) void xLine(int x,int y,int x1,int y1,byte c);
+CIMPORT byte GetPaletteColor(int r, int g, int b);
+CIMPORT void xLine(int x,int y,int x1,int y1,byte c);
 int NCHATS[3]={0,0,0};
 int MAXCHATS[3]={0,0,0};
 char** ChatMess[3]={NULL,NULL,NULL};
@@ -221,9 +222,9 @@ CIMPORT void AddPrimitiveChat(char* Nick, char* str,
 	strcpy(ChatSender[NCHATS],Nick);
 	NCHATS++;
 };*/
-CIMPORT void AddChatString(char* Nick, char* str, int MaxLx, lpRLCFont FONT,
+void AddChatString(char* Nick, char* str, int MaxLx, lpRLCFont FONT,
     char**& ChatMess, char**& ChatSender,
-    int& NCHATS, int& MAXCHATS);/*{
+    int& NCHATS, int& MAXCHATS){
 	bool FLine=1;
 	char ACCAMULATOR[256];
 	int pp=0;
@@ -261,7 +262,7 @@ CIMPORT void AddChatString(char* Nick, char* str, int MaxLx, lpRLCFont FONT,
 		};
 	};
 };
-*/
+
 struct TempWindow{
 	int WindX; 
 	int WindY;
@@ -271,7 +272,7 @@ struct TempWindow{
 	int WindY1; 
 	int ScrWidth;
 };
-CIMPORT void PushWindow(TempWindow* W);/* {
+void PushWindow(TempWindow* W) {
 	W->ScrWidth=ScrWidth;
 #ifndef _COSSACKS2
 	W->WindLx=WindLx;
@@ -285,8 +286,8 @@ CIMPORT void PushWindow(TempWindow* W);/* {
 	W->WindLx	= W->WindX1 - W->WindX + 1;
 	W->WindLy	= W->WindY1 - W->WindY + 1;
 #endif
-};*/
-CIMPORT void PopWindow(TempWindow* W);/* {
+};
+void PopWindow(TempWindow* W) {
 	ScrWidth=W->ScrWidth;
 #ifndef _COSSACKS2
 	WindLx=W->WindLx;
@@ -299,8 +300,8 @@ CIMPORT void PopWindow(TempWindow* W);/* {
 	g_SetWindParam( W->WindX, W->WindY, W->WindLx, W->WindLy );
 #endif
 	
-};*/
-CIMPORT void IntersectWindows(int x0, int y0, int x1, int y1);/* {
+};
+void IntersectWindows(int x0, int y0, int x1, int y1) {
 #ifndef _COSSACKS2
 	if(x0>WindX)WindX=x0;
 	if(y0>WindY)WindY=y0;
@@ -339,7 +340,7 @@ CIMPORT void IntersectWindows(int x0, int y0, int x1, int y1);/* {
 	WindLy=WindY1-WindY+1;
 	g_SetWindParam( WindX, WindY, WindX1, WindY1 );
 #endif // _COSSACKS2
-};*/
+};
 CIMPORT
 void ShowClanString(int x,int y,char* s,byte State,RLCFont* Fn,RLCFont* Fn1,int DY);
 CustomBorder* CUBM;
@@ -429,12 +430,12 @@ void Draw_PLIST(int x,int y,int Lx,int Ly,int Index,byte Active,int param){
 };
 CIMPORT
 void DrawStdBar2(int x0,int y0,int x1,int y1,int GP);
-CIMPORT void DRAWBOX(int x, int y, int Lx, int Ly, int Idx, byte Active, int param);/* {
+void DRAWBOX(int x, int y, int Lx, int Ly, int Idx, byte Active, int param) {
 	DrawStdBar2(x,y,x+Lx-1,y+Ly-1,param);
-}*/
+}
 CIMPORT char LASTCLICKCHATNAME[128];
-CIMPORT bool CheckForPersonalChat(char* STR);
-/* {
+bool CheckForPersonalChat(char* STR)
+ {
 	if(STR[0]=='-'&&STR[1]=='-'&&STR[2]=='>'){
 		char* SS=strchr(STR,':');
 		if(SS){
@@ -446,7 +447,7 @@ CIMPORT bool CheckForPersonalChat(char* STR);
 				if(CSYS.Connected){
 					chatSendUserMessage(CSYS.chat,SS3,SS+1,0);
 					char ccc[128];
-					sprintf(ccc,"%s-->%s",CSYS.chatNick,SS3);
+					sprintf_s(ccc,sizeof(ccc),"%s-->%s",CSYS.chatNick,SS3);
 					CSYS.Common[CSYS.CurChannel].Add(ccc,SS+1);
 					//TPEN.GlobalChat.Add(ccc,SS+1);
 					return true;
@@ -455,8 +456,8 @@ CIMPORT bool CheckForPersonalChat(char* STR);
 		};
 	};
 	return false;
-};*/
-CIMPORT bool CheckPersonality(char* MESSAGE);/* {
+};
+bool CheckPersonality(char* MESSAGE) {
 	if(LASTCLICKCHATNAME[0]){
 		char CC4[512];
 		CC4[0]=0;
@@ -473,20 +474,20 @@ CIMPORT bool CheckPersonality(char* MESSAGE);/* {
 		return true;
 	};
 	return false;
-};*/
+};
 
 extern CIMPORT bool GameInProgress;
 CIMPORT
 void DarkScreen();
 CIMPORT void SendPings();
 CIMPORT bool EnumPlr();
-CIMPORT void MemScreenPart(int x, int y, int lx, int ly, byte* Ptr);/* {
+void MemScreenPart(int x, int y, int lx, int ly, byte* Ptr){
 	for(int yy=0;yy<ly;yy++){
 		int ofs=x+(y+yy)*ScrWidth;
 		memcpy(Ptr,((byte*)ScreenPtr)+ofs,lx);
 		Ptr+=lx;
 	};
-};*/
+};
 
 CIMPORT extern int menu_x_off, menu_y_off;
 
@@ -634,7 +635,7 @@ void SetChatWState(int ID,int State){
 		break;
 	};
 };
-void RunHTTPC();/* {
+void RunHTTPC() {
 	STARTUPINFO			StartUpInfo;
 	PROCESS_INFORMATION		ProcessInformation;
 	memset(&StartUpInfo,0x00,sizeof(STARTUPINFO));
@@ -652,7 +653,7 @@ void RunHTTPC();/* {
 				NULL,
 				&StartUpInfo,
 				&ProcessInformation);
-};*/
+};
 CIMPORT void ClearGChat();
 CIMPORT void SetCurPtr(int v);
 bool RunHomePageAnyway=0;

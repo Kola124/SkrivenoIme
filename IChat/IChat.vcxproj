@@ -87,7 +87,7 @@
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">
-    <OutDir>..\bin\</OutDir>
+    <OutDir>..\lib\</OutDir>
     <IntDir>.\../_release\IChat\</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
@@ -211,7 +211,7 @@ xcopy               /Y               e:\arc_usa\ichat.dll               ..\bin
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_MBCS;_USRDLL;ICHAT_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
@@ -236,7 +236,7 @@ xcopy               /Y               e:\arc_usa\ichat.dll               ..\bin
       <MapFileName>.\../_release/IChat.map</MapFileName>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
-      <ImportLibrary>.\../_release/IChat.lib</ImportLibrary>
+      <ImportLibrary>.\../lib/IChat.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalDependencies>Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>libc.lib;</IgnoreSpecificDefaultLibraries>
@@ -266,7 +266,7 @@ xcopy               /Y               e:\arc_usa\ichat.dll               ..\bin
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_MBCS;_USRDLL;ICHAT_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
@@ -349,10 +349,7 @@ xcopy               /Y               e:\arc_usa\ichat.dll               ..\bin
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Library Include="..\bin\dmcr.lib">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">true</ExcludedFromBuild>
-    </Library>
+    <Library Include="..\lib\dmcr.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

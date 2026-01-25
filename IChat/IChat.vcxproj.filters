@@ -109,6 +109,6 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Library Include="..\bin\dmcr.lib" />
+    <Library Include="..\lib\dmcr.lib" />
   </ItemGroup>
 </Project>
