@@ -2,11 +2,7 @@
 //
 
 #include "..\common.h"
-#include "StdAfx.h"
 #include "..\IntExplorer\ParseRQ.h"
-#include "..\Cossacks2_project\Resfile.h"
-#include <cstdlib>
-#include <cstdio>
 
 BOOL APIENTRY DllMain( HANDLE hModule, 
                        DWORD  ul_reason_for_call, 
