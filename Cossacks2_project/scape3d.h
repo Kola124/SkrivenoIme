@@ -106,159 +106,155 @@ public:
 typedef Rect<int>	NRect;
 
 /*****************************************************************************/
-/*	Class:	Hache
-/*	Desc:	Hash table with cached elements allocated from the pool
+/*  Class:   Hache
+/*  Desc:    Hash table with cached elements allocated from the pool
 /*****************************************************************************/
-template <	class	EType,
-			int		tableSize, 
-			int		minPoolSize
-			>
+template <class EType, int tableSize, int minPoolSize>
 class Hache
 {
-	//  internal class Entry
-	class Entry : public EType
-	{
-	public:
-		Entry() : next(0), prev(0), factor(0), EType() {}
-		
-		//  entrys with the same hash values are stored in the double-linked
-		//  list chains
-		Entry*			next;
-		Entry*			prev;
-		unsigned int	factor;
-	}; // class Entry
+    //  internal class Entry
+    class Entry : public EType
+    {
+    public:
+        Entry() : next(0), prev(0), factor(0), EType() {}
 
-	Entry*			pool;				//  pool for elements
-	int				poolSize;			//  current pool size
-	int				nEntriesUsed;		//  current used number of pool entries
-	Entry*			table[tableSize];	//  hash table
+        //  entrys with the same hash values are stored in the double-linked
+        //  list chains
+        Entry* next;
+        Entry* prev;
+        unsigned int    factor;
+    }; // class Entry
+
+    Entry* pool;               //  pool for elements
+    int             poolSize;           //  current pool size
+    int             nEntriesUsed;       //  current used number of pool entries
+    Entry* table[tableSize];   //  hash table
 
 public:
-	Hache() 
-	{
-		pool		= new Entry[minPoolSize];
-		poolSize	= minPoolSize;
-		nEntriesUsed= 0;
-		memset( table, 0, tableSize * sizeof( Entry* ) );
-	}
+    Hache()
+    {
+        pool = new Entry[minPoolSize];
+        poolSize = minPoolSize;
+        nEntriesUsed = 0;
+        memset(table, 0, tableSize * sizeof(Entry*));
+    }
 
-	virtual ~Hache()
-	{
-		delete []pool;
-	}
+    virtual ~Hache()
+    {
+        delete[]pool;
+    }
 
-	void		reset()
-	{
-		nEntriesUsed = 0;
-		memset( table, 0, tableSize * sizeof( Entry* ) );	
-	}
+    void        reset()
+    {
+        nEntriesUsed = 0;
+        memset(table, 0, tableSize * sizeof(Entry*));
+    }
 
-	EType*		getEl	( const EType::Attr& attr )
-	{
-		unsigned int h = hashVal % tableSize;
-		if (table[h] == 0) return 0;
-		//  ok, one or bunch of entries with same hash value
-		return locateEntry( *(table[h]), attr );
-	}
+    EType* getEl(const typename EType::Attr& attr)
+    {
+        unsigned int h = attr.hash() % tableSize;
+        if (table[h] == 0) return 0;
+        //  ok, one or bunch of entries with same hash value
+        return locateEntry(*(table[h]), attr);
+    }
 
-	EType*		getHitAllocEl( const EType::Attr& attr, unsigned int factor )
-	{
-		unsigned int h = attr.hash() % tableSize;
-		Entry* entry;
-		if (table[h] == 0) 
-		{
-			entry		= allocEntry();
-			entry->next = 0;
-			entry->prev = 0;
-			table[h]	= entry;
-		}
-		else
-		{
-			entry = locateEntry( *(table[h]), attr );
-			if (!entry) 
-			{
-				entry			= allocEntry(); 
-				entry->next		= table[h];
-				entry->prev		= 0;
-				if (table[h]) table[h]->prev = entry;
-				table[h]		= entry;
-			}
-		}
-		
-		entry->factor = factor;
-		return entry;
-	}
+    EType* getHitAllocEl(const typename EType::Attr& attr, unsigned int factor)
+    {
+        unsigned int h = attr.hash() % tableSize;
+        Entry* entry;
+        if (table[h] == 0)
+        {
+            entry = allocEntry();
+            entry->next = 0;
+            entry->prev = 0;
+            table[h] = entry;
+        }
+        else
+        {
+            entry = locateEntry(*(table[h]), attr);
+            if (!entry)
+            {
+                entry = allocEntry();
+                entry->next = table[h];
+                entry->prev = 0;
+                if (table[h]) table[h]->prev = entry;
+                table[h] = entry;
+            }
+        }
 
-	int			numElem() const { return nEntriesUsed;	}
-	int			maxElem() const { return poolSize;		}
+        entry->factor = factor;
+        return entry;
+    }
 
-	EType*		elem( int idx ) 
-	{ 
-		assert( idx >= 0 && idx < poolSize ); 
-		return &(pool[idx]); 
-	}
+    int         numElem() const { return nEntriesUsed; }
+    int         maxElem() const { return poolSize; }
 
-	int getSizeBytes() const
-	{
-		int sz = 0;
-		for (int i = 0; i < poolSize; i++)
-		{
-			sz += pool[i].getSizeBytes();
-			sz += sizeof( Entry ) - sizeof( EType );
-		}
-		return sz + sizeof( this ) 
-				+ tableSize * sizeof( Entry* );
-	}
+    EType* elem(int idx)
+    {
+        assert(idx >= 0 && idx < poolSize);
+        return &(pool[idx]);
+    }
+
+    int getSizeBytes() const
+    {
+        int sz = 0;
+        for (int i = 0; i < poolSize; i++)
+        {
+            sz += pool[i].getSizeBytes();
+            sz += sizeof(Entry) - sizeof(EType);
+        }
+        return sz + sizeof(this)
+            + tableSize * sizeof(Entry*);
+    }
 
 protected:
-	Entry*		allocEntry()
-	{
-		if (nEntriesUsed == poolSize)
-		//  no more entries, need to dismiss one 
-		{
-			unsigned int minF = pool[0].factor;
-			int dismIdx = 0;
-			for (int i = 1; i < poolSize; i++)
-			{
-				if (pool[i].factor < minF) {dismIdx = i; minF = pool[i].factor;}
-			}
-			//  pull dismissed item from chain
-			Entry* entry = &(pool[dismIdx]);
+    Entry* allocEntry()
+    {
+        if (nEntriesUsed == poolSize)
+            //  no more entries, need to dismiss one 
+        {
+            unsigned int minF = pool[0].factor;
+            int dismIdx = 0;
+            for (int i = 1; i < poolSize; i++)
+            {
+                if (pool[i].factor < minF) { dismIdx = i; minF = pool[i].factor; }
+            }
+            //  pull dismissed item from chain
+            Entry* entry = &(pool[dismIdx]);
 
-			if (entry->prev)
-			{
-				entry->prev->next = entry->next;
-			}
-			else
-			//  dismissed entry is at the chain root 
-			//  and is pointed from hash table
-			{
-				unsigned int h = entry->hash() % tableSize;
-				assert( entry == table[h] );
-				table[h] = entry->next;
-			}
+            if (entry->prev)
+            {
+                entry->prev->next = entry->next;
+            }
+            else
+                //  dismissed entry is at the chain root 
+                //  and is pointed from hash table
+            {
+                unsigned int h = entry->hash() % tableSize;
+                assert(entry == table[h]);
+                table[h] = entry->next;
+            }
 
-			if (entry->next)
-			{
-				entry->next->prev = entry->prev;
-			}
+            if (entry->next)
+            {
+                entry->next->prev = entry->prev;
+            }
 
-			return entry;
-		}
-		return &(pool[nEntriesUsed++]);
-	}
-	
-	Entry* locateEntry( const Entry& first, const EType::Attr& attr )
-	{
-		Entry* cur = const_cast<Entry*>( &first );
-		do
-		{
-			if (cur->hasAttr( attr )) return cur;
-			cur = cur->next;
-		}
-		while (cur);
-		return 0;
-	}
+            return entry;
+        }
+        return &(pool[nEntriesUsed++]);
+    }
+
+    Entry* locateEntry(const Entry& first, const typename EType::Attr& attr)
+    {
+        Entry* cur = const_cast<Entry*>(&first);
+        do
+        {
+            if (cur->hasAttr(attr)) return cur;
+            cur = cur->next;
+        } while (cur);
+        return 0;
+    }
 }; // class Hache
 
 /*****************************************************************************/
