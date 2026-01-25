@@ -9519,6 +9519,7 @@ void CenterScreen(){
 };
 extern bool EnterChatMode;
 extern char ChatString[128];
+extern wchar_t unicode_chat_string[128];
 bool Superuser=0;
 void AssignHint1(char* s,int time);
 void CmdGiveMoney(byte SrcNI,byte DstNI,byte Res,int Amount);
@@ -9529,6 +9530,7 @@ extern char CHATSTRING[256];
 int ChatCursPos=0;
 bool CheckFNSend(int idx);
 extern byte LastAscii;
+extern wchar_t last_unicode;
 void HandleSMSChat(char* Mess);
 void HandlwSMSMouse();
 void CmdOfferVoting();
@@ -9944,6 +9946,22 @@ KRT:
 		//if(strlen(IB->Str)>0)IB->Str[strlen(IB->Str)-1]=0;
 		goto KRT;
 	}else{
+        if (last_unicode)
+        {
+            wchar_t one_char_str[2];
+            one_char_str[0] = last_unicode;
+            one_char_str[1] = 0;
+            if (120 > wcslen(unicode_chat_string) + sizeof(wchar_t))
+            {
+                wchar_t temp[2048];
+                wcscpy(temp, unicode_chat_string);
+                temp[ChatCursPos] = 0;
+                wcscat(temp, one_char_str);
+                wcscat(temp, unicode_chat_string + sizeof(wchar_t) * ChatCursPos);
+                wcscpy(unicode_chat_string, temp);
+            }
+        }
+
 		if(LastAscii){
 			LastKey=LastAscii;
 			char xx[2];
