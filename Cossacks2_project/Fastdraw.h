@@ -32,32 +32,38 @@ extern FASTDRAW_API void* RealScreenPtr;
 
 struct RLCHeader
 {
-    short	SizeX;
-    short	SizeY;
+    short SizeX = 0;
+    short SizeY = 0;
 };
 typedef RLCHeader* lpRLCHeader;
 struct xRLCTable
 {
-    int Size;
-    int sign;
-    int	SCount;
-    int OfsTable[32768000];
+    int Size = 0;
+    int sign = 0;
+    int SCount = 0;
+    int OfsTable[32768000]; //int OfsTable[32768000];
 };
 typedef xRLCTable* RLCTable;
 typedef RLCTable* lpRLCTable;
 class FASTDRAW_API RLCFont
 {
 public:
-    int	FirstSymbol;
+    int FirstSymbol;
     int LastSymbol;
-    byte Options;
     int ShadowGP;
+    RLCTable RLC;
     short ShadowDx;
     short ShadowDy;
-    RLCTable RLC;
+    byte Options;
+    
     RLCFont();
     RLCFont(char* Name);
     RLCFont(int GP_Index);
+    
+    // ADD THESE TWO:
+    RLCFont(const RLCFont& other);
+    RLCFont& operator=(const RLCFont& other);
+    
     void SetGPIndex(int n);
     void SetRedColor();
     void SetWhiteColor();

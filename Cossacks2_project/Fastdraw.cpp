@@ -34,12 +34,14 @@ byte PAL7[256];
 void ErrM(char* s);
 extern void* offScreenPtr;
 
-
 typedef RLCHeader* lpRLCHeader;
 
 typedef xRLCTable* RLCTable; 
 typedef RLCTable* lpRLCTable;
+//void DDLog2(LPSTR sz, ...);
+
 RLCFont::RLCFont(int GP_Index){
+    //DDLog2("RLCFont(int %d) constructor: this=%p\n", GP_Index, this);
 #ifdef _USE3D
 	SetColor( 0xFFFFFFFF );
 #endif // _USE3D
@@ -48,14 +50,50 @@ RLCFont::RLCFont(int GP_Index){
 	LastSymbol=0;
 	Options=0;
 	ShadowGP=-1;
+    ShadowDx = 0;
+    ShadowDy = 0;
 };
+
+RLCFont::RLCFont(const RLCFont& other) {
+    //DDLog2("RLCFont copy constructor: this=%p, other=%p, other.RLC=%p\n", this, &other, other.RLC);
+    FirstSymbol = other.FirstSymbol;
+    LastSymbol = other.LastSymbol;
+    Options = other.Options;
+    ShadowGP = other.ShadowGP;
+    ShadowDx = other.ShadowDx;
+    ShadowDy = other.ShadowDy;
+    RLC = other.RLC;
+#ifdef _USE3D
+    color = other.color;
+#endif
+}
+
+RLCFont& RLCFont::operator=(const RLCFont& other) {
+    //DDLog2("RLCFont operator=: this=%p, other=%p, other.RLC=%p\n", this, &other, other.RLC);
+    if (this != &other) {
+        FirstSymbol = other.FirstSymbol;
+        LastSymbol = other.LastSymbol;
+        Options = other.Options;
+        ShadowGP = other.ShadowGP;
+        ShadowDx = other.ShadowDx;
+        ShadowDy = other.ShadowDy;
+        RLC = other.RLC;
+#ifdef _USE3D
+        color = other.color;
+#endif
+    }
+    return *this;
+}
+//void DDLog2(LPSTR sz, ...);
 void RLCFont::SetGPIndex(int n){
 	RLC=(RLCTable)n;
+    //DDLog2("SetGPIndex: this=%p, n=%d, RLC=%p\n", this, n, RLC);
 	FirstSymbol=0;
 	LastSymbol=0;
 	Options=0;
 };
 RLCFont::RLCFont(){
+    //DDLog2("RLCFont() default constructor: this=%p\n", this);
 #ifdef _USE3D
 	SetColor( 0xFFFFFFFF );
 #endif // _USE3D
@@ -64,8 +102,11 @@ RLCFont::RLCFont(){
 	LastSymbol=0;
 	Options=0;
 	ShadowGP=-1;
+    ShadowDx = 0;
+    ShadowDy = 0;
 };
 RLCFont::~RLCFont(){
+    //DDLog2("~RLCFont() destructor: this=%p, RLC=%p\n", this, RLC);
 	if(RLC&&int(RLC)>4096)free(RLC);
 	RLC=NULL;
 };
@@ -204,7 +245,7 @@ void ShowRLC(int x,int y,void* PicPtr)
 	int subline=0;
 	int PLY=(lpRLCHeader(PicPtr)->SizeY)&65535;
 	int PLX=(lpRLCHeader(PicPtr)->SizeX)&65535;
-	if ((y+PLY-1<WindY)|(y>WindY1)||
+	if ((y+PLY-1<WindY) || (y>WindY1)||
 		((x+PLX<=WindX)||(x>WindX1)||!PLY)) return;
 	if (y<WindY) 
 	{
@@ -308,7 +349,7 @@ ScanLineLoopEnd1:
 			};
 		}else if(x+PLX>=WindX1){
 			int roff=WindX1-x+1;
-			int part;
+			int part=0;
 			__asm{
 				push	esi
 				push	edi
@@ -433,7 +474,7 @@ ScanLineLoopEnd:
 }
 //End of RLC with clipping
 //Showing inverse RLC image with clipping
-void ShowRLCi(int x,int y,void* PicPtr)
+static void ShowRLCi(int x,int y,void* PicPtr)
 {
 	//for(int i=0;i<256;i++) precomp[i]=i;
 	int ScrOfst=int(ScreenPtr)+y*ScrWidth+x;
@@ -441,7 +482,7 @@ void ShowRLCi(int x,int y,void* PicPtr)
 	int subline=0;
 	int PLY=(lpRLCHeader(PicPtr)->SizeY)&65535;
 	int PLX=(lpRLCHeader(PicPtr)->SizeX)&65535;
-	if ((y+PLY-1<WindY)|(y>WindY1)||
+	if ((y+PLY-1<WindY) || (y>WindY1)||
 		((x<WindX)||(x-PLX+1>=WindX1)||!PLY)) return;
 	if (y<WindY) 
 	{
@@ -542,7 +583,7 @@ ScanLineLoopEnd1:
 			};
 		}else if(x-PLX+1<WindX){
 			int roff=x-WindX+1;
-			int part;
+			int part=0;
 			__asm{
 				push	esi
 				push	edi
@@ -651,7 +692,7 @@ ScanLineLoopEnd:
 	}
 }
 //End of RLC with clipping & with palette
-void ShowRLCpal(int x,int y,void* PicPtr,byte* pal)
+static void ShowRLCpal(int x,int y,void* PicPtr,byte* pal)
 {
 	//for(int i=0;i<256;i++) precomp[i]=i;
 	int ScrOfst=int(ScreenPtr)+y*ScrWidth+x;
@@ -659,7 +700,7 @@ void ShowRLCpal(int x,int y,void* PicPtr,byte* pal)
 	int subline=0;
 	int PLY=(lpRLCHeader(PicPtr)->SizeY)&65535;
 	int PLX=(lpRLCHeader(PicPtr)->SizeX)&65535;
-	if ((y+PLY-1<WindY)|(y>WindY1)||
+	if ((y+PLY-1<WindY) || (y>WindY1)||
 		((x+PLX<=WindX)||(x>WindX1)||!PLY)) return;
 	if (y<WindY) 
 	{
@@ -692,7 +733,7 @@ Loop1xx3:	dec		cx
 	}
 	if (WindY1<y+PLY-1) subline+=y+PLY-1-WindY1;
 	addofs+=4;
-	byte Acm;
+	byte Acm=0;
 	PLY-=subline;
 	if(PLY>0){
 		if(x<WindX){
@@ -765,7 +806,7 @@ ScanLineLoopEnd1:
 			};
 		}else if(x+PLX>=WindX1){
 			int roff=WindX1-x+1;
-			int part;
+			int part=0;
 			__asm{
 				push	esi
 				push	edi
@@ -883,7 +924,7 @@ ScanLineLoopEnd:
 }
 //End of RLC with clipping & encoding
 //Showing inverse RLC image with clipping & encodint
-void ShowRLCipal(int x,int y,void* PicPtr,byte* pal)
+static void ShowRLCipal(int x,int y,void* PicPtr,byte* pal)
 {
 	//for(int i=0;i<256;i++) precomp[i]=i;
 	int ScrOfst=int(ScreenPtr)+y*ScrWidth+x;
@@ -891,7 +932,7 @@ void ShowRLCipal(int x,int y,void* PicPtr,byte* pal)
 	int subline=0;
 	int PLY=(lpRLCHeader(PicPtr)->SizeY)&65535;
 	int PLX=(lpRLCHeader(PicPtr)->SizeX)&65535;
-	if ((y+PLY-1<WindY)|(y>WindY1)||
+	if ((y+PLY-1<WindY) || (y>WindY1)||
 		((x<WindX)||(x-PLX+1>=WindX1)||!PLY)) return;
 	if (y<WindY) 
 	{
@@ -924,7 +965,7 @@ Loop1xx3:	dec		cx
 	}
 	if (WindY1<y+PLY-1) subline+=y+PLY-1-WindY1;
 	addofs+=4;
-	byte Acm;
+	byte Acm=0;
 	PLY-=subline;
 	if(PLY>0){
 		if(x>WindX1){
@@ -997,7 +1038,7 @@ ScanLineLoopEnd1:
 			};
 		}else if(x-PLX+1<WindX){
 			int roff=x-WindX+1;
-			int part;
+			int part=0;
 			__asm{
 				push	esi
 				push	edi
@@ -1119,7 +1160,7 @@ ScanLineLoopEnd:
 //End of inverted RLC with clipping & encoding
 
 //End of RLC with clipping & with palette->fon
-void ShowRLCfonpal(int x,int y,void* PicPtr,byte* pal)
+static void ShowRLCfonpal(int x,int y,void* PicPtr,byte* pal)
 {
 	//for(int i=0;i<256;i++) precomp[i]=i;
 	int ScrOfst=int(ScreenPtr)+y*ScrWidth+x;
@@ -1127,7 +1168,7 @@ void ShowRLCfonpal(int x,int y,void* PicPtr,byte* pal)
 	int subline=0;
 	int PLY=(lpRLCHeader(PicPtr)->SizeY)&65535;
 	int PLX=(lpRLCHeader(PicPtr)->SizeX)&65535;
-	if ((y+PLY-1<WindY)|(y>WindY1)||
+	if ((y+PLY-1<WindY) || (y>WindY1)||
 		((x+PLX<=WindX)||(x>WindX1)||!PLY)) return;
 	if (y<WindY) 
 	{
@@ -1160,7 +1201,7 @@ Loop1xx3:	dec		cx
 	}
 	if (WindY1<y+PLY-1) subline+=y+PLY-1-WindY1;
 	addofs+=4;
-	byte Acm;
+	byte Acm=0;
 	PLY-=subline;
 	if(PLY>0){
 		if(x<WindX){
@@ -1233,7 +1274,7 @@ ScanLineLoopEnd1:
 			};
 		}else if(x+PLX>=WindX1){
 			int roff=WindX1-x+1;
-			int part;
+			int part=0;
 			__asm{
 				push	esi
 				push	edi
@@ -1354,7 +1395,7 @@ ScanLineLoopEnd:
 }
 //End of RLC with clipping & encoding
 //Showing inverse RLC image with clipping & encodint
-void ShowRLCifonpal(int x,int y,void* PicPtr,byte* pal)
+static void ShowRLCifonpal(int x,int y,void* PicPtr,byte* pal)
 {
 	//for(int i=0;i<256;i++) precomp[i]=i;
 	int ScrOfst=int(ScreenPtr)+y*ScrWidth+x;
@@ -1362,7 +1403,7 @@ void ShowRLCifonpal(int x,int y,void* PicPtr,byte* pal)
 	int subline=0;
 	int PLY=(lpRLCHeader(PicPtr)->SizeY)&65535;
 	int PLX=(lpRLCHeader(PicPtr)->SizeX)&65535;
-	if ((y+PLY-1<WindY)|(y>WindY1)||
+	if ((y+PLY-1<WindY) || (y>WindY1)||
 		((x<WindX)||(x-PLX+1>=WindX1)||!PLY)) return;
 	if (y<WindY) 
 	{
@@ -1395,7 +1436,7 @@ Loop1xx3:	dec		cx
 	}
 	if (WindY1<y+PLY-1) subline+=y+PLY-1-WindY1;
 	addofs+=4;
-	byte Acm;
+	byte Acm=0;
 	PLY-=subline;
 	if(PLY>0){
 		if(x>WindX1){
@@ -1471,7 +1512,7 @@ ScanLineLoopEnd1:
 			};
 		}else if(x-PLX+1<WindX){
 			int roff=x-WindX+1;
-			int part;
+			int part=0;
 			__asm{
 				push	esi
 				push	edi
@@ -1596,7 +1637,7 @@ ScanLineLoopEnd:
 
 
 //End of RLC with clipping & with palette(half-transparent fog)
-void ShowRLChtpal(int x,int y,void* PicPtr,byte* pal)
+static void ShowRLChtpal(int x,int y,void* PicPtr,byte* pal)
 {
 	//for(int i=0;i<256;i++) precomp[i]=i;
 	int ScrOfst=int(ScreenPtr)+y*ScrWidth+x;
@@ -1604,7 +1645,7 @@ void ShowRLChtpal(int x,int y,void* PicPtr,byte* pal)
 	int subline=0;
 	int PLY=(lpRLCHeader(PicPtr)->SizeY)&65535;
 	int PLX=(lpRLCHeader(PicPtr)->SizeX)&65535;
-	if ((y+PLY-1<WindY)|(y>WindY1)||
+	if ((y+PLY-1<WindY) || (y>WindY1)||
 		((x+PLX<=WindX)||(x>WindX1)||!PLY)) return;
 	if (y<WindY) 
 	{
@@ -1637,7 +1678,7 @@ Loop1xx3:	dec		cx
 	}
 	if (WindY1<y+PLY-1) subline+=y+PLY-1-WindY1;
 	addofs+=4;
-	byte Acm;
+	byte Acm=0;
 	PLY-=subline;
 	if(PLY>0){
 		if(x<WindX){
@@ -1713,7 +1754,7 @@ ScanLineLoopEnd1:
 			};
 		}else if(x+PLX>=WindX1){
 			int roff=WindX1-x+1;
-			int part;
+			int part=0;
 			__asm{
 				push	esi
 				push	edi
@@ -1837,7 +1878,7 @@ ScanLineLoopEnd:
 }
 //End of RLC with clipping & encoding
 //Showing inverse RLC image with clipping & encodint(half-transparent fog)
-void ShowRLCihtpal(int x,int y,void* PicPtr,byte* pal)
+static void ShowRLCihtpal(int x,int y,void* PicPtr,byte* pal)
 {
 	//for(int i=0;i<256;i++) precomp[i]=i;
 	int ScrOfst=int(ScreenPtr)+y*ScrWidth+x;
@@ -1845,7 +1886,7 @@ void ShowRLCihtpal(int x,int y,void* PicPtr,byte* pal)
 	int subline=0;
 	int PLY=(lpRLCHeader(PicPtr)->SizeY)&65535;
 	int PLX=(lpRLCHeader(PicPtr)->SizeX)&65535;
-	if ((y+PLY-1<WindY)|(y>WindY1)||
+	if ((y+PLY-1<WindY)||(y>WindY1)||
 		((x<WindX)||(x-PLX+1>=WindX1)||!PLY)) return;
 	if (y<WindY) 
 	{
@@ -1878,7 +1919,7 @@ Loop1xx3:	dec		cx
 	}
 	if (WindY1<y+PLY-1) subline+=y+PLY-1-WindY1;
 	addofs+=4;
-	byte Acm;
+	byte Acm=0;
 	PLY-=subline;
 	if(PLY>0){
 		if(x>WindX1){
@@ -1954,7 +1995,7 @@ ScanLineLoopEnd1:
 			};
 		}else if(x-PLX+1<WindX){
 			int roff=x-WindX+1;
-			int part;
+			int part=0;
 			__asm{
 				push	esi
 				push	edi
@@ -2081,59 +2122,59 @@ ScanLineLoopEnd:
 }
 //End of inverted RLC with clipping & encoding(half-transparent fog)
 
-void ShowRLCp1(int x,int y,void* PicPtr)
+static void ShowRLCp1(int x,int y,void* PicPtr)
 {
 	ShowRLCpal(x,y,PicPtr,PAL1);
 }
-void ShowRLCp2(int x,int y,void* PicPtr)
+static void ShowRLCp2(int x,int y,void* PicPtr)
 {
 	ShowRLCpal(x,y,PicPtr,PAL2);
 }
-void ShowRLCp3(int x,int y,void* PicPtr)
+static void ShowRLCp3(int x,int y,void* PicPtr)
 {
 	ShowRLCpal(x,y,PicPtr,PAL3);
 }
-void ShowRLCp4(int x,int y,void* PicPtr)
+static void ShowRLCp4(int x,int y,void* PicPtr)
 {
 	ShowRLCpal(x,y,PicPtr,PAL4);
 }
-void ShowRLCp5(int x,int y,void* PicPtr)
+static void ShowRLCp5(int x,int y,void* PicPtr)
 {
 	ShowRLCpal(x,y,PicPtr,PAL5);
 }
-void ShowRLCp6(int x,int y,void* PicPtr)
+static void ShowRLCp6(int x,int y,void* PicPtr)
 {
 	ShowRLCpal(x,y,PicPtr,PAL6);
 }
-void ShowRLCp7(int x,int y,void* PicPtr)
+static void ShowRLCp7(int x,int y,void* PicPtr)
 {
 	ShowRLCpal(x,y,PicPtr,PAL7);
 }
-void ShowRLCip1(int x,int y,void* PicPtr)
+static void ShowRLCip1(int x,int y,void* PicPtr)
 {
 	ShowRLCipal(x,y,PicPtr,PAL1);
 }
-void ShowRLCip2(int x,int y,void* PicPtr)
+static void ShowRLCip2(int x,int y,void* PicPtr)
 {
 	ShowRLCipal(x,y,PicPtr,PAL2);
 }
-void ShowRLCip3(int x,int y,void* PicPtr)
+static void ShowRLCip3(int x,int y,void* PicPtr)
 {
 	ShowRLCipal(x,y,PicPtr,PAL3);
 }
-void ShowRLCip4(int x,int y,void* PicPtr)
+static void ShowRLCip4(int x,int y,void* PicPtr)
 {
 	ShowRLCipal(x,y,PicPtr,PAL4);
 }
-void ShowRLCip5(int x,int y,void* PicPtr)
+static void ShowRLCip5(int x,int y,void* PicPtr)
 {
 	ShowRLCipal(x,y,PicPtr,PAL5);
 }
-void ShowRLCip6(int x,int y,void* PicPtr)
+static void ShowRLCip6(int x,int y,void* PicPtr)
 {
 	ShowRLCipal(x,y,PicPtr,PAL6);
 }
-void ShowRLCip7(int x,int y,void* PicPtr)
+static void ShowRLCip7(int x,int y,void* PicPtr)
 {
 	ShowRLCipal(x,y,PicPtr,PAL7);
 }
@@ -2145,31 +2186,31 @@ extern byte rfog[8192];
 extern byte trans8[65536];
 
 
-void ShowRLCShadow(int x,int y,void* PicPtr)
+static void ShowRLCShadow(int x,int y,void* PicPtr)
 {
 	ShowRLCfonpal(x,y,PicPtr,fog+4096);
 }
-void ShowRLCiShadow(int x,int y,void* PicPtr)
+static void ShowRLCiShadow(int x,int y,void* PicPtr)
 {
 	ShowRLCifonpal(x,y,PicPtr,fog+4096);
 }
-void ShowRLCWhite(int x,int y,void* PicPtr)
+static void ShowRLCWhite(int x,int y,void* PicPtr)
 {
 	ShowRLCfonpal(x,y,PicPtr,wfog+1024);
 }
-void ShowRLCDarkN(int x,int y,void* PicPtr,int N)
+static void ShowRLCDarkN(int x,int y,void* PicPtr,int N)
 {
 	ShowRLCpal(x,y,PicPtr,wfog+(N<<8));
 };
-void ShowRLCiDarkN(int x,int y,void* PicPtr,int N)
+static void ShowRLCiDarkN(int x,int y,void* PicPtr,int N)
 {
 	ShowRLCipal(x,y,PicPtr,wfog+(N<<8));
 };
-void ShowRLCRedN(int x,int y,void* PicPtr,int N)
+static void ShowRLCRedN(int x,int y,void* PicPtr,int N)
 {
 	ShowRLCpal(x,y,PicPtr,yfog+(N<<8));
 };
-void ShowRLCiRedN(int x,int y,void* PicPtr,int N)
+static void ShowRLCiRedN(int x,int y,void* PicPtr,int N)
 {
 	ShowRLCipal(x,y,PicPtr,yfog+(N<<8));
 };
@@ -2205,47 +2246,47 @@ void ShowRLCItemRedN(int x,int y,lpRLCTable lprt,int n,int Ints)
 		ShowRLCiRedN(x,y,(void*)((*lprt)->OfsTable[n-4096]),Ints);
 	};
 };
-void ShowRLCWFog(int x,int y,void* PicPtr)
+static void ShowRLCWFog(int x,int y,void* PicPtr)
 {
 	ShowRLChtpal(x,y,PicPtr,wfog+1024);
 }
-void ShowRLCiWhite(int x,int y,void* PicPtr)
+static void ShowRLCiWhite(int x,int y,void* PicPtr)
 {
 	ShowRLCifonpal(x,y,PicPtr,wfog+1024);
 }
-void ShowRLCiWFog(int x,int y,void* PicPtr)
+static void ShowRLCiWFog(int x,int y,void* PicPtr)
 {
 	ShowRLCihtpal(x,y,PicPtr,wfog+1024);
 }
-void ShowRLCiTrans8(int x,int y,void* PicPtr)
+static void ShowRLCiTrans8(int x,int y,void* PicPtr)
 {
 	ShowRLCihtpal(x,y,PicPtr,trans8);
 }
-void ShowRLCTrans8(int x,int y,void* PicPtr)
+static void ShowRLCTrans8(int x,int y,void* PicPtr)
 {
 	ShowRLChtpal(x,y,PicPtr,trans8);
 }
-void ShowRLCDark(int x,int y,void* PicPtr)
+static void ShowRLCDark(int x,int y,void* PicPtr)
 {
 	ShowRLChtpal(x,y,PicPtr,fog+1024);
 }
-void ShowRLCiDark(int x,int y,void* PicPtr)
+static void ShowRLCiDark(int x,int y,void* PicPtr)
 {
 	ShowRLCihtpal(x,y,PicPtr,fog+1024);
 }
-void ShowRLCBlue(int x,int y,void* PicPtr)
+static void ShowRLCBlue(int x,int y,void* PicPtr)
 {
 	ShowRLChtpal(x,y,PicPtr,rfog+2048);
 }
-void ShowRLCiBlue(int x,int y,void* PicPtr)
+static void ShowRLCiBlue(int x,int y,void* PicPtr)
 {
 	ShowRLCihtpal(x,y,PicPtr,rfog+2048);
 }
-void ShowRLCFire(int x,int y,void* PicPtr)
+static void ShowRLCFire(int x,int y,void* PicPtr)
 {
 	ShowRLChtpal(x,y,PicPtr,yfog);
 }
-void ShowRLCiFire(int x,int y,void* PicPtr)
+static void ShowRLCiFire(int x,int y,void* PicPtr)
 {
 	ShowRLCihtpal(x,y,PicPtr,yfog);
 }
@@ -2412,18 +2453,25 @@ void ShowRLCItemFired(int x,int y,lpRLCTable lprt,int n)
 };
 
 #endif //_!USE3D
-
-int GetRLCWidth(RLCTable lpr,byte n)
+int GetRLCWidth(RLCTable lpr, byte n)
 {
-	int GPID=int(lpr);
-	if(GPID<4096){
-		if(n==32)return GPS.GetGPWidth(GPID,'c');
-		return GPS.GetGPWidth(GPID,n);
-	};
-	if (n<lpr->SCount) return (*((lpRLCHeader)((void*)(lpr->OfsTable[n])))).SizeX;
-	else return 0;
+    uintptr_t GPID = reinterpret_cast<uintptr_t>(lpr);
+    if(GPID < 4096){
+        if(n==32) {
+            int w = GPS.GetGPWidth(static_cast<int>(GPID), 'c');
+            return w;
+        }
+        int w = GPS.GetGPWidth(static_cast<int>(GPID), n);
+        return w;
+    };
+    
+    if (n < lpr->SCount) {
+        int w = (*((lpRLCHeader)((void*)(lpr->OfsTable[n])))).SizeX;
+        return w;
+    }
+    return 0;
 }
-int GetCHEX(byte c){
+static int GetCHEX(byte c){
 	if(c>='0'&&c<='9')return c-'0';
 	if(c>='a'&&c<='z')return c+10-'a';
 	if(c>='A'&&c<='Z')return c+10-'A';
@@ -2436,7 +2484,7 @@ int GetRLCWidthUNICODE(RLCTable lpr,byte* strptr,int* L){
 			    (GetCHEX(strptr[2])<<8)+
 				(GetCHEX(strptr[3])<<4)+
 				GetCHEX(strptr[4]);
-		int GPID=int(lpr);
+		uintptr_t GPID = reinterpret_cast<uintptr_t>(lpr);
 		if(GPID<4096){
 			UNICODETABLE* UT=GPS.UNITBL[GPID];
 			if(!UT)return 0;
@@ -2496,46 +2544,58 @@ void ShowChar(int x,int y,char c,lpRLCFont lpf){
 };
 CEXPORT
 void ShowCharUNICODE(int x,int y,byte* strptr,lpRLCFont lpr){
-	if(strptr[0]==SIGNBYTE){
-		int idx=(GetCHEX(strptr[1])<<12)+
-			    (GetCHEX(strptr[2])<<8)+
-				(GetCHEX(strptr[3])<<4)+
-				GetCHEX(strptr[4]);
-		int GPID=int(lpr->RLC);
-		if(GPID<4096){
-			UNICODETABLE* UT=GPS.UNITBL[GPID]; 
-			if(UT){
-				for(int j=0;j<UT->NTables;j++){
-					if(idx>=UT->USET[j].Start){
-						int v=idx-UT->USET[j].Start;
-						if(v<UT->USET[j].NSymbols){
-							v+=UT->USET[j].GP_Start;
-							GPID=UT->USET[j].GPID;
-							if(lpr->ShadowGP!=-1){
-								GPS.ImageType[lpr->ShadowGP]=1;
-								//GPS.ShowGP(x+UT->USET[j].DX+lpr->ShadowDx,y+UT->USET[j].DY+lpr->ShadowDy,GPID,v,0);
-							};
-							if(UT->USET[j].UseColor)GPS.ImageType[GPID]=(GPS.ImageType[GPID]&7)|lpr->Options;
-							else GPS.ImageType[GPID]=1;
-							GPS.ShowGP(x+UT->USET[j].DX,y+UT->USET[j].DY,GPID,v,0);
-							return;
-						};
-					};
-				};
-			};
-		};
-	}else{
-		if(lpr->ShadowGP!=-1){
+    if(strptr[0]==SIGNBYTE){
+        int idx=(GetCHEX(strptr[1])<<12)+
+                (GetCHEX(strptr[2])<<8)+
+                (GetCHEX(strptr[3])<<4)+
+                GetCHEX(strptr[4]);
+        int GPID=int(lpr->RLC);
+        if(GPID<4096){
+            UNICODETABLE* UT=GPS.UNITBL[GPID]; 
+            if(UT){
+                for(int j=0;j<UT->NTables;j++){
+                    if(idx>=UT->USET[j].Start){
+                        int v=idx-UT->USET[j].Start;
+                        if(v<UT->USET[j].NSymbols){
+                            v+=UT->USET[j].GP_Start;
+                            GPID=UT->USET[j].GPID;
+                            if(lpr->ShadowGP!=-1){
+                                // FIXED: Access as byte array
+                                if(lpr->ShadowGP >= 0 && lpr->ShadowGP < GPS.NGP) {
+                                    GPS.ImageType[lpr->ShadowGP]=1;
+                                }
+                                GPS.ShowGP(x+UT->USET[j].DX+lpr->ShadowDx,y+UT->USET[j].DY+lpr->ShadowDy,GPID,v,0);
+                            };
+                            
+                            // FIXED: Access as byte array with bounds check
+                            if(GPID >= 0 && GPID < GPS.NGP) {
+                                if(UT->USET[j].UseColor) {
+                                    GPS.ImageType[GPID]=(GPS.ImageType[GPID]&7)|(byte)lpr->Options;
+                                } else {
+                                    GPS.ImageType[GPID]=1;
+                                }
+                                GPS.ShowGP(x+UT->USET[j].DX,y+UT->USET[j].DY,GPID,v,0);
+                                return;
+                            }
+                        };
+                    };
+                };
+            };
+        };
+    }else{
+        if(lpr->ShadowGP!=-1){
 #ifdef _USE3D
-			GPS.SetCurrentDiffuse(0xFF462814);
+            GPS.SetCurrentDiffuse(0xFF462814);
 #else
-            //DIPLOMACY CRASHES GAME WHEN THIS ISNT COMMENTED I SMASHED MY HEAD ABOUT THIS AND DIDNT FIND SOLUTION
-			///GPS.ImageType[lpr->ShadowGP]=1;
+            // FIXED: Access as byte array with bounds check
+            if(lpr->ShadowGP >= 0 && lpr->ShadowGP < GPS.NGP) {
+                GPS.ImageType[lpr->ShadowGP]=1;
+            }
 #endif
-			//GPS.ShowGP(x+lpr->ShadowDx,y+lpr->ShadowDy,lpr->ShadowGP,strptr[0],0);
-		};
-		ShowChar(x,y,strptr[0],lpr);
-	};
+            GPS.ShowGP(x+lpr->ShadowDx,y+lpr->ShadowDy,lpr->ShadowGP,strptr[0],0);
+        };
+        ShowChar(x,y,strptr[0],lpr);
+    };
 };
 void ShowString(int x,int y,LPCSTR lps,lpRLCFont lpf)
 {
@@ -2605,7 +2665,7 @@ int GetRLCStrWidth(char* str,lpRLCFont lpf){
 	};
 	return L;
 };
-void ShowShadString(int x,int y,LPCSTR lps,lpRLCFont lpf)
+static void ShowShadString(int x,int y,LPCSTR lps,lpRLCFont lpf)
 {
 	if (lps==NULL) return;
 	byte	ch;
@@ -2658,6 +2718,8 @@ RLCFont::RLCFont(char* Name){
 	LOADED=LOLD;
 	Options=0;
 	ShadowGP=-1;
+    ShadowDx = 0;
+    ShadowDy = 0;
 };
 void RLCFont::SetRedColor(){
 	Options=32;
