@@ -1789,12 +1789,12 @@ void OnCommandMorale(word Sender) {
     GETOB(SOB, Sender);
     static int lastTime=0;
     if ((GetTickCount() - lastTime) > 1000) {
-    if (SOB) {
-        if (SOB)AddMoraleInRadius(SOB->RealX >> 4, SOB->RealY >> 4, SOB->NMask, MaxMorale_CenterRadius, MaxMorale_CenterInc, 1);
+        if (SOB) {
+            if (SOB)AddMoraleInRadius(SOB->RealX >> 4, SOB->RealY >> 4, SOB->NMask, MaxMorale_CenterRadius, MaxMorale_CenterInc, 1);
         }
         lastTime = GetTickCount();
     }
-    };
+};
 
 void OnUnitDeath(word MID,word Sender){
 	OneObject* OB;
@@ -1822,7 +1822,7 @@ int GetMaxMorale(OneObject* OB){
         int(OB->newMons->StartMorale)* MR_ONE + 200000;
     }
     else {
-	return int(OB->newMons->StartMorale)*MR_ONE;
+        return int(OB->newMons->StartMorale)*MR_ONE;
     }
 	
 };
