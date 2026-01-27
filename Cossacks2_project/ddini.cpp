@@ -133,22 +133,6 @@ void* offScreenPtr = NULL;
 
 int SCRSZY = 0;
 
-int CalculateIntegerScale(int desktopW, int desktopH, int gameW, int gameH) {
-    int scaleX = desktopW / gameW;
-    int scaleY = desktopH / gameH;
-    
-    // Use the smaller scale to ensure the game fits on screen
-    int scale = (scaleX < scaleY) ? scaleX : scaleY;
-    
-    // Ensure at least 1x scaling
-    if (scale < 1) scale = 1;
-    
-    DDLog("Integer scale calculation: Desktop=%dx%d, Game=%dx%d, ScaleX=%d, ScaleY=%d, Final=%dx\n",
-          desktopW, desktopH, gameW, gameH, scaleX, scaleY, scale);
-    
-    return scale;
-}
-
 CEXPORT
 byte GetPaletteColor(int r, int g, int b) {
     int dmax = 10000;
@@ -164,6 +148,7 @@ byte GetPaletteColor(int r, int g, int b) {
 }
 
 void ClearRGB() {
+    
     if (!bActive) return;
     if (RealScreenPtr) {
         memset(RealScreenPtr, 0, RSCRSizeX * SCRSZY);
@@ -226,7 +211,7 @@ bool ProcessMessagesSDL() {
         
         switch (event.type) {
             case SDL_QUIT:
-                DDLog("SDL_QUIT event received\n");
+                //DDLog("SDL_QUIT event received\n");
                 PostMessage(hwnd, WM_QUIT, 0, 0);
                 break;
                 
@@ -301,15 +286,13 @@ bool ProcessMessagesSDL() {
             case SDL_WINDOWEVENT:
                 switch (event.window.event) {
                     case SDL_WINDOWEVENT_FOCUS_GAINED:
-                        DDLog("SDL_WINDOWEVENT_FOCUS_GAINED - setting bActive=TRUE\n");
                         bActive = TRUE;
                         PostMessage(hwnd, WM_ACTIVATEAPP, TRUE, 0);
                         break;
                         
                     case SDL_WINDOWEVENT_FOCUS_LOST:
-                        DDLog("SDL_WINDOWEVENT_FOCUS_LOST - setting bActive=FALSE\n");
-                        bActive = FALSE;
-                        PostMessage(hwnd, WM_ACTIVATEAPP, FALSE, 0);
+                        bActive = TRUE;
+                        PostMessage(hwnd, WM_ACTIVATEAPP, TRUE, 0);
                         break;
                         
                     case SDL_WINDOWEVENT_EXPOSED:
@@ -330,6 +313,7 @@ CEXPORT void UpdateGlobalHWND(HWND newHwnd) {
 CEXPORT
 void FlipPages(void)
 {
+    
 #ifdef _USE3D
     void Test3D();
     Test3D();
@@ -345,8 +329,8 @@ void FlipPages(void)
 #endif
 
     if (!bActive) {
-        DDLog("FlipPages: Not active, skipping\n");
-        return;
+        //DDLog("FlipPages: Not active, skipping\n");
+        //return;
     }
     
     if (!sdlRenderer || !sdlTexture || !sdlSurface || !offScreenPtr) {
@@ -404,6 +388,7 @@ void FlipPages(void)
 
 void LockSurface(void)
 {
+    
     if (DDError) return;
 
     ScreenPtr = (void*)((byte*)offScreenPtr + MaxSizeX * 32);
@@ -418,6 +403,7 @@ void LockSurface(void)
 
 void UnlockSurface(void)
 {
+    
     if (DDError) return;
     // Nothing to unlock for our offscreen buffer
 }
@@ -561,6 +547,7 @@ void DelLog() {
 
 bool CreateDDObjects(HWND hwnd)
 {
+    
 #ifdef _USE3D
     IRS = GetRenderSystemDX();
     assert(IRS);
@@ -607,7 +594,7 @@ bool CreateDDObjects(HWND hwnd)
                   desktopWidth, desktopHeight, desktopMode.refresh_rate);
             
             // Calculate integer scale factor
-            scaleFactor = CalculateIntegerScale(desktopWidth, desktopHeight, RealLx, RealLy);
+            //scaleFactor = CalculateIntegerScale(desktopWidth, desktopHeight, RealLx, RealLy);
         } else {
             DDLog("Failed to get desktop display mode: %s\n", SDL_GetError());
             desktopWidth = RealLx;
@@ -716,15 +703,20 @@ bool CreateDDObjects(HWND hwnd)
         DDLog("Created accelerated renderer\n");
     }
     
-    // Set integer scaling hint BEFORE setting logical size
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest"); // Pixel-perfect scaling
-    SDL_RenderSetIntegerScale(sdlRenderer, SDL_TRUE); // Force integer scaling
+    //"0" - Nearest neighbor (no filtering, sharp pixels)
+    //"1" - Linear interpolation (smooth/blurred)
+    //"2" - Anisotropic filtering (highest quality, hardware dependent)
+
     
-    // Set logical size to game resolution
-    if (SDL_RenderSetLogicalSize(sdlRenderer, RealLx, RealLy) != 0) {
-        DDLog("Failed to set logical size: %s\n", SDL_GetError());
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
+    extern bool bStretchMode;
+    if (bStretchMode) {
+    // Stretch mode - disable logical size, render directly
+    SDL_RenderSetLogicalSize(sdlRenderer, 0, 0);  // Disable logical size
     } else {
-        DDLog("Set logical size: %dx%d (will be integer scaled)\n", RealLx, RealLy);
+        // Aspect ratio mode - logical size with letterboxing
+        SDL_RenderSetLogicalSize(sdlRenderer, RealLx, RealLy);
+        SDL_RenderSetIntegerScale(sdlRenderer, SDL_FALSE);
     }
     
     // Get actual viewport to verify integer scaling
@@ -1024,7 +1016,7 @@ void SlowLoadPalette(LPCSTR lpFileName)
                     mul0 = mul;
                 }
                 
-                SDL_Delay(10);
+                //SDL_Delay(10);
             } while (mul0 < 255);
         }
     }
@@ -1061,7 +1053,7 @@ void SlowUnLoadPalette(LPCSTR lpFileName)
                 mul0 = mul;
             }
             
-            SDL_Delay(10);
+            //SDL_Delay(10);
         } while (mul0 < 255);
     }
 }

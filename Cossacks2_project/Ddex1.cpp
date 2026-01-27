@@ -13,6 +13,7 @@
 #include "./Steam/steam_api.h"
 
 bool window_mode;
+bool bStretchMode;
 int screen_width;
 int screen_height;
 double screen_ratio;
@@ -1080,7 +1081,7 @@ long FAR PASCAL WindowProc( HWND hWnd, UINT message,
         break;
 
     case WM_ACTIVATEAPP:
-        bActive = wParam;
+        bActive = TRUE;
 		if(bActive){
 			if(lpDDSPrimary){
 				//LockSurface();
@@ -3822,6 +3823,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
     else
     {
         window_mode = false;
+    }
+    if (strstr(lpCmdLine, "/stretch")) {
+        bStretchMode = true;
     }
 #ifndef CDVERSION
 	CDGINIT_EnCD();
