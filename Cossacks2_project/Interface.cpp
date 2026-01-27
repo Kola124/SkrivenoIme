@@ -671,7 +671,7 @@ void SetGameDisplayModeAnyway(int SizeX,int SizeY){
 	GSSetup800();
 	//SetCursorPos(512,300);
 	//SetMPtr(512,300,0);
-    DrawAllScreen();
+    //DrawAllScreen();
     if (window_mode)
     {
         ResizeAndCenterWindow();
@@ -718,7 +718,7 @@ bool SetGameDisplayMode(int SizeX,int SizeY){
     {
         ResizeAndCenterWindow();
     }
-	/*if (CheckMode())return true;
+	if (CheckMode())return true;
 	else{
 		RealLx=OldSizeX;
 		RealLy=OldSizeY;
@@ -727,7 +727,7 @@ bool SetGameDisplayMode(int SizeX,int SizeY){
 		GSSetup800();
 		DrawAllScreen();
 		return false;
-	};*/
+	};
 	return false;
 };
 extern int ScrollSpeed;
@@ -6291,23 +6291,7 @@ void LOOSEANDEXITFAST();
 void EndGSC_Reporting();
 bool ShowPostScreen=0;
 void PlayGame(){
-    InGame = true;
-    if (window_mode)
-    {//Explicit call in case if game starts at 1024x768
-        ResizeAndCenterWindow();
-    }
-    //Reset resolution for main menu
-    if (window_mode)
-    {//Dont't do in fullscreen to prevent menu stretching
-        if (RealLx != 1024 || RealLy != 768)
-        {
-            SetGameDisplayModeAnyway(1024, 768);
-        }
-    }
-    else
-    {//Always go for native screen resolution when showing menu in fullscreen
-        SetGameDisplayModeAnyway(screen_width, screen_height);
-    }
+    //if(exRealLx!=RealLx)SetGameDisplayModeAnyway(exRealLx,exRealLy);
 	GSSetup800();
 	LoadFog(0);
 	InitGame();
@@ -6316,7 +6300,7 @@ void PlayGame(){
 	GameNeedToDraw=false;
 	GameExit=false;
 	MakeMenu=false;
-	
+	InGame = true;
 	ShowPostScreen=0;
 	if(PlayGameMode)StartAboutTime=GetTickCount();
 StartPlay:
@@ -6425,7 +6409,7 @@ resgame:;
 	//SlowUnLoadPalette("0\\agew_1.pal");
 	int ExRX=RealLx;
 	int ExRY=RealLy;
-	//if(RealLx!=1024||RealLy!=768)SetGameDisplayModeAnyway(1024,768);
+	if(RealLx!=1024||RealLy!=768)SetGameDisplayModeAnyway(1024,768);
 	if(ShowStat){
 		if(!ShowStatistics()){
 			GameExit=false;
@@ -6561,8 +6545,9 @@ void EditGame(){
 		}else GameNeedToDraw=true;
 	}while(!GameExit);
 	IgnoreSlow=true;
+    SetGameDisplayModeAnyway(1024,768);
     //Reset resolution for main menu
-    if (window_mode)
+    /*if (window_mode)
     {//Dont't do in fullscreen to prevent menu stretching
         if (RealLx != 1024 || RealLy != 768)
         {
@@ -6572,7 +6557,7 @@ void EditGame(){
     else
     {//Always go for native screen resolution when showing menu in fullscreen
         SetGameDisplayModeAnyway(screen_width, screen_height);
-    }
+    }*/
 	IgnoreSlow=false;
 };
 //--------------ALL GAME IS IN THIS PROCEDURE!-------------//
@@ -8278,7 +8263,7 @@ extern byte CaptState;
 extern byte SaveState;
 void GetOptionsFromMap(char* Name){
 	if(Name[0]=='R'&&Name[1]=='N'&&Name[3]==' '){
-		int v1, v2, v3, ADD_PARAM;
+		int v1,v2,v3,ADD_PARAM;
 		char ccc[32];
 		int z=sscanf(Name,"%s%x%x%x%d",ccc,&v1,&v2,&v3,&ADD_PARAM);
 		if(z==5){
@@ -8288,21 +8273,6 @@ void GetOptionsFromMap(char* Name){
 			CaptState=(ADD_PARAM/100000)%10;
 			SaveState=(ADD_PARAM/1000000)%10;
 		};
-        /*int options = 0;
-        int z = sscanf(Name, "%*s %*s %*s %*s %d", &options);//BUGFIX: proper parsing
-        if (1 == z)
-        {
-            //Decode 7-digit number into game settings
-            int option_values[11] = { 0 };
-
-            DecodeOptionsFromNumber(options, option_values);
-
-            BaloonState = option_values[0];
-            CannonState = option_values[1];
-            XVIIIState = option_values[2];
-            CaptState = option_values[3];
-            SaveState = option_values[4];
-        }*/
 	};
 };
 extern char AI_Log[256];
