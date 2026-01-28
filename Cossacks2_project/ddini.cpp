@@ -709,10 +709,10 @@ bool CreateDDObjects(HWND hwnd)
     //"2" - Anisotropic filtering (highest quality, hardware dependent)
     extern bool InGame, InEditor;
     if (!InGame || !InEditor) {
-        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
     }
     else {
-        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
     }
     
 
