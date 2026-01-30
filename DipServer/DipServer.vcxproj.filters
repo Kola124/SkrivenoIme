@@ -55,10 +55,13 @@
     <ClCompile Include="BattleDialogs.cpp">
       <Filter>vital</Filter>
     </ClCompile>
-    <ClCompile Include="Mind.cpp">
+    <ClCompile Include="MindMT.cpp">
       <Filter>vital</Filter>
     </ClCompile>
     <ClCompile Include="Script.cpp">
+      <Filter>vital</Filter>
+    </ClCompile>
+    <ClCompile Include="mind.cpp">
       <Filter>vital</Filter>
     </ClCompile>
   </ItemGroup>

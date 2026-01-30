@@ -310,7 +310,10 @@ copy ..\_debug\DipServer\$(ProjectName).lib ..\lib\$(ProjectName).lib
     <ClCompile Include="DIP_SimpleBuilding.cpp" />
     <ClCompile Include="DString.cpp" />
     <ClCompile Include="Economic.cpp" />
-    <ClCompile Include="Mind.cpp" />
+    <ClCompile Include="mind.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="MindMT.cpp" />
     <ClCompile Include="Script.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_CII|Win32'">Create</PrecompiledHeader>

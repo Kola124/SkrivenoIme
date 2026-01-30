@@ -15,7 +15,7 @@ void HandleBattleCml(char* com,char** params,int npr,ParsedRQ* Result){
 	byte ID=GetMyPlayerID();
 	CPlayerInfo* PInfo=Battle.Info+ID;
 	if(!strcmp(params[0],"ready")){
-		word Data[2];
+		word Data[2]={0};
 		Data[0]=2048;	// command
 		Data[1]=ID;	// player color
 		SendDipCommand((char*)Data,sizeof Data);
@@ -100,7 +100,7 @@ void HandleBattleCml(char* com,char** params,int npr,ParsedRQ* Result){
 			}else{
 				//PopupDipDialog();
 				if(!PInfo->WaitStart){
-					word Data[3];
+					word Data[3]={0};
 					Data[0]=2051;
 					Data[1]=ID;	// player color
 					SendDipCommand((char*)Data,sizeof Data);
@@ -112,7 +112,7 @@ void HandleBattleCml(char* com,char** params,int npr,ParsedRQ* Result){
 }
 
 void RunStartTimer(){
-	word Data[3];
+	word Data[3]={0};
 	Data[0]=2050;
 	Data[1]=GetMyPlayerID();	// player color
 	SendDipCommand((char*)Data,sizeof Data);
@@ -1082,7 +1082,7 @@ void UnitType::GetCharacter(byte NI){
 	NAttTypes=GetMainChar(NI, NIndex, &MC);
 
 	if(NAttTypes){
-		int i;
+		int i=0;
 		CurDamage.reserve(NAttTypes); for(int i=0;i<NAttTypes;i++) CurDamage[i]=MC.MaxDamage[i];
 		CurProtect.reserve(NAttTypes); for(int i=0;i<NAttTypes;i++) CurProtect[i]=MC.Protection[i];
 		CurShield=MC.Shield;
