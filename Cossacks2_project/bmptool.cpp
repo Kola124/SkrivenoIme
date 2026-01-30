@@ -1,10 +1,12 @@
-#include "stdio.h"
+﻿#include "stdio.h"
 #include "windows.h"
 //#include "stdafx.h"
 #include "ResFile.h"
 #include <math.h>
 #include "bmptool.h"
 #include <assert.h>
+#include <exception>
+
 #define CEXPORT __declspec(dllexport)
 CEXPORT void* _ExMalloc(int Size);
 #define znew(t,s) (t*)_ExMalloc((s)*sizeof(t))
@@ -162,25 +164,68 @@ extern HWND hwnd;
 void CheckIntegrity(){
 	
 };
-#undef free
+#include <stdlib.h>
 #undef malloc
+#undef calloc
+#undef free
 int TotalSize=0;
 //#ifndef _USE3D
 
-#include "FMM\FMM.H"
+//#include "FMM\FMM.H"
 void* FM_Malloc(int size){
-	if(!size)size=1;
-	void* p=MManager.Allocate(size);
-	memset(p,0,size);
-	return p;
+	if (size <= 0) return nullptr; 
+	void* ptr = calloc(size, 1);
+	if (ptr) {
+		TotalSize++;
+		((DWORD*)ptr)[0] = 0xCAFEBABE;
+	}
+	return ptr;
 };
 void FM_free(void* ptr){
-	if(ptr)MManager.Deallocate((FMPTR)ptr);
+	try {
+		
+		if (!ptr) {
+
+			return;
+		}
+
+		DWORD* Ptr = (DWORD*)ptr;
+
+		
+		if ((uintptr_t)Ptr < 0x1000) {
+
+			return;
+		}
+
+		
+		if (Ptr[0] == 0xDEADBEEF) {
+
+			return; 
+		}
+
+
+		Ptr[0] = 0xDEADBEEF;
+
+
+		free(ptr);
+
+
+		if (TotalSize > 0) {
+			TotalSize--;
+		}
+		else {
+
+		}
+	}
+	catch (const std::exception& e) {
+	}
+	catch (...) {
+	}
 };
 
 //Using Global heap
 #define malloc FM_Malloc
-#define calloc(a,b) FM_Malloc(a)
+#define calloc(a,b) FM_Malloc((a)*(b))
 #define free FM_free
 
 //#endif //_USE3D
@@ -392,7 +437,7 @@ CEXPORT
 void* _ExMalloc(int Size){
 	TotalSize++;
 	byte* data=(byte*)calloc(Size+12,1);
-	((DWORD*)data)[0]=Size;
+	((DWORD*)data)[0]=Size; 
 	((DWORD*)data)[1]='TRTS';
 	*((DWORD*)(data+8+Size))='LNIF';
 	AllocSize+=Size;

@@ -33,7 +33,7 @@ void __stdcall CDGINIT_INIT3(){
 extern int COUNTER;
 typedef short* lpShort;
 typedef DWORD* lpDWORD ;
-#define znew(t,s) (t*)malloc((s)*sizeof(t))
+#define znew(t,s) (t*)_ExMalloc((s)*sizeof(t))
 #define GPX(x,y) ((GP_Header*)(int(x)+x##->##y))
 int startTrans=0;
 byte NatPal[64]={0xD0,0xD1,0xD2,0xD3,0xD4,0xD5,0xD6,0xD7,0xD8,0xD9,0xDA,0xDB,0xDC,0xDD,0xDE,0xDF,
