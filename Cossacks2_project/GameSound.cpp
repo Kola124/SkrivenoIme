@@ -23,7 +23,7 @@ extern int WorkSound;
 extern int OrderSound;
 extern int MidiSound;
 static bool SoundOK;
-CDirSound* CDS;
+CSDLSound* CDS;
 char* SoundID[MaxSnd];
 word SndTable[MaxSnd][16];
 byte SnDanger[MaxSnd];
@@ -51,7 +51,8 @@ void LoadSounds(char* fn){
 	int srpos=0;
 	int nsn,z;
 	NSounds=0;
-	SoundOK=CDS->DirectSoundOK()!=0;
+	// Changed from DirectSoundOK() to SDLSoundOK()
+	SoundOK=CDS->SDLSoundOK()!=0;
 	GFILE* f1=Gopen(fn,"rt");
 	AFile(fn);
 	char ccpr[128];
@@ -111,7 +112,8 @@ uuu:			if(Extent){
 				normstr(sss);
 				if(SoundOK){
 					if(!strcmp(ccpr,sss)){
-						SndTable[NSounds][i]=CDS->DuplicateSoundBuffer(CDS->m_currentBufferNum);
+						// Changed from DuplicateSoundBuffer() to DuplicateSound()
+						SndTable[NSounds][i]=CDS->DuplicateSound(CDS->m_currentBufferNum);
 						CDS->SetLastVolume(Vol);
 						CDS->SetSoundCategory(CDS->m_currentBufferNum,CURCTG,INCTG);
 						if(INCTG){
@@ -122,18 +124,22 @@ uuu:			if(Extent){
 						AText(sss);
 						int sdid;
 						if(CW.WaveOK()){
-							sdid=CDS->CreateSoundBuffer(&CW);
-							CDS->SetSoundCategory(sdid,CURCTG,INCTG);
-							if(INCTG)CDS->AddGroupSound(INCTG,sdid);
-							CDS->SetLastVolume(Vol);
-							if(CDS->DirectSoundOK()){
-								CDS->CopyWaveToBuffer(&CW,sdid);
+							// SDL version doesn't use CWave object directly
+							// Load WAV file using the filename directly
+							sdid=CDS->LoadWAV(sss);
+							if(sdid != 0){
+								CDS->SetSoundCategory(sdid, CURCTG, INCTG);
+                                if(INCTG) CDS->AddGroupSound(INCTG, sdid);
+                                CDS->SetLastVolume(Vol);  // This should now be safe
+                                SndTable[NSounds][i] = sdid;
+                                strcpy(ccpr, sss);
 							}else{
-								sprintf(idn,"Could not create sound buffer : %s",sss);
+								sprintf(idn,"Could not load sound : %s",sss);
 								Errs(idn);
+								nsn--;
+								NSnd[NSounds]--;
+								i--;
 							};
-							SndTable[NSounds][i]=sdid;
-							strcpy(ccpr,sss);
 						}else{
 							//sprintf(idn,"Could not load sound : %s",sss);
 							//Errs(idn);
@@ -153,7 +159,7 @@ uuu:			if(Extent){
 	};
 	//NSounds=0;
 	Gclose(f1);
-	//if(!CDS->DirectSoundOK()){
+	//if(!CDS->SDLSoundOK()){
 	//	NSounds=0;
 	//};
 	NoMineSound=GetSound("NOFREEMINES");
@@ -175,7 +181,7 @@ void PlayEffect(int n,int pan,int vol){
 				if(!poss){
 					CDS->SetVolume(sid,vol/*+CDS->Volume[sid]*/);
 					CDS->SetPan(sid,pan);
-					CDS->PlaySound(sid,0);
+					CDS->PlaySoundSDL(sid,0);
 					sndmade=false;
 				}else{
 					u--;
@@ -188,7 +194,7 @@ void PlayEffect(int n,int pan,int vol){
 				int nnn=(srando()*maxsnd)>>15;
 				CDS->SetVolume(SndTable[n][nnn],vol);
 				CDS->SetPan(SndTable[n][nnn],pan);
-				CDS->PlaySound(SndTable[n][nnn]);
+				CDS->PlaySoundSDL(SndTable[n][nnn]);
 			};
 			*/
 		};
@@ -228,7 +234,7 @@ void PlayCoorEffect(int n,int x,int y,int pan,int vol){
 				int nnn=(srando()*maxsnd)>>15;
 				CDS->SetVolume(SndTable[n][nnn],vol);
 				CDS->SetPan(SndTable[n][nnn],pan);
-				CDS->PlaySound(SndTable[n][nnn]);
+				CDS->PlaySoundSDL(SndTable[n][nnn]);
 			};
 			*/
 		};
@@ -255,7 +261,7 @@ void PlaySingleEffect(int n,int pan,int vol){
 				if(!poss){
 					CDS->SetVolume(sid,vol);
 					CDS->SetPan(sid,pan);
-					CDS->PlaySound(sid,0);
+					CDS->PlaySoundSDL(sid,0);
 					sndmade=false;
 				}else{
 					u--;
@@ -268,7 +274,7 @@ void PlaySingleEffect(int n,int pan,int vol){
 				int nnn=(srando()*maxsnd)>>15;
 				CDS->SetVolume(SndTable[n][nnn],vol);
 				CDS->SetPan(SndTable[n][nnn],pan);
-				CDS->PlaySound(SndTable[n][nnn]);
+				CDS->PlaySoundSDL(SndTable[n][nnn]);
 			};
 			*/
 		};

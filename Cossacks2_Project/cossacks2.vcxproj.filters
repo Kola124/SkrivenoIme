@@ -1163,6 +1163,9 @@
     <ClCompile Include="New\UdpHolePuncher.cpp">
       <Filter>New</Filter>
     </ClCompile>
+    <ClCompile Include="New\SecureDivision.cpp">
+      <Filter>New</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="Bink\binkw32.lib">
@@ -1217,6 +1220,9 @@
       <Filter>LIB</Filter>
     </Library>
     <Library Include="..\lib\LF_Server.lib">
+      <Filter>LIB</Filter>
+    </Library>
+    <Library Include="include\SDL2_mixer.lib">
       <Filter>LIB</Filter>
     </Library>
   </ItemGroup>

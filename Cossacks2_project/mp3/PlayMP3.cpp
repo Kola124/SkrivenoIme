@@ -72,7 +72,7 @@ void StartPlayRandomMP3(bool CheckAnyway){
 	};
 	*/
 	if(NFILES){
-		int NATTM=200;
+		int NATTM=0;
 		bool found=0;
 		char NAME[128]="";
 		do{

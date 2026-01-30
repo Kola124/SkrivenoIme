@@ -12,7 +12,7 @@ inline void* _cdecl operator new(size_t size)
 
 inline void __cdecl operator delete(void *ptr)
 {
- free(ptr);
+      free(ptr);
 };
 
 #define znew(t,s) (t*)_ExMalloc((s)*sizeof(t))

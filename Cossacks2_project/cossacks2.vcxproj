@@ -192,7 +192,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <LanguageStandard_C>Default</LanguageStandard_C>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;CRASHTESTFIX;AIFIX;VIEW_TOP;HASH_TOP;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;CRASHTESTFIX;MULTITHREAD;AIFIX;VIEW_TOP;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <ShowIncludes>false</ShowIncludes>
@@ -207,7 +207,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/FIXED:NO /MAPINFO:EXPORTS %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>msvcrt.lib;libcmtd.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;oldnames.lib;dsound.lib;dxguid.lib;dplayx.lib;strmiids.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;libcmt.lib;ddraw.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>msvcrt.lib;libcmtd.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;oldnames.lib;dxguid.lib;dplayx.lib;strmiids.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\bin\dmcr.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>../lib;../../lib;../bin;../../bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -728,8 +728,12 @@
     <ClInclude Include="Fex\Include\BaseTsd.h" />
     <ClInclude Include="Fex\Include\dmusici.h" />
     <ClInclude Include="Fex\Include\MultiMon.h" />
-    <ClInclude Include="FMM\FMM.h" />
-    <ClInclude Include="FMM\FMManager.h" />
+    <ClInclude Include="FMM\FMM.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="FMM\FMManager.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="fog.h" />
     <ClInclude Include="Fonts.h" />
     <ClInclude Include="G17\bz2\bzlib.h" />
@@ -839,51 +843,141 @@
     <ClInclude Include="Sort.h" />
     <ClInclude Include="SpraySystem.h" />
     <ClInclude Include="SquareObject.h" />
-    <ClInclude Include="Steam\isteamapps.h" />
-    <ClInclude Include="Steam\isteamappticket.h" />
-    <ClInclude Include="Steam\isteamclient.h" />
-    <ClInclude Include="Steam\isteamcontroller.h" />
-    <ClInclude Include="Steam\isteamdualsense.h" />
-    <ClInclude Include="Steam\isteamfriends.h" />
-    <ClInclude Include="Steam\isteamgamecoordinator.h" />
-    <ClInclude Include="Steam\isteamgameserver.h" />
-    <ClInclude Include="Steam\isteamgameserverstats.h" />
-    <ClInclude Include="Steam\isteamhtmlsurface.h" />
-    <ClInclude Include="Steam\isteamhttp.h" />
-    <ClInclude Include="Steam\isteaminput.h" />
-    <ClInclude Include="Steam\isteaminventory.h" />
-    <ClInclude Include="Steam\isteammatchmaking.h" />
-    <ClInclude Include="Steam\isteammusic.h" />
-    <ClInclude Include="Steam\isteammusicremote.h" />
-    <ClInclude Include="Steam\isteamnetworking.h" />
-    <ClInclude Include="Steam\isteamnetworkingmessages.h" />
-    <ClInclude Include="Steam\isteamnetworkingsockets.h" />
-    <ClInclude Include="Steam\isteamnetworkingutils.h" />
-    <ClInclude Include="Steam\isteamparentalsettings.h" />
-    <ClInclude Include="Steam\isteamps3overlayrenderer.h" />
-    <ClInclude Include="Steam\isteamremoteplay.h" />
-    <ClInclude Include="Steam\isteamremotestorage.h" />
-    <ClInclude Include="Steam\isteamscreenshots.h" />
-    <ClInclude Include="Steam\isteamtimeline.h" />
-    <ClInclude Include="Steam\isteamugc.h" />
-    <ClInclude Include="Steam\isteamuser.h" />
-    <ClInclude Include="Steam\isteamuserstats.h" />
-    <ClInclude Include="Steam\isteamutils.h" />
-    <ClInclude Include="Steam\isteamvideo.h" />
-    <ClInclude Include="Steam\matchmakingtypes.h" />
-    <ClInclude Include="Steam\steamclientpublic.h" />
-    <ClInclude Include="Steam\steamencryptedappticket.h" />
-    <ClInclude Include="Steam\steamhttpenums.h" />
-    <ClInclude Include="Steam\steamnetworkingfakeip.h" />
-    <ClInclude Include="Steam\steamnetworkingtypes.h" />
-    <ClInclude Include="Steam\steamps3params.h" />
-    <ClInclude Include="Steam\steamtypes.h" />
-    <ClInclude Include="Steam\steamuniverse.h" />
-    <ClInclude Include="Steam\steam_api.h" />
-    <ClInclude Include="Steam\steam_api_common.h" />
-    <ClInclude Include="Steam\steam_api_flat.h" />
-    <ClInclude Include="Steam\steam_api_internal.h" />
-    <ClInclude Include="Steam\steam_gameserver.h" />
+    <ClInclude Include="Steam\isteamapps.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteamappticket.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteamclient.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteamcontroller.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteamdualsense.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteamfriends.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteamgamecoordinator.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteamgameserver.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteamgameserverstats.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteamhtmlsurface.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteamhttp.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteaminput.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteaminventory.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteammatchmaking.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteammusic.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteammusicremote.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteamnetworking.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteamnetworkingmessages.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteamnetworkingsockets.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteamnetworkingutils.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteamparentalsettings.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteamps3overlayrenderer.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteamremoteplay.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteamremotestorage.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteamscreenshots.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteamtimeline.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteamugc.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteamuser.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteamuserstats.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteamutils.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\isteamvideo.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\matchmakingtypes.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\steamclientpublic.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\steamencryptedappticket.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\steamhttpenums.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\steamnetworkingfakeip.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\steamnetworkingtypes.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\steamps3params.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\steamtypes.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\steamuniverse.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\steam_api.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\steam_api_common.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\steam_api_flat.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\steam_api_internal.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\steam_gameserver.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="StrategyResearch.h" />
     <ClInclude Include="StringHash.h" />
     <ClInclude Include="TMixer.h" />
@@ -977,7 +1071,9 @@
     <ClCompile Include="FBI.cpp" />
     <ClCompile Include="Fex\FEXModule.cpp" />
     <ClCompile Include="Fex\FEXSysInfo.cpp" />
-    <ClCompile Include="FMM\FMManager.cpp" />
+    <ClCompile Include="FMM\FMManager.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="fog.cpp" />
     <ClCompile Include="Fractal.cpp" />
     <ClCompile Include="G17\bz2\blocksort.cpp" />
@@ -1200,6 +1296,7 @@
     </ClCompile>
     <ClCompile Include="NewUpgrade.cpp" />
     <ClCompile Include="New\MapOptionsEncoder.cpp" />
+    <ClCompile Include="New\SecureDivision.cpp" />
     <ClCompile Include="New\UdpHolePuncher.cpp" />
     <ClCompile Include="Nuclear.cpp" />
     <ClCompile Include="OnWater.cpp" />
@@ -1366,11 +1463,19 @@
     </Library>
     <Library Include="..\lib\d3d8.lib" />
     <Library Include="..\lib\d3dx8.lib" />
-    <Library Include="..\lib\DipServer.lib" />
-    <Library Include="..\lib\IChat.lib" />
-    <Library Include="..\lib\IntExplorer.lib" />
+    <Library Include="..\lib\DipServer.lib">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+    </Library>
+    <Library Include="..\lib\IChat.lib">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+    </Library>
+    <Library Include="..\lib\IntExplorer.lib">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+    </Library>
     <Library Include="..\lib\LF_Server.lib" />
-    <Library Include="..\lib\steam_api.lib" />
+    <Library Include="..\lib\steam_api.lib">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </Library>
     <Library Include="Bink\binkw32.lib">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">false</ExcludedFromBuild>
@@ -1379,6 +1484,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">false</ExcludedFromBuild>
     </Library>
     <Library Include="include\SDL2.lib" />
+    <Library Include="include\SDL2_mixer.lib" />
     <Library Include="InetRaiting\GP.lib">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">true</ExcludedFromBuild>
@@ -1431,10 +1537,14 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Bat\all.bat" />
-    <None Include="..\lib\steam_api.dll" />
+    <None Include="..\lib\steam_api.dll">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </None>
     <None Include="cpp.hint" />
     <None Include="mode.dat" />
-    <None Include="Steam\steam_api.json" />
+    <None Include="Steam\steam_api.json">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Script1.rc" />

@@ -10,7 +10,7 @@
 //#define VIEW_TOP
 //#define WIN32_LEAN_AND_MEAN
 #include "ddini.h"
-#include "./Steam/steam_api.h"
+//#include "./Steam/steam_api.h"
 
 bool window_mode;
 bool bStretchMode;
@@ -206,7 +206,8 @@ extern bool GetCoord;
 extern bool InGame;
 extern bool InEditor;
 extern int FogMode;
-extern CDirSound* CDS;
+extern CSDLSound CDIRSND;  // Global instance
+extern CSDLSound* CDS;
 extern int RealPause;
 void ProcessUFO();
 void SaveGame(char* fnm,char* gg,int ID);
@@ -229,7 +230,6 @@ bool EditMapMode;
 int HeightEditMode;
 bool HelpMode;
 bool ChoosePosition;
-CDirSound CDIRSND;
 int  ReliefBrush;
 int  CostThickness;
 int  TerrBrush;
@@ -367,7 +367,7 @@ void TimerProc(void)
 void LoadEconomy();
 void LoadNations();
 void LoadWeapon();
-void LoadNation(char* fn,byte msk,byte NIndex);
+void LoadNation(char* fn, byte msk, byte NIndex, byte NatID);
 void LoadAllNewMonsters();
 void InitNewMonstersSystem();
 void LoadWaveAnimations();
@@ -932,7 +932,6 @@ extern bool RUNMAPEDITOR;
 extern bool RUNUSERMISSION;
 extern char USERMISSPATH[128];
 void OnWTPacket(WPARAM wSerial, LPARAM hCtx);
-
 //MOUSE HANDLING, HANDLING OF MOUSE, MOUSE BUTTONS
 long FAR PASCAL WindowProc( HWND hWnd, UINT message, 
                             WPARAM wParam, LPARAM lParam )
@@ -2470,13 +2469,9 @@ BOOL GetCossacksDir(LPSTR lpszPath)
 		return FALSE;
 };
 void PlayBinkFile(char* path);
-HRESULT mpv_Play(LPCSTR lpcszMediaFileName);
-void mpv_Done(void);
 bool InVideo=0;
 void PlayVideo(){
-	//return;
 	char CPATH[256];
-	//if(!GetCossacksDir(CPATH))return;
 	char AviName[256];
 	sprintf(AviName,"Video\\1.bik",CPATH);
 	ResFile f=RReset(AviName);
@@ -2488,30 +2483,20 @@ void PlayVideo(){
 		return;
 	};
 
-	/*
-	for(int k=0;k<16;k++){
-		ResFile f=RReset(AviName);
-		if(f!=INVALID_HANDLE_VALUE){
-			RClose(f);
-			goto plavi;
-		};
-		AviName[0]++;
-	};
-	*/
-	//return;
 plavi:
 	StopPlayCD();
 	ClearScreen();
-	//FreeDDObjects();
 	InVideo=1;
 	InitRGB640Screen();
 	MiniMode=false;
-	CDIRSND.~CDirSound();
+	CDIRSND.ReleaseAll();
+	
 	PlayBinkFile("Video\\1.bik");
 	PlayBinkFile("Video\\2.bik");
 	PlayBinkFile("Video\\3.bik");
 	PlayBinkFile("Video\\4.bik");
 	PlayBinkFile("Video\\5.bik");
+	
 	if(First){
 		sprintf(AviName,"Video\\cdv.avi",CPATH);
 		ResFile f=RReset(AviName);
@@ -2546,6 +2531,7 @@ plavi:
 			ClearRGB();
 		};
 	};
+	
 	sprintf(AviName,"%s\\Video\\kz.avi",CPATH);
 	f=RReset(AviName);
 	if(f!=INVALID_HANDLE_VALUE){
@@ -2558,20 +2544,23 @@ plavi:
 		}while(!(KeyPressed||Lpressed||!bActive));
 		CloseAVI(hwnd);
 	};
+	
 	PlayBinkFile("Video\\6.bik");
 	PlayBinkFile("Video\\7.bik");
 	PlayBinkFile("Video\\8.bik");
 	PlayBinkFile("Video\\9.bik");
 	PlayBinkFile("Video\\10.bik");
-
+	
 	Lpressed=false;
 	KeyPressed=false;
 	ClearRGB();
 	InVideo=0;
-	//FreeDDObjects();
 	InitScreen();
-	CDIRSND.CreateDirSound(hwnd);
-	CDS=&CDIRSND;
+	
+	CDIRSND.CreateSDLSound();
+	
+	CDS = &CDIRSND;
+	
 	LoadSounds("SoundList.txt");
 	xLockMouse=false;
 	if(PlayMode)PlayRandomTrack();
@@ -2640,7 +2629,10 @@ static BOOL doInit( HINSTANCE hInstance, int nCmdShow )
     ShowWindow(hwnd, SW_SHOWNORMAL);
     UpdateWindow(hwnd);
 
-    CDIRSND.CreateDirSound(hwnd);
+    void ov_Init(HWND hExtWnd);
+	ov_Init(hwnd);
+
+    CDIRSND.CreateSDLSound();
     CDS = &CDIRSND;
     LoadSounds("SoundList.txt");
     MemReport("LoadSounds");
@@ -2742,7 +2734,7 @@ static BOOL doInit( HINSTANCE hInstance, int nCmdShow )
     return FALSE;
 }
 /* doInit */
-void AddDestn(byte x,byte y);
+void AddDestn(int x, int y);
 void ProcessNewMonsters();
 int PrevTime=0;
 void InitXShift();
@@ -2813,10 +2805,6 @@ void PreDrawGameProcess() {
 	ProcessMapAutosave();
 	AddRandomBlobs();
 	CDS->ProcessSoundSystem();
-	
-	// REMOVED the timing control from PreDraw - let it run every frame
-	// Only control the actual game time increment
-	
 	if(NOPAUSE){
 		for(int w=0;w<8;w++){
 			WasInGold[w]=NInGold[w];
@@ -3624,7 +3612,7 @@ bool RunSMD(){
 #ifdef SPEEDFIX
                 Gscanf(fff, "%d%d%d%d%d%d%d%d%d%d", &exRealLx, &exRealLy, &WarSound, &OrderSound, &OrderSound, &MidiSound, &FPSTimeSF, &ScrollSpeed, &exFMode, &PlayMode);
 #else
-                Gscanf(fff, "%d%d%d%d%d%d%d%d%d%d", &exRealLx, &exRealLy, &WarSound, &OrderSound, &OrderSound, &MidiSound, &FPSTime, &ScrollSpeed, &exFMode, &PlayMode);
+                Gscanf(fff,"%d%d%d%d%d%d%d%d%d%d%d%d%d",&ex_window_x,&ex_window_y,&WarSound,&OrderSound,&OrderSound,&MidiSound,&dummy, &FPSTime,&ScrollSpeed,&exFMode,&PlayMode,&ex_x ,&ex_y);
 #endif
                 SetCDVolume(MidiSound);
 				Gclose(fff);
@@ -3642,7 +3630,7 @@ bool RunSMD(){
 #ifdef SPEEDFIX
                         Gscanf(fff, "%d%d%d%d%d%d%d%d%d%d", &exRealLx, &exRealLy, &WarSound, &OrderSound, &OrderSound, &MidiSound, &FPSTimeSF, &ScrollSpeed, &exFMode, &PlayMode);
 #else
-                        Gscanf(fff, "%d%d%d%d%d%d%d%d%d%d", &exRealLx, &exRealLy, &WarSound, &OrderSound, &OrderSound, &MidiSound, &FPSTime, &ScrollSpeed, &exFMode, &PlayMode);
+                        Gprintf(fff,"%d %d %d %d %d %d %d %d %d %d %d %d",ex_window_x,ex_window_y,WarSound,OrderSound,OrderSound,MidiSound,FPSTime,ScrollSpeed,exFMode,PlayMode,ex_x ,ex_y);
 #endif
                         SetCDVolume(MidiSound);
 						Gclose(fff);
@@ -3736,7 +3724,7 @@ int Alert(const char* lpCaption, const char* lpText)
 }
 
 
-int SteamInitialisation() {
+/*int SteamInitialisation() {
     if (SteamAPI_RestartAppIfNecessary(k_uAppIdInvalid))
     {
         // if Steam is not running or the game wasn't started through Steam, SteamAPI_RestartAppIfNecessary starts the 
@@ -3764,6 +3752,7 @@ int SteamInitialisation() {
         return EXIT_FAILURE;
     }
 }
+*/
 
 void SetDebugMode();
 void NoDebugMode();
@@ -3904,17 +3893,11 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
         int ex_window_x, ex_window_y, ex_x, ex_y;
         int dummy;
         //7th value was FPSTime
-#ifdef SPEEDFIX
-        Gscanf(fff, "%d%d%d%d%d%d%d%d%d%d%d%d%d",
-            &ex_window_x, &ex_window_y, &ex_x, &ex_y,
-            &WarSound, &OrderSound, &OrderSound, &MidiSound,
-            &dummy, &FPSTimeSF, &ScrollSpeed, &exFMode, &PlayMode);
-#else
-        Gscanf(fff, "%d%d%d%d%d%d%d%d%d%d%d%d%d",
-            &ex_window_x, &ex_window_y, &ex_x, &ex_y,
-            &WarSound, &OrderSound, &OrderSound, &MidiSound,
-            &dummy, &FPSTime, &ScrollSpeed, &exFMode, &PlayMode);
-#endif
+		#ifdef SPEEDFIX
+		Gscanf(fff,"%d%d%d%d%d%d%d%d%d%d",&exRealLx,&exRealLy,&WarSound,&OrderSound,&OrderSound,&MidiSound,&FPSTimeSF,&ScrollSpeed,&exFMode,&PlayMode);
+		#else
+		Gscanf(fff,"%d%d%d%d%d%d%d%d%d%d%d%d%d",&ex_window_x,&ex_window_y,&WarSound,&OrderSound,&OrderSound,&MidiSound,&dummy, &FPSTime,&ScrollSpeed,&exFMode,&PlayMode,&ex_x ,&ex_y);
+		#endif
         Gclose(fff);
 
         //Set last 'global resolution' according to current mode
@@ -4127,17 +4110,11 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 
         GFILE* fff=Gopen("mode.dat","wt");
         if(fff){
-#ifdef SPEEDFIX
-            Gprintf(fff, "%d %d %d %d %d %d %d %d %d %d %d %d %d",
-                ex_window_x, ex_window_y, ex_x, ex_y,
-                WarSound, OrderSound, OrderSound,
-                MidiSound, 0, FPSTimeSF, ScrollSpeed, exFMode, PlayMode);
-#else
-            Gprintf(fff, "%d %d %d %d %d %d %d %d %d %d %d %d %d",
-                ex_window_x, ex_window_y, ex_x, ex_y,
-                WarSound, OrderSound, OrderSound,
-                MidiSound, 0, FPSTime, ScrollSpeed, exFMode, PlayMode);
-#endif
+				#ifdef SPEEDFIX
+				Gprintf(fff,"%d %d %d %d %d %d %d %d %d %d",exRealLx,exRealLy,WarSound,OrderSound,OrderSound,MidiSound,FPSTimeSF,ScrollSpeed,exFMode,PlayMode);
+				#else
+				Gprintf(fff,"%d %d %d %d %d %d %d %d %d %d %d %d %d",ex_window_x,ex_window_y,WarSound,OrderSound,OrderSound,MidiSound, 0,FPSTime,ScrollSpeed,exFMode,PlayMode,ex_x ,ex_y);
+				#endif
             Gclose(fff);
         };
         

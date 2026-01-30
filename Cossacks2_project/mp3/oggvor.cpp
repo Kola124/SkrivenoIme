@@ -2,7 +2,6 @@
 #include <basetyps.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <dsound.h>
 //#include <dsconf.h>
 #include <stdlib.h>
 
