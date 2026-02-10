@@ -8,7 +8,7 @@
 #define current_time GetTickCount
 char* GetCUserInfo(char* Nick);
 void AddCUserInfo(char* Nick,char* Info);
-
+#ifndef STEAM
 void ChatSystem::AddPlayer(char* Nick,int c){
 	int i;
 	for(int i=0;i<CCH[c].NPlayers;i++)if(!strcmp(Nick,CCH[c].Players[i].Nick))return;
@@ -70,6 +70,7 @@ void ChatSystem::Disconnect(){
 		chatDisconnect(chat);
 	};
 };
+#endif
 void Raw(CHAT chat, const char * raw, void * param)
 {
 	ChatSystem* CC=(ChatSystem*)param;
@@ -206,7 +207,7 @@ void ConnectCallback(CHAT chat, CHATBool success, void * param)
 	if(success)CC->Connected=1;
 	else CC->Error=1;
 }
-
+#ifndef STEAM
 void NickErrorCallback(CHAT chat, int type, const char * nick, void * param)
 {
 	ChatSystem* CC=(ChatSystem*)param;
@@ -253,6 +254,7 @@ void NickErrorCallback(CHAT chat, int type, const char * nick, void * param)
 			}
 		};
 };
+#endif
 
 void EnumUsersCallback(CHAT chat, CHATBool success, const char * channel, int numUsers, const char ** users, int * modes, void * param);
 void EnterChannelCallback(CHAT chat, CHATBool success, CHATEnterResult result, const char * channel, void * param)
@@ -336,7 +338,7 @@ void ChatBroadcastKeyChanged(CHAT chat,
 						 const char * value,
 						 void * param){
 };
-
+#ifndef STEAM
 void ChatSystem::Setup(){
 	strcpy(serverAddress,"peerchat.gamespy.com");
 	port = 6667;
@@ -364,8 +366,10 @@ void ChatSystem::Setup(){
 	channelCallbacks.param = this;
 	channelCallbacks.broadcastKeyChanged=&ChatBroadcastKeyChanged;
 };
+#endif
 int PREVSEND=0;
 int NSS=0;
+#ifndef STEAM
 void ChatSystem::Process(){
 	if(chat)chatThink(chat);
 	for(int q=0;q<NCHNL;q++)SortPlayers(CCH[q].Players,CCH[q].NPlayers);
@@ -391,10 +395,13 @@ void ChatSystem::Process(){
 		};
 	};
 };
+#endif
+
 CEXPORT 
 void ChatProcess(){
 	if(CSYS.chat)chatThink(CSYS.chat);
 };
+#ifndef STEAM
 bool ChatSystem::ConnectToChat(char* Nick,char* Info,char* Mail,char* Chat,char* C1,char* C2){
 	strcpy(chatNick,Nick);
 	strcpy(chatUser,Info);
@@ -432,6 +439,7 @@ bool ChatSystem::ConnectToChat(char* Nick,char* Info,char* Mail,char* Chat,char*
 	};
 	return Connected;
 };
+#endif
 ChatSystem::ChatSystem(){
 	memset(this,0,sizeof* this);
 };
@@ -442,6 +450,7 @@ ChatSystem::~ChatSystem(){
 	if(AbsPlayers)free(AbsPlayers);
 	memset(this,0,sizeof* this);
 };
+#ifndef STEAM
 ChatMsg::ChatMsg(){
 	memset(this,0,sizeof *this);
 };
@@ -466,6 +475,7 @@ void ChatMsg::Add(char* nick,char* msg){
 	strcpy(Nick[NMsg],nick);
 	NMsg++;
 };
+#endif
 bool ChatMsg::RemoveOne(char* nick,char* buf,int Len){
 	if(NMsg){
 		strcpy(nick,Nick[0]);

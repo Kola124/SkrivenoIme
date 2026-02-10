@@ -97,6 +97,11 @@ extern char ACCESS[16];
 
 bool processMultiplayer(){
 	GoHomeAnyway();
+	
+#ifndef STEAM
+	// ============================================================================
+	// DIRECTPLAY VERSION (Original)
+	// ============================================================================
 	byte AddrBuf[128];
 	memset(AddrBuf,0,128);
 	int crs=0;
@@ -142,13 +147,6 @@ REINCONN:;
 			addressElements[0].dwDataSize = sizeof(GUID);
 			addressElements[0].lpData = (LPVOID) &DPSPGUID_IPX;
 			lpDPlayLobby2A->CreateCompoundAddress(addressElements,1,AddrBuf,&sz);
-			/*
-			memcpy(AddrBuf,&DPAID_TotalSize,16);
-			AddrBuf[16]=56;
-			memcpy(AddrBuf+20,&DPAID_ServiceProvider,16);
-			AddrBuf[36]=16;
-			memcpy(AddrBuf+40,&DPSPGUID_IPX,16);
-			*/
 			break;
 		case 1://TCP/IP
 			IPADDR[0]=0;
@@ -161,14 +159,6 @@ REINCONN:;
 			addressElements[1].dwDataSize = strlen(IPADDR)+1;
 			addressElements[1].lpData = (LPVOID) IPADDR;
 			lpDPlayLobby2A->CreateCompoundAddress(addressElements,2,AddrBuf,&sz);
-			/*
-			memcpy(AddrBuf,&DPAID_ServiceProvider,16);
-			AddrBuf[16]=16;
-			memcpy(AddrBuf+20,&DPSPGUID_TCPIP,16);
-			memcpy(AddrBuf+36,&DPAID_INet,16);
-			AddrBuf[40]=1;
-			AddrBuf[41]=0;
-			*/
 			break;
 		};
 		lpDPlayLobby2A->Release();
@@ -260,11 +250,164 @@ REINCONN:;
 		break;
 	};
 	return 1;
-};
 
+#else
+	// ============================================================================
+	// STEAM VERSION (New)
+	// ============================================================================
+	
+	int crs=0;
+RetryConn_Steam:;
+	if(IEMMOD)goto REINCONN_Steam;
+	
+	crs = MPL_ChooseConnection();
+	if(TOTALEXIT) return 0;
+	if(crs == mcmCancel) return 0;
+	
+	// Handle internet mode (protocol 3 = new internet)
+	if(CurProtocol == 3) {
+		if(!ProcessNewInternetLogin()) return false;
+REINCONN_Steam:;
+		int r = ProcessInternetConnection(1);
+		if(!r) return 0;
+		if(r == 2) crs = 10;  // Join
+		if(r == 1) crs = 11;  // Host Deathmatch
+		if(r == 3) crs = 13;  // Host Battle
+	} else {
+		if(!CommEnterName()) return 0;
+	}
+	
+	// With Steam, always use new internet protocol
+	DoNewInet = 1;
+    extern bool IPCORE_INIT;
+    extern bool NETWORK_INIT;
+	// Initialize Steam networking if needed
+	if(!IPCORE_INIT) {
+		CloseMPL();
+		CreateMultiplaterInterface();
+		if(!NETWORK_INIT) goto RetryConn_Steam;
+	}
+	
+	// No DirectPlay address setup needed with Steam!
+	// Steam handles all network configuration automatically
+	
+	switch(crs) {
+	case mcmHost:
+		// Host a regular game (LAN/local)
+		if(CreateNamedSession(PlName, 0, GMMAXPL)) {
+			WaitingHostGame(0);
+		}
+		break;
+		
+	case mcmJoin:
+		// Join a regular game
+		MPL_JoinGame(0);
+		break;
+		
+	case 11: // Internet Host (Deathmatch)
+		PlayerMenuMode = 1;
+		
+		if(CreateSession(GlobalRIF.Name, GlobalRIF.Nick, 0, DoNewInet, GlobalRIF.MaxPlayers)) {
+			NeedToPerformGSC_Report = 1;
+			
+			// NO HOLE PUNCHING NEEDED WITH STEAM!
+			// Steam handles all NAT traversal automatically
+			// udp_hole_puncher.Init() is not needed
+			
+			WaitingHostGame(0);
+			NeedToPerformGSC_Report = 0;
+			
+			if(PlayerMenuMode == 1) {
+				// Need to leave the room
+				LeaveGSCRoom();
+				goto REINCONN_Steam;
+			} else {
+				// Game started successfully
+				char* PLAYERS[8];
+				int Profiles[8];
+				char NAT[8][32];
+				char* Nations[8];
+				int Teams[8];
+				int Colors[8];
+				
+				for(int i = 0; i < NPlayers; i++) {
+					PLAYERS[i] = PINFO[i].name;
+					sprintf(NAT[i], "%d", PINFO[i].NationID + 48);
+					Nations[i] = NAT[i];
+					Profiles[i] = PINFO[i].ProfileID;
+					Teams[i] = PINFO[i].GroupID;
+					Colors[i] = PINFO[i].ColorID;
+				}
+				
+				StartGSCGame("", PINFO[0].MapName, NPlayers, Profiles, Nations, Teams, Colors);
+				NeedToReportInGameStats = 1;
+				LastTimeReport_tmtmt = 0;
+			}
+		} else {
+			LeaveGSCRoom();
+			goto REINCONN_Steam;
+		}
+		break;
+		
+	case 13: // Host Battle
+		PlayerMenuMode = 1;
+		goto REINCONN_Steam;
+		break;
+		
+	case 10: // Internet Join (Deathmatch)
+		PlayerMenuMode = 1;
+		
+		// With Steam, IPADDR contains the lobby ID instead of IP address
+		// Format: "lobby_123456789012345"
+		strcpy(IPADDR, GlobalRIF.RoomIP);
+		
+		if(!FindSessionAndJoin(ROOMNAMETOCONNECT, GlobalRIF.Nick, DoNewInet, GlobalRIF.port)) {
+			LeaveGSCRoom();
+			WaitWithMessage(GetTextByID("ICUNJ"));
+		} else {
+			WaitingJoinGame(GMTYPE);
+		}
+		
+		if(PlayerMenuMode == 1) {
+			LeaveGSCRoom();
+			goto REINCONN_Steam;
+		} else {
+			// Game joined successfully
+			char* PLAYERS[8];
+			int Profiles[8];
+			char NAT[8][32];
+			char* Nations[8];
+			int Teams[8];
+			int Colors[8];
+			
+			for(int i = 0; i < NPlayers; i++) {
+				PLAYERS[i] = PINFO[i].name;
+				sprintf(NAT[i], "%d", PINFO[i].NationID + 48);
+				Nations[i] = NAT[i];
+				Profiles[i] = PINFO[i].ProfileID;
+				Teams[i] = PINFO[i].GroupID;
+				Colors[i] = PINFO[i].ColorID;
+			}
+			
+			StartGSCGame("", PINFO[0].MapName, NPlayers, Profiles, Nations, Teams, Colors);
+			NeedToReportInGameStats = 1;
+			LastTimeReport_tmtmt = 0;
+		}
+		break;
+	}
+	
+	return 1;
+
+#endif // USE_STEAM_NETWORKING
+}
 
 void processBattleMultiplayer(){
 TryConnection:;
+
+#ifndef STEAM
+	// ============================================================================
+	// DIRECTPLAY VERSION (Original)
+	// ============================================================================
 	byte AddrBuf[128];
 	memset(AddrBuf,0,128);
 	int crs;
@@ -280,24 +423,18 @@ TryConnection:;
 	};
 	if(!CommEnterName())return;
 	
-	//if(crs==mcmHost){
-	//	BTLID=ProcessWars();
-	//};
-
 	if(BTLID==-1)goto TryConnection;
 	if(!lpDirectPlay3A){
 		DoNewInet=0;
 		CreateMultiplaterInterface();
 		if(!lpDirectPlay3A)return;
 	};
-
 	LPDIRECTPLAYLOBBYA	lpDPlayLobbyA = NULL;
 	LPDIRECTPLAYLOBBY2A	lpDPlayLobby2A = NULL;
 	if FAILED(DirectPlayLobbyCreate(NULL, &lpDPlayLobbyA, NULL, NULL, 0)) return;
 	// get ANSI DirectPlayLobby2 interface
 	HRESULT hr = lpDPlayLobbyA->QueryInterface(IID_IDirectPlayLobby2A, (LPVOID *) &lpDPlayLobby2A);
 	if FAILED(hr)return;
-
 	// don't need DirectPlayLobby interface anymore
 	lpDPlayLobbyA->Release();
 	lpDPlayLobbyA = NULL;
@@ -323,13 +460,11 @@ TryConnection:;
 		addressElements[1].lpData = (LPVOID) IPADDR;
 		lpDPlayLobby2A->CreateCompoundAddress(addressElements,2,AddrBuf,&sz);
 		break;
-
 	};
 	lpDPlayLobby2A->Release();
 	CloseMPL();
 	CreateMultiplaterInterface();
-	if FAILED(lpDirectPlay3A->InitializeConnection(AddrBuf
-		/*lplpConnectionBuffer[CurProtocol]*/,0)) return;
+	if FAILED(lpDirectPlay3A->InitializeConnection(AddrBuf,0)) return;
 	switch(crs){
 	case mcmHost:
 		if(CreateNamedSession(PlName,BTLID+1,2))WaitingHostGame(BTLID+1);
@@ -338,4 +473,93 @@ TryConnection:;
 		MPL_JoinGame(BTLID+1);
 		break;
 	};
-};
+
+#else
+	// ============================================================================
+	// STEAM VERSION (New)
+	// ============================================================================
+	
+	int crs;
+	crs = MPL_ChooseConnection();
+	if (TOTALEXIT) return;
+	if (crs == mcmCancel) return;
+	
+	// Special mode handling (if CurProtocol == 3, redirect to regular multiplayer)
+	if (CurProtocol == 3) {
+		IEMMOD = 1;
+		processMultiplayer();
+		if (TOTALEXIT) return;
+		IEMMOD = 0;
+		return;
+	}
+    extern bool IPCORE_INIT;
+    extern bool NETWORK_INIT;
+	// Get player name
+	if (!CommEnterName()) return;
+	
+	// Check battle ID
+	if (BTLID == -1) goto TryConnection;
+	
+	// Initialize Steam networking if not already done
+	if (!IPCORE_INIT) {
+		DoNewInet = 1;  // Force new internet protocol
+		CreateMultiplaterInterface();
+		if (!NETWORK_INIT) return;
+	}
+	
+	// With Steam, we don't need protocol selection or address setup
+	// Steam handles all network connectivity automatically
+	
+	// CurProtocol is ignored with Steam - it always uses Steam P2P
+	// IPADDR is only used if we need to join a specific lobby by ID
+	
+	switch (crs) {
+	case mcmHost:
+		// Create a battle game (2 players, battle mode)
+		{
+			char sessionName[128];
+			sprintf_s(sessionName, sizeof(sessionName), "[BATTLE]_%s", PlName);
+			
+			if (CreateNamedSession(PlName, BTLID + 1, 2)) {
+				// Session created successfully
+				WaitingHostGame(BTLID + 1);
+			}
+		}
+		break;
+		
+	case mcmJoin:
+		// Join a battle game
+		MPL_JoinGame(BTLID + 1);
+		break;
+	}
+
+#endif // USE_STEAM_NETWORKING
+}
+
+// ============================================================================
+// Helper function for Steam battle game creation
+// ============================================================================
+
+#ifdef STEAM
+
+// This replaces the DirectPlay address setup for Steam
+bool Steam_SetupBattleConnection(int battleID)
+{
+	// With Steam, no address setup is needed
+	// Steam P2P connection is established automatically through the lobby
+	
+	// Just verify Steam is ready
+	if (!SteamUser() || !SteamMatchmaking() || !SteamNetworking())
+	{
+		return false;
+	}
+	
+	// Set battle-specific rich presence
+	char battleInfo[64];
+	sprintf_s(battleInfo, sizeof(battleInfo), "Battle %d", battleID);
+	SteamFriends()->SetRichPresence("status", battleInfo);
+	
+	return true;
+}
+
+#endif // USE_STEAM_NETWORKING

@@ -104,11 +104,15 @@
     <ClInclude Include="nonport.h">
       <Filter>Chat\Chat Headers</Filter>
     </ClInclude>
+    <ClInclude Include="steam_chat_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\lib\dmcr.lib" />
+    <Library Include="..\lib\steam_api.lib" />
   </ItemGroup>
 </Project>

@@ -10,7 +10,9 @@
 //#define VIEW_TOP
 //#define WIN32_LEAN_AND_MEAN
 #include "ddini.h"
-//#include "./Steam/steam_api.h"
+#ifdef STEAM
+#include "./Steam/steam_api.h"
+#endif
 
 bool window_mode;
 bool bStretchMode;
@@ -3723,8 +3725,8 @@ int Alert(const char* lpCaption, const char* lpText)
 #endif
 }
 
-
-/*int SteamInitialisation() {
+#ifdef STEAM
+int SteamInitialisation() {
     if (SteamAPI_RestartAppIfNecessary(k_uAppIdInvalid))
     {
         // if Steam is not running or the game wasn't started through Steam, SteamAPI_RestartAppIfNecessary starts the 
@@ -3752,10 +3754,12 @@ int Alert(const char* lpCaption, const char* lpText)
         return EXIT_FAILURE;
     }
 }
-*/
-
+#endif
 void SetDebugMode();
 void NoDebugMode();
+#ifdef STEAM
+extern "C" __declspec(dllimport) void UpdateSteamExplorer(); 
+#endif
 extern BOOL DDDebug;
 //int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 //   LPSTR lpCmdLine, int nCmdShow)
@@ -3763,7 +3767,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
     _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
 {
 	//TestHash();
-    //SteamInitialisation();
+#ifdef STEAM
+    SteamInitialisation();
+#endif
 	DelLog();
 	FEX_BEGIN();	
 	if(FEX_MemStatus1.dwTotalVirtual<1024*1024*700){
@@ -4081,6 +4087,11 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 
     if(bActive){
         StartExplorer();
+#ifdef STEAM
+        // Update Steam lobbies
+        
+        UpdateSteamExplorer();  // Add this!
+#endif
         InVideo=0;
         AllGame();
         ClearScreen();

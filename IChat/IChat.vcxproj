@@ -13,6 +13,10 @@
       <Configuration>Library</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release STEAM|Win32">
+      <Configuration>Release STEAM</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
@@ -25,6 +29,12 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <PlatformToolset>v143</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
@@ -55,6 +65,10 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Library|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
@@ -82,6 +96,11 @@
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>..\bin\</OutDir>
+    <IntDir>.\../_release\IChat\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">
     <OutDir>..\bin\</OutDir>
     <IntDir>.\../_release\IChat\</IntDir>
     <LinkIncremental>false</LinkIncremental>
@@ -251,6 +270,62 @@ xcopy               /Y               e:\arc_usa\ichat.dll               ..\bin
       </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\../_release/IChat.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_MBCS;_USRDLL;STEAM;ICHAT_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>.\../_release/IChat.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\../_release/</AssemblerListingLocation>
+      <ObjectFileName>.\../_release/</ObjectFileName>
+      <ProgramDataBaseFileName>.\../_release/</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0419</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/MAPINFO:EXPORTS %(AdditionalOptions)</AdditionalOptions>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>../lib;../../lib;../bin;../../bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ProgramDatabaseFile>.\../_release/IChat.pdb</ProgramDatabaseFile>
+      <GenerateMapFile>true</GenerateMapFile>
+      <MapFileName>.\../_release/IChat.map</MapFileName>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <ImportLibrary>.\../lib/IChat.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalDependencies>Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>libc.lib;</IgnoreSpecificDefaultLibraries>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\../_release/IChat.bsc</OutputFile>
+    </Bscmake>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">
     <Midl>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -309,24 +384,45 @@ xcopy               /Y               e:\arc_usa\ichat.dll               ..\bin
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\IntExplorer\ParseRQ.cpp" />
-    <ClCompile Include="Chat\chatCallbacks.c" />
-    <ClCompile Include="Chat\chatChannel.c" />
-    <ClCompile Include="Chat\chatHandlers.c" />
-    <ClCompile Include="Chat\chatMain.c" />
-    <ClCompile Include="Chat\chatSocket.c" />
-    <ClCompile Include="cs_chat.cpp" />
-    <ClCompile Include="darray.c" />
+    <ClCompile Include="Chat\chatCallbacks.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Chat\chatChannel.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Chat\chatHandlers.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Chat\chatMain.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Chat\chatSocket.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="cs_chat.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="darray.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="GSC_ChatWindow.cpp" />
-    <ClCompile Include="hashtable.c" />
+    <ClCompile Include="hashtable.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="IChat.cpp" />
-    <ClCompile Include="md5c.c" />
-    <ClCompile Include="nonport.c" />
+    <ClCompile Include="md5c.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="nonport.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_CII|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug_CII|Win32'">stdafx.h</PrecompiledHeaderFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</PrecompiledHeaderFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
@@ -344,12 +440,14 @@ xcopy               /Y               e:\arc_usa\ichat.dll               ..\bin
     <ClInclude Include="md5.h" />
     <ClInclude Include="nonport.h" />
     <ClInclude Include="StdAfx.h" />
+    <ClInclude Include="steam_chat_system.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\lib\dmcr.lib" />
+    <Library Include="..\lib\steam_api.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,4 +1,11 @@
+#ifndef STEAM
 #include ".\New\UdpHolePuncher.h"
+#endif
+
+#ifdef STEAM
+#include "Steam\SteamCommCore.h"
+#endif
+
 #include "Limitations.h"
 #include "ddini.h"
 #include "ResFile.h"
@@ -67,9 +74,11 @@
 
 //#define INTF_AC
 #define INTF_AC_ADD
-
+#ifndef STEAM
 UdpHolePuncher udp_hole_puncher;
-
+#else
+CSteamCommCore IPCORE2; 
+#endif
 extern bool RUNMAPEDITOR;
 extern bool RUNUSERMISSION;
 extern char USERMISSPATH[128];
@@ -2437,6 +2446,7 @@ int GetGSC_Profile(){
 };
 CIMPORT
 int Process_GSC_ChatWindow(bool Active,RoomInfo* RIF);
+#ifndef STEAM
 int ProcessInternetConnection(bool Active){
     return Process_GSC_ChatWindow(Active, &GlobalRIF);
     if(UseGSC_Login){
@@ -4720,6 +4730,71 @@ int ProcessInternetConnection(bool Active){
 
     return 0; 
 };
+
+#else // !STEAM
+int ProcessInternetConnection(bool Active) {
+    // Simple version - just refresh callbacks
+    if (!Active) {
+        SteamAPI_RunCallbacks();
+        return 1;
+    }
+
+    return Process_GSC_ChatWindow(Active, &GlobalRIF);
+    
+    // For Active mode, show simple host/cancel dialog
+    ClearScreen();
+    LoadFog(1);
+    LoadPalette("1\\agew_1.pal");
+    
+    LocalGP IBTN("Interface\\IButtons");
+    SQPicture Back("INTERFACE\\BACK_SHELL.BMP");
+    
+#ifdef SCREENFIX
+    DialogsSystem DSS(menu_x_off, menu_y_off);
+#else
+    DialogsSystem DSS(0, 0);
+#endif
+    
+    LocalGP HFONT("rom10");
+    RLCFont hfnt(HFONT.GPID);
+    hfnt.SetWhiteColor();
+    DSS.HintFont = &hfnt;
+    
+#ifdef SCREENFIX
+    DSS.HintY = menu_hint_y;
+    DSS.HintX = menu_hint_x;
+#else
+    DSS.HintY = 18;
+    DSS.HintX = 701;
+#endif
+    
+    DSS.addPicture(NULL, 0, 0, &Back, &Back, &Back);
+    
+    // Host button
+    GP_Button* CREATE = DSS.addGP_Button(NULL, 862, 468, IBTN.GPID, 2, 1);
+    CREATE->UserParam = 1;
+    CREATE->OnUserClick = &MMItemChoose;
+    CREATE->Hint = GetTextByID("IG_CREATE");
+    
+    // Cancel button  
+    GP_Button* CANCEL = DSS.addGP_Button(NULL, 862, 668, IBTN.GPID, 7, 6);
+    CANCEL->UserParam = 0;
+    CANCEL->OnUserClick = &MMItemChoose;
+    CANCEL->Hint = GetTextByID("IG_CANCEL");
+    
+    ItemChoose = -1;
+    
+    do {
+        SteamAPI_RunCallbacks();
+        ProcessMessages();
+        DSS.MarkToDraw();
+        DSS.ProcessDialogs();
+        DSS.RefreshView();
+    } while (ItemChoose == -1);
+    
+    return ItemChoose;
+}
+#endif
 CEXPORT
 void SendPings();
 bool CheckPingsReady();
@@ -6698,6 +6773,7 @@ bool NotifyFirewallState(){
 bool DPL_CreatePlayer(LPDIRECTPLAY3A lpDirectPlay3A,
 					  LPGUID lpguidSessionInstance, LPDPNAME lpszPlayerName,bool Host);
 #ifdef MAKE_PTC
+#ifndef STEAM
 int CheckLobby(){
 
 #ifndef _USE3D
@@ -6795,7 +6871,176 @@ int CheckLobby(){
 		return false;
 	};
 };
+#else
+int CheckLobby(){
+#ifndef _USE3D
+	WindX=0;
+	WindY=0;
+	WindX1=1023;
+	WindY1=767;
+	WindLx=1024;
+	WindLy=768;
+#else
+	GPS.SetClipArea( 0, 0, 1024, 768 );
 #endif
+	// ============================================================================
+	// STEAM VERSION (New)
+	// ============================================================================
+	
+	// Check if game was launched through Steam join/invite
+	// Steam doesn't use DirectPlay lobby, instead uses command line or Steam API
+	
+	// Check for command line parameter: +connect_lobby <lobbyid>
+	const char* cmdLine = GetCommandLineA();
+	if (strstr(cmdLine, "+connect_lobby") != NULL)
+	{
+		// Extract lobby ID from command line
+		const char* lobbyStr = strstr(cmdLine, "+connect_lobby");
+		if (lobbyStr)
+		{
+			lobbyStr += strlen("+connect_lobby");
+			while (*lobbyStr == ' ') lobbyStr++; // Skip spaces
+			
+			// Parse lobby ID
+			uint64 lobbyIDNum = _strtoui64(lobbyStr, NULL, 10);
+			if (lobbyIDNum != 0)
+			{
+				CSteamID lobbyID;
+				lobbyID.SetFromUint64(lobbyIDNum);
+				
+				LoadFog(2);
+				LoadPalette("2\\agew_1.pal");
+				ShowLoading();
+				
+				// Get lobby data to determine game type
+				const char* lobbyName = SteamMatchmaking()->GetLobbyData(lobbyID, "name");
+				char cc[128] = "";
+				if (lobbyName)
+					strcpy_s(cc, sizeof(cc), lobbyName);
+				cc[8] = 0;
+				
+				bool BATTL = !strcmp(cc, "[BATTLE]");
+				
+				// Join the lobby
+				CreateMultiplaterInterface();
+				
+				char lobbyIDStr[32];
+				sprintf_s(lobbyIDStr, sizeof(lobbyIDStr), "lobby_%llu", lobbyIDNum);
+				
+				// Get player name from Steam
+				const char* playerName = SteamFriends()->GetPersonaName();
+				
+				if (IPCORE2.InitClient(lobbyIDStr, playerName, 0))
+				{
+					ClearScreen();
+					LoadFog(2);
+					LoadPalette("2\\agew_1.pal");
+					
+					// Wait in lobby
+					if (!BATTL) {
+						if (!MPL_WaitingGame(false, 0)) return false;
+					}
+					else {
+						if (!MPL_WaitingBattleGame(false, 1)) return false;
+					}
+					
+					return 1;
+				}
+				else
+				{
+					ShowFailure(2); // Failed to join
+					return false;
+				}
+			}
+		}
+	}
+	
+	// Check if launched from Steam friends list (join friend's game)
+	if (SteamFriends()->GetFriendCount(k_EFriendFlagImmediate) > 0)
+	{
+		// Check game info for rich presence
+		FriendGameInfo_t friendGameInfo;
+		CSteamID myID = SteamUser()->GetSteamID();
+		
+		// Check if we were invited
+		int numInvites = SteamMatchmaking()->GetNumLobbyMembers(k_steamIDNil);
+		// Note: This is a simplified check - in reality you'd track invite state
+	}
+	
+	// No lobby to join - return false (normal startup)
+	return false;
+}
+#endif // USE_STEAM_NETWORKING
+#endif
+
+#ifdef STEAM
+
+// Call this when creating a game to allow friends to join
+void Steam_SetupInvite(bool isBattle)
+{
+	if (!IPCORE2.IsServer())
+		return;
+	
+	// Get current lobby
+	char lobbyAddr[64];
+	IPCORE2.GetServerAddress(lobbyAddr);
+	
+	// Parse lobby ID
+	CSteamID lobbyID;
+	if (strncmp(lobbyAddr, "lobby_", 6) == 0)
+	{
+		uint64 lobbyIDNum = _strtoui64(lobbyAddr + 6, NULL, 10);
+		lobbyID.SetFromUint64(lobbyIDNum);
+	}
+	
+	if (lobbyID.IsValid())
+	{
+		// Set rich presence so friends can see the game
+		SteamFriends()->SetRichPresence("status", "In Game");
+		SteamFriends()->SetRichPresence("connect", lobbyAddr);
+		
+		// Set lobby joinable
+		SteamMatchmaking()->SetLobbyJoinable(lobbyID, true);
+		
+		// Allow friends to join
+		if (isBattle)
+		{
+			SteamMatchmaking()->SetLobbyType(lobbyID, k_ELobbyTypeFriendsOnly);
+		}
+		else
+		{
+			SteamMatchmaking()->SetLobbyType(lobbyID, k_ELobbyTypePublic);
+		}
+	}
+}
+
+// Handle Steam overlay "Join Game" command
+void Steam_HandleOverlayCommand(GameLobbyJoinRequested_t* pCallback)
+{
+	// User clicked "Join Game" in Steam overlay
+	// Save lobby ID and restart CheckLobby flow
+	
+	uint64 lobbyID = pCallback->m_steamIDLobby.ConvertToUint64();
+	
+	// You could save this to a global variable or file
+	// Then CheckLobby() will pick it up on next call
+	
+	// Or directly join:
+	char lobbyIDStr[32];
+	sprintf_s(lobbyIDStr, sizeof(lobbyIDStr), "lobby_%llu", lobbyID);
+	
+	const char* playerName = SteamFriends()->GetPersonaName();
+	
+	CreateMultiplaterInterface();
+	if (IPCORE2.InitClient(lobbyIDStr, playerName, 0))
+	{
+		// Joined successfully
+		// The game should transition to waiting room
+	}
+}
+
+#endif // USE_STEAM_NETWORKING
+
 int prevVid=-1;
 int prevVid1=-1;
 int prevVid2=-1;
@@ -6861,6 +7106,7 @@ void AllGame() {
 	};
 stgame:
 	int mret;
+    SteamAPI_RunCallbacks(); 
 	if(Lobby)mret=mcmSingle;
 	else mret=processMainMenu();
 	if(mret==mcmExit)return;

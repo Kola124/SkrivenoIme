@@ -974,7 +974,9 @@ ffe2:;
 	int NL0=CMGRP1[0]->NLines;
 	do{
 		if(UseGSC_Login){
+#ifndef STEAM
             udp_hole_puncher.KeepAlive();
+#endif
 			ChatProcess();
 			if(CheckPersonality(CHATMESSAGE)){
 				CHATBOX->CursPos=strlen(CHATMESSAGE);

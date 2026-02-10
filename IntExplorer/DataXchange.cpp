@@ -7,6 +7,461 @@
 #include "IntExplorer.h"
 #include "ParseRQ.h"
 #include "GameOnMap.h"
+
+#ifdef STEAM
+
+#include "..\Cossacks2_project\Steam\steam_api.h"
+#include "..\Cossacks2_project\Steam\isteammatchmaking.h"
+
+static sicExplorer* g_CurrentSXP = nullptr;
+static char g_CurrentWindowID[16] = "00";
+
+// ============================================================================
+// Steam Lobby Manager (Add to top of file after includes)
+// ============================================================================
+
+CIMPORT void DDLog2(LPSTR sz, ...);
+
+class SteamLobbyManager {
+public:
+    struct RoomInfo {
+        char RID[32];
+        char Title[128];
+        char Host[64];
+        char Type[32];
+        char Level[32];
+        char Players[32];
+        char Version[32];
+        char IPAddr[64];
+        int Ping;
+    };
+    
+    RoomInfo Rooms[100];
+    int NRooms;
+    bool RequestPending;
+    int LastUpdate;
+    
+    SteamLobbyManager() {
+        NRooms = 0;
+        RequestPending = false;
+        LastUpdate = 0;
+    }
+    
+    void RequestLobbies() {
+        if (!SteamMatchmaking() || RequestPending) return;
+        
+        SteamMatchmaking()->AddRequestLobbyListStringFilter(
+            "game", "cossacks2", k_ELobbyComparisonEqual
+        );
+        SteamMatchmaking()->AddRequestLobbyListDistanceFilter(
+            k_ELobbyDistanceFilterWorldwide
+        );
+        
+        SteamMatchmaking()->RequestLobbyList();
+        RequestPending = true;
+    }
+    
+    void Update() {
+        SteamAPI_RunCallbacks();
+        
+        int now = GetTickCount();
+        if (now - LastUpdate > 5000 && !RequestPending) {
+            RequestLobbies();
+        }
+    }
+    
+    void OnLobbyMatchList(int numLobbies) {
+        NRooms = 0;
+        RequestPending = false;
+        
+        for (int i = 0; i < numLobbies && i < 100; i++) {
+            CSteamID lobbyID = SteamMatchmaking()->GetLobbyByIndex(i);
+            if (!lobbyID.IsValid()) continue;
+            
+            RoomInfo& room = Rooms[NRooms];
+            
+            sprintf_s(room.RID, "%llu", lobbyID.ConvertToUint64());
+            
+            const char* name = SteamMatchmaking()->GetLobbyData(lobbyID, "name");
+            strncpy_s(room.Title, name && name[0] ? name : "Game", _TRUNCATE);
+            
+            CSteamID owner = SteamMatchmaking()->GetLobbyOwner(lobbyID);
+            const char* ownerName = SteamFriends()->GetFriendPersonaName(owner);
+            strncpy_s(room.Host, ownerName ? ownerName : "Unknown", _TRUNCATE);
+            
+            const char* type = SteamMatchmaking()->GetLobbyData(lobbyID, "game_type");
+            strncpy_s(room.Type, type && type[0] ? type : "Simple", _TRUNCATE);
+            
+            const char* level = SteamMatchmaking()->GetLobbyData(lobbyID, "level");
+            strncpy_s(room.Level, level && level[0] ? level : "Normal", _TRUNCATE);
+            
+            int members = SteamMatchmaking()->GetNumLobbyMembers(lobbyID);
+            int maxMembers = SteamMatchmaking()->GetLobbyMemberLimit(lobbyID);
+            sprintf_s(room.Players, "%d/%d", members, maxMembers);
+            
+            const char* version = SteamMatchmaking()->GetLobbyData(lobbyID, "version");
+            strncpy_s(room.Version, version && version[0] ? version : "1.0", _TRUNCATE);
+            
+            sprintf_s(room.IPAddr, "%llu", lobbyID.ConvertToUint64());
+            room.Ping = 50;
+            
+            NRooms++;
+        }
+        
+        LastUpdate = GetTickCount();
+    }
+};
+
+static SteamLobbyManager g_SteamLobbies;
+
+// Steam callback
+class CSteamCallbacks {
+private:
+    STEAM_CALLBACK(CSteamCallbacks, OnLobbyMatchList, LobbyMatchList_t);
+};
+
+void CSteamCallbacks::OnLobbyMatchList(LobbyMatchList_t* pCallback) {
+    g_SteamLobbies.OnLobbyMatchList(pCallback->m_nLobbiesMatching);
+}
+
+static CSteamCallbacks g_SteamCallbacks;
+
+// ============================================================================
+// Steam Device - Handles Local Files and Steam Lobbies
+// ============================================================================
+
+struct SteamRequestHandle {
+    enum Type {
+        FILE_REQUEST,      // Loading .cml file from disk
+        LOBBY_REQUEST,     // Getting lobby list from Steam
+        UNKNOWN
+    };
+    
+    Type type;
+    char* data;
+    int size;
+    bool ready;
+};
+
+#define MAX_STEAM_HANDLES 100
+static SteamRequestHandle g_SteamHandles[MAX_STEAM_HANDLES];
+static DWORD g_NextSteamHandle = 0x10000;
+
+void ProcessTemplate(char* content, int maxSize, const char* version) {
+    char temp[16384];
+    char* src = content;
+    char* dst = temp;
+    int remaining = sizeof(temp) - 1;
+    
+    while (*src && remaining > 0) {
+        // Look for template markers <? ... ?>
+        if (src[0] == '<' && src[1] == '?') {
+            char* end = strstr(src, "?>");
+            if (end) {
+                // Extract variable name
+                char varName[256];
+                int len = end - src - 2;
+                if (len > 0 && len < 255) {
+                    memcpy(varName, src + 2, len);
+                    varName[len] = 0;
+                    
+                    // Trim spaces
+                    char* vn = varName;
+                    while (*vn == ' ') vn++;
+                    char* vnEnd = vn + strlen(vn) - 1;
+                    while (vnEnd > vn && *vnEnd == ' ') *vnEnd-- = 0;
+                    
+                    // Replace with value
+                    const char* replacement = "";
+                    
+                    if (strcmp(vn, "h.req.ver") == 0) {
+                        replacement = version ? version : "1.0";
+                    }
+                    else if (strcmp(vn, "server.config.table_timeout") == 0) {
+                        replacement = "20000";  // 20 second refresh
+                    }
+                    else if (strcmp(vn, "server.data.start_at") == 0) {
+                        replacement = "Steam Server";  // Placeholder
+                    }
+                    
+                    // Copy replacement
+                    int repLen = strlen(replacement);
+                    if (repLen < remaining) {
+                        strcpy(dst, replacement);
+                        dst += repLen;
+                        remaining -= repLen;
+                    }
+                }
+                
+                // Skip past the template
+                src = end + 2;
+                continue;
+            }
+        }
+        
+        // Copy normal character
+        *dst++ = *src++;
+        remaining--;
+    }
+    
+    *dst = 0;
+    
+    // Copy back to original buffer if it fits
+    if (strlen(temp) < maxSize) {
+        strcpy(content, temp);
+    }
+}
+
+void ProcessTemplateVariables(char* data, int* size, int maxSize) {
+    char* newData = (char*)malloc(maxSize);
+    char* dst = newData;
+    char* src = data;
+    
+    while (*src && (dst - newData) < maxSize - 100) {
+        // Replace <%ASTATE%>
+        if (src[0] == '<' && src[1] == '%') {
+            char* varEnd = strstr(src, "%>");
+            if (varEnd) {
+                char varName[64];
+                int varLen = varEnd - src - 2;
+                if (varLen < sizeof(varName)) {
+                    strncpy_s(varName, sizeof(varName), src + 2, varLen);
+                    varName[varLen] = 0;
+                    
+                    if (strcmp(varName, "ASTATE") == 0) {
+                        *dst++ = '1';  // Always available
+                        src = varEnd + 2;
+                        continue;
+                    }
+                    
+                    src = varEnd + 2;
+                    continue;
+                }
+            }
+        }
+        
+        // Replace <? server expressions ?>
+        if (src[0] == '<' && src[1] == '?') {
+            char* varEnd = strstr(src, "?>");
+            if (varEnd) {
+                char expr[256];
+                int exprLen = varEnd - src - 2;
+                if (exprLen < sizeof(expr)) {
+                    strncpy_s(expr, sizeof(expr), src + 2, exprLen);
+                    expr[exprLen] = 0;
+                    
+                    char* trimmed = expr;
+                    while (*trimmed == ' ') trimmed++;
+                    
+                    if (strstr(trimmed, "h.req.ver")) {
+                        strcpy_s(dst, maxSize - (dst - newData), "1.0");
+                        dst += 3;
+                    } else if (strstr(trimmed, "table_timeout")) {
+                        strcpy_s(dst, maxSize - (dst - newData), "20000");
+                        dst += 5;
+                    } else if (strstr(trimmed, "start_at")) {
+                        strcpy_s(dst, maxSize - (dst - newData), "Steam");
+                        dst += 5;
+                    }
+                    
+                    src = varEnd + 2;
+                    continue;
+                }
+            }
+        }
+        
+        *dst++ = *src++;
+    }
+    
+    *dst = 0;
+    int newSize = dst - newData;
+    
+    if (newSize < maxSize) {
+        memcpy(data, newData, newSize + 1);
+        *size = newSize;
+    }
+    
+    free(newData);
+}
+
+static char g_GameDirectory[MAX_PATH] = "";
+void InitGameDirectory() {
+    if (g_GameDirectory[0] == 0) {
+        char cwd[MAX_PATH];
+        GetCurrentDirectory(sizeof(cwd), cwd);
+        
+        GetModuleFileName(NULL, g_GameDirectory, sizeof(g_GameDirectory));
+        char* lastSlash = strrchr(g_GameDirectory, '\\');
+        if (lastSlash) *lastSlash = 0;
+    }
+}
+
+DWORD Steam_SendRequest(char* request, int size) {
+    ParsedRQ P1;
+    P1.Extract(request, size);
+    
+    int handleIndex = -1;
+    for (int i = 0; i < MAX_STEAM_HANDLES; i++) {
+        if (!g_SteamHandles[i].ready && g_SteamHandles[i].data == NULL) {
+            handleIndex = i;
+            break;
+        }
+    }
+    if (handleIndex == -1) return 0;
+    
+    SteamRequestHandle& handle = g_SteamHandles[handleIndex];
+    handle.ready = false;
+    
+    // USE STORED WINDOW ID
+    char* windowID = g_CurrentWindowID;
+    
+    if (P1.NComm > 0) {
+        char* comm = P1.Comm[0].ComID;
+        
+        // GETTBL
+        if (strcmp(comm, "GETTBL") == 0) {
+            if (P1.Comm[0].NParams > 0) {
+                char* tableID = P1.Comm[0].Params[0];
+                
+                if (strstr(tableID, "ROOMS_V")) {
+                    g_SteamLobbies.Update();
+                    
+                    ParsedRQ response;
+                    response.AddComm("LW_tbl");
+                    response.AddParam(tableID, strlen(tableID));
+                    
+                    char numRows[32];
+                    sprintf_s(numRows, "%d", g_SteamLobbies.NRooms);
+                    response.AddParam(numRows, strlen(numRows));
+                    
+                    for (int i = 0; i < g_SteamLobbies.NRooms; i++) {
+                        auto& room = g_SteamLobbies.Rooms[i];
+                        response.AddParam(room.RID, strlen(room.RID));
+                        response.AddParam(room.Title, strlen(room.Title));
+                        response.AddParam(room.Host, strlen(room.Host));
+                        response.AddParam(room.Type, strlen(room.Type));
+                        response.AddParam(room.Level, strlen(room.Level));
+                        response.AddParam(room.Players, strlen(room.Players));
+                        response.AddParam(room.Version, strlen(room.Version));
+                        response.AddParam(room.IPAddr, strlen(room.IPAddr));
+                    }
+                    
+                    // CRITICAL: Add window ID
+                    response.AddParam(windowID, strlen(windowID));
+                    
+                    int binarySize = response.Compact(NULL, 0);
+                    handle.data = (char*)malloc(binarySize);
+                    handle.size = response.Compact(handle.data, binarySize);
+                    
+                    handle.ready = true;
+                    return g_NextSteamHandle + handleIndex;
+                }
+            }
+        }
+        
+        // File loading
+        else if (strcmp(comm, "open") == 0 || strcmp(comm, "LW_file") == 0) {
+            if (P1.Comm[0].NParams > 0) {
+                char* filename = P1.Comm[0].Params[0];
+                InitGameDirectory();
+                char filepath[512];
+                sprintf_s(filepath, "%s\\Internet\\%s", g_GameDirectory, filename);
+                
+                ResFile F = RReset(filepath);
+                if (F == INVALID_HANDLE_VALUE) {
+                    F = RReset(filename);
+                }
+                
+                if (F != INVALID_HANDLE_VALUE) {
+                    int fileSize = RFileSize(F);
+                    char* fileData = (char*)malloc(fileSize + 4096);
+                    RBlockRead(F, fileData, fileSize);
+                    fileData[fileSize] = 0;
+                    RClose(F);
+                    
+                    // Process templates
+                    ProcessTemplate(fileData, fileSize + 4096, "1.0");
+                    
+                    ParsedRQ response;
+                    response.AddComm("LW_show");
+                    response.AddParam(fileData, strlen(fileData));
+                    
+                    // CRITICAL: Add window ID
+                    response.AddParam(windowID, strlen(windowID));
+                    
+                    free(fileData);
+                    
+                    int binarySize = response.Compact(NULL, 0);
+                    handle.data = (char*)malloc(binarySize);
+                    handle.size = response.Compact(handle.data, binarySize);
+                    
+                    handle.ready = true;
+                    return g_NextSteamHandle + handleIndex;
+                }
+            }
+        }
+    }
+
+    ParsedRQ response;
+    int binarySize = response.Compact(NULL, 0);
+    handle.data = (char*)malloc(binarySize);
+    handle.size = response.Compact(handle.data, binarySize);
+    handle.ready = true;
+    return g_NextSteamHandle + handleIndex;
+}
+
+DWORD Steam_GetRequestResult(DWORD Handle, char** Result, int* Size) {
+    int handleIndex = Handle - g_NextSteamHandle;
+    
+    if (handleIndex < 0 || handleIndex >= MAX_STEAM_HANDLES) {
+        return 1;  // Invalid handle
+    }
+    
+    SteamRequestHandle& handle = g_SteamHandles[handleIndex];
+    
+    if (!handle.ready) {
+        return 0;  // Not ready yet
+    }
+    
+    if (handle.data == NULL) {
+        return 2;  // Error/not found
+    }
+    
+    *Result = handle.data;
+    *Size = handle.size;
+    
+    return 128;  // Success
+}
+
+void Steam_CloseRequest(DWORD Handle) {
+    int handleIndex = Handle - g_NextSteamHandle;
+    
+    if (handleIndex >= 0 && handleIndex < MAX_STEAM_HANDLES) {
+        SteamRequestHandle& handle = g_SteamHandles[handleIndex];
+        if (handle.data) {
+            free(handle.data);
+            handle.data = NULL;
+        }
+        handle.ready = false;
+        handle.size = 0;
+    }
+}
+
+void Steam_Process() {
+    g_SteamLobbies.Update();
+}
+
+void Steam_CloseAll() {
+    for (int i = 0; i < MAX_STEAM_HANDLES; i++) {
+        if (g_SteamHandles[i].data) {
+            free(g_SteamHandles[i].data);
+        }
+    }
+    memset(g_SteamHandles, 0, sizeof(g_SteamHandles));
+}
+
+#endif // USE_STEAM_NETWORKING
+
 CIMPORT void SetCurPtr(int v);
 extern CIMPORT bool GameInProgress;
 bool LOGMODE=0;
@@ -67,6 +522,9 @@ public:
 	void  CloseAll();
 	void  Shutdown();
 	void  RegisterDevice(char* ID,char* DLL_Path);
+#ifdef STEAM
+    void RegisterSteamDevice(char* ID);
+#endif
 };
 SXP_DevScope::SXP_DevScope(){
 	memset(this,0,sizeof *this);
@@ -76,6 +534,25 @@ SXP_DevScope::~SXP_DevScope(){
 	Shutdown();
 };
 void FilterRQ2Send(sicExplorer* SXP,ParsedRQ* RQ,bool AllowNew);
+
+#ifdef STEAM
+	
+void SXP_DevScope::RegisterSteamDevice(char* ID){
+	DEVS=(OneSXP_Device*)realloc(DEVS,(NDEVS+1)*sizeof OneSXP_Device);
+	
+	// Set Steam device functions
+	DEVS[NDEVS].SendRequest = Steam_SendRequest;
+	DEVS[NDEVS].GetRequestResult = Steam_GetRequestResult;
+	DEVS[NDEVS].CloseRequest = Steam_CloseRequest;
+	DEVS[NDEVS].Process = Steam_Process;
+	DEVS[NDEVS].CloseAll = Steam_CloseAll;
+	DEVS[NDEVS].H = NULL;  // No DLL for Steam device
+	
+	strcpy(DEVS[NDEVS].Name, ID);
+	NDEVS++;
+}
+#endif
+
 DWORD SXP_DevScope::SendRequest(sicExplorer* SXP,char* request,bool AllowNewWindow,bool Auto){
 	ParsedRQ P1;
 	P1.Parse(request);
@@ -94,6 +571,21 @@ DWORD SXP_DevScope::SendRequest(sicExplorer* SXP,ParsedRQ* P1,bool AllowNewWindo
 		P1->DelComm(i);
 		i--;
 	};
+#ifdef STEAM
+	// Store current SXP context
+	g_CurrentSXP = SXP;
+	if(SXP && SXP->CurWPosition < SXP->NWindows && SXP->NWindows > 0){
+		OneSicWindow* OSW = SXP->Windows[SXP->CurWPosition];
+		if(OSW && OSW->WinID[0]){
+			strncpy(g_CurrentWindowID, OSW->WinID, 15);
+			g_CurrentWindowID[15] = 0;
+		}else{
+			strcpy(g_CurrentWindowID, "00");
+		}
+	}else{
+		strcpy(g_CurrentWindowID, "00");
+	}
+#endif
 	for(int i=0;i<NDEVS;i++)if(!strcmp(DEVS[i].Name,P1->DevName)){
 		int sz=P1->Compact(NULL,0);
 		char* data=(char*)malloc(sz);
@@ -181,7 +673,12 @@ SXP_DevScope DEVSCOPE;
 void InitDevs(){
 	DEVSCOPE.RegisterDevice("LF","LF_Server.DLL");
 	DEVSCOPE.RegisterDevice("DS","DipServer.DLL");
+#ifndef STEAM
 	DEVSCOPE.RegisterDevice("GW","GW_Server.DLL");
+    InitGameDirectory(); 
+#else
+	DEVSCOPE.RegisterSteamDevice("GW");
+#endif
 };
 DWORD SendGlobalRequest(sicExplorer* SXP,char* data,bool allow){
 	return DEVSCOPE.SendRequest(SXP,data,allow,1);

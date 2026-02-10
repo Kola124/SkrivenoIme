@@ -1,7 +1,12 @@
 #include "..\common.h"
 //#include "Chat\chat.h"
 #include "Chat\chat.h"
-#include "cs_chat.h"
+#ifdef STEAM
+#include "..\Cossacks2_project\Steam\steam_api.h"
+#include "steam_chat_system.h"  // NEW: Steam replacement
+#else
+#include "cs_chat.h"  // OLD: GameSpy version
+#endif
 #include "..\IntExplorer\ParseRQ.h"
 //#include "StdAfx.h"
 //#include <stdio.h>
@@ -10,7 +15,12 @@
 
 #include <cstring>
 #include <cstdlib>
-
+#ifdef STEAM
+CEXPORT 
+void ChatProcess(){
+	//if(CSYS.chat)chatThink(CSYS.chat);
+};
+#endif
 CIMPORT bool ReadWinString(GFILE* F,char* STR,int Max);
 class CNamesCash{
 public:
@@ -194,7 +204,12 @@ CIMPORT void ProcessExplorer(int Index);
 CIMPORT void ProcessExplorerDSS(int Index, DialogsSystem* DSS);
 CIMPORT void ExplorerOpenRef(int Index, char* ref);
 CIMPORT void ExplorerResize(int Index, int x, int y, int x1, int y1);
+#ifndef STEAM
 ChatSystem CSYS;
+#else
+#define ChatSystem Steam_ChatSystem
+Steam_ChatSystem CSYS;
+#endif
 CIMPORT byte GetPaletteColor(int r, int g, int b);
 CIMPORT void xLine(int x,int y,int x1,int y1,byte c);
 int NCHATS[3]={0,0,0};
@@ -445,7 +460,9 @@ bool CheckForPersonalChat(char* STR)
 				memcpy(SS3,STR+3,L);
 				SS3[L]=0;
 				if(CSYS.Connected){
+#ifndef STEAM
 					chatSendUserMessage(CSYS.chat,SS3,SS+1,0);
+#endif
 					char ccc[128];
 					sprintf_s(ccc,sizeof(ccc),"%s-->%s",CSYS.chatNick,SS3);
 					CSYS.Common[CSYS.CurChannel].Add(ccc,SS+1);
@@ -550,7 +567,9 @@ void EnterPersonalMessage(char* Nick,bool Active){
 		};
 	}while(ItemChoose==-1&&!GameInProgress);
 	if(ItemChoose==mcmOk){
+#ifndef STEAM
 		chatSendUserMessage(CSYS.chat,Nick,MESSAGE,0);
+#endif
 		char ccc[512];
 		sprintf_s(ccc,sizeof(ccc),"%s-->%s",CSYS.chatNick,nick);
 		CSYS.Common[CSYS.CurChannel].Add(ccc,MESSAGE);
@@ -562,7 +581,9 @@ void EnterPersonalMessage(char* Nick,bool Active){
 CEXPORT
 void SendPrivateMessage(char* Nick,char* MESSAGE){
 	if(CSYS.Connected){
+#ifndef STEAM
 		chatSendUserMessage(CSYS.chat,Nick,MESSAGE,0);
+#endif
 		char ccc[512];
 		sprintf_s(ccc,sizeof(ccc),"%s-->%s",CSYS.chatNick,Nick);
 		CSYS.Common[CSYS.CurChannel].Add(ccc,MESSAGE);
@@ -702,33 +723,65 @@ int Process_GSC_ChatWindow(bool Active,RoomInfo* RIF){
 
 	if(Active)GameInProgress=0;
 	if(Active&&!CSYS.Connected){
-		RunHTTPC();
-		Back.Draw(0,0);
-		DarkScreen();
-		ShowCentralMessage2C(GetTextByID("ICCONN"),BOR2.GPID);
-		FlipPages();
-		CSYS.Setup();
-		char* Nick=ExplorerGetVar(2,"%NICK");
-		char* Prof=ExplorerGetVar(2,"%PROF");
-		char* Mail=ExplorerGetVar(2,"%MAIL");
-		if(!Nick)Nick="UNKNOWN";
-		if(!Prof)Prof="";
-		if(!Mail)Mail="";
-		char PRF[64];
-		sprintf(PRF,"GSCPROF_%s",Prof);
-		CSYS.Disconnect();
-		CSYS.ConnectToChat(Nick,PRF,Mail,CHATSERV,CHANNEL1,CHANNEL2);
-		if(!CSYS.Connected){
-			Back.Draw(0,0);
-			DarkScreen();
-			ShowCentralMessage2C(GetTextByID("ICUNCON"),BOR2.GPID);
-			FlipPages();
-			KeyPressed=0;
-			do{
-				ProcessMessages();
-			}while(!KeyPressed);
-			return false;
-		};
+		#ifndef STEAM
+    // OLD: GameSpy version (keep for reference)
+        RunHTTPC();
+        Back.Draw(0,0);
+        DarkScreen();
+        ShowCentralMessage2C(GetTextByID("ICCONN"),BOR2.GPID);
+        FlipPages();
+        CSYS.Setup();
+        char* Nick=ExplorerGetVar(2,"%NICK");
+        char* Prof=ExplorerGetVar(2,"%PROF");
+        char* Mail=ExplorerGetVar(2,"%MAIL");
+        if(!Nick)Nick="UNKNOWN";
+        if(!Prof)Prof="";
+        if(!Mail)Mail="";
+        char PRF[64];
+        sprintf(PRF,"GSCPROF_%s",Prof);
+        CSYS.Disconnect();
+        CSYS.ConnectToChat(Nick,PRF,Mail,CHATSERV,CHANNEL1,CHANNEL2);
+        if(!CSYS.Connected){
+            Back.Draw(0,0);
+            DarkScreen();
+            ShowCentralMessage2C(GetTextByID("ICUNCON"),BOR2.GPID);
+            FlipPages();
+            KeyPressed=0;
+            do{
+                ProcessMessages();
+            }while(!KeyPressed);
+            return false;
+        };
+#else
+        // NEW: Steam version (instant connection!)
+        CSYS.Setup();
+        
+        // Get player name from Steam
+        char Nick[128];
+        const char* steamName = SteamFriends()->GetPersonaName();
+        strcpy(Nick, steamName ? steamName : "Player");
+    
+        // Get Steam ID
+        CSteamID steamID = SteamUser()->GetSteamID();
+        char Prof[128];
+        sprintf(Prof, "STEAM_%llu", steamID.ConvertToUint64());
+    
+        CSYS.Disconnect();
+        // Steam version connects instantly (no server needed!)
+        CSYS.ConnectToChat(Nick, Prof, "steam", "steam://", "", "");
+    
+        if(!CSYS.Connected){
+            Back.Draw(0,0);
+            DarkScreen();
+            ShowCentralMessage2C("Steam connection failed", BOR2.GPID);
+            FlipPages();
+            KeyPressed=0;
+            do{
+                ProcessMessages();
+            }while(!KeyPressed);
+            return false;
+        };
+#endif
 	};
 	//-------------
 	int PXA[8];//={37,38,39,40,41,42,44,43};
@@ -1076,7 +1129,9 @@ int Process_GSC_ChatWindow(bool Active,RoomInfo* RIF){
 		if(LastKey==13){
 			if(CHATMESSAGE[0]){
 				if(!CheckForPersonalChat(CHATMESSAGE)){
+#ifndef STEAM
 					chatSendChannelMessage(CSYS.chat,CSYS.chatChannel[CSYS.CurChannel],CHATMESSAGE,0);
+#endif
 				};
 				//CSYS.Common.Add(CSYS.chatNick,CHATMESSAGE);
 				CHATMESSAGE[0]=0;

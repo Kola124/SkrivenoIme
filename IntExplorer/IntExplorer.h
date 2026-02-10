@@ -100,7 +100,11 @@ public:
 	char* GetGVar(char* Name);
 
 	void* CreateSXProcess(fnExpProcess* Process,fnExpProcess* Close,int size);
-
+#ifdef STEAM
+    void Steam_SendRequest(char* request, int size);
+    void Steam_GetRequestResult(DWORD Handle, char** Result, int* Size);
+    void Steam_CloseRequest(DWORD Handle);
+#endif
 	~sicExplorer();
 };
 struct InterfaceElementPosition{

@@ -2,7 +2,7 @@ extern int menu_x_off;
 extern int menu_y_off;
 extern int menu_hint_x;
 extern int menu_hint_y;
-
+#ifndef STEAM
 bool ProcessNewInternetLogin(){
 #ifdef SCREENFIX
 	DialogsSystem DSS(menu_x_off, menu_y_off);
@@ -88,3 +88,29 @@ bool ProcessNewInternetLogin(){
 
 	return AKEY[0]!=0;
 };
+#else
+#include <..\Steam\steam_api.h>
+extern char PlName[64];
+extern "C" __declspec(dllimport) void InitSteamExplorer();
+bool ProcessNewInternetLogin() {
+    // With Steam, user is already authenticated!
+    // No web browser, no login UI needed
+    
+    static bool initialized = false;
+    if (!initialized) {
+        InitSteamExplorer();
+        initialized = true;
+    }
+    
+    if (!SteamUser()->BLoggedOn()) return false;
+    
+    CSteamID steamID = SteamUser()->GetSteamID();
+    sprintf_s(ACCESS, sizeof(ACCESS), "STEAM_%llu", 
+             steamID.ConvertToUint64());
+    
+    const char* name = SteamFriends()->GetPersonaName();
+    if (name) strncpy_s(PlName, 64, name, _TRUNCATE);
+    
+    return true;
+}
+#endif

@@ -62,7 +62,11 @@ bool MCHOOSE(SimpleDialog* SD){
 	ItemChoose=SD->UserParam;
 	return true;
 };
+#ifndef STEAM
 char ACCESS[16]="";
+#else
+char ACCESS[256]="";
+#endif
 void SlowLoadPalette(LPCSTR lpFileName);
 void ExplorerOpenRef(int Index,char* ref);
 void ShowCentralMessage(char* Message,int GPIDX);

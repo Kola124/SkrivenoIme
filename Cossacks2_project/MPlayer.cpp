@@ -25,7 +25,11 @@
 #include "Gp_Draw.h"
 #include "Megapolis.h"
 #pragma pack(4)
+#ifndef STEAM
 #include "CommCore.h"
+#else
+#include "Steam\SteamCommCore.h"
+#endif
 #include "Pinger.h"
 #include "InetRaiting\stats\gstats.h"
 #include "InetRaiting\stats\gpersist.h"
@@ -38,7 +42,11 @@
 void StartPing(DWORD DPID,int ID);
 void EndPing(int ID);
 char* GetLString(DWORD DPID);
+#ifdef STEAM
+CSteamCommCore IPCORE;  
+#else
 CCommCore IPCORE;
+#endif
 bool InternetProto=0;
 //#define PSEVDOINET
 //#define LOOSESIGNAL

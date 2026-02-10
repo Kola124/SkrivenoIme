@@ -73,5 +73,6 @@
     <Library Include="..\lib\IChat.lib" />
     <Library Include="..\lib\LF_Server.lib" />
     <Library Include="..\lib\dmcr.lib" />
+    <Library Include="..\lib\steam_api.lib" />
   </ItemGroup>
 </Project>

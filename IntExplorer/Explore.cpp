@@ -3,6 +3,277 @@
 #include "..\common.h"
 #include "IntExplorer.h"
 #include "ParseRQ.h"
+
+#ifdef STEAM
+
+#include "..\Cossacks2_project\Steam\steam_api.h"
+#include "..\Cossacks2_project\Steam\isteammatchmaking.h"
+
+// ============================================================================
+// File Cache System (for .cml files loaded from disk)
+// ============================================================================
+
+struct CachedFile {
+    char* data;
+    int size;
+    DWORD handle;
+    bool inUse;
+};
+
+static CachedFile g_FileCache[100];
+static DWORD g_NextHandle = 0x1000;
+
+DWORD AddToCache(char* data, int size) {
+    for (int i = 0; i < 100; i++) {
+        if (!g_FileCache[i].inUse) {
+            g_FileCache[i].data = data;
+            g_FileCache[i].size = size;
+            g_FileCache[i].handle = g_NextHandle++;
+            g_FileCache[i].inUse = true;
+            return g_FileCache[i].handle;
+        }
+    }
+    return 0;
+}
+
+bool GetFromCache(DWORD handle, char** data, int* size) {
+    for (int i = 0; i < 100; i++) {
+        if (g_FileCache[i].inUse && g_FileCache[i].handle == handle) {
+            *data = g_FileCache[i].data;
+            *size = g_FileCache[i].size;
+            return true;
+        }
+    }
+    return false;
+}
+
+void ClearCache(DWORD handle) {
+    for (int i = 0; i < 100; i++) {
+        if (g_FileCache[i].inUse && g_FileCache[i].handle == handle) {
+            free(g_FileCache[i].data);
+            g_FileCache[i].inUse = false;
+            return;
+        }
+    }
+}
+
+// ============================================================================
+// Steam Lobby Data Manager
+// ============================================================================
+
+class SteamLobbyManager {
+public:
+    struct RoomInfo {
+        char RID[32];
+        char Title[128];
+        char Host[64];
+        char Type[32];
+        char Level[32];
+        char Players[32];
+        char Version[32];
+        char IPAddr[64];
+        int Ping;
+    };
+    
+    RoomInfo Rooms[100];
+    int NRooms;
+    bool RequestPending;
+    int LastUpdate;
+    
+    SteamLobbyManager() {
+        NRooms = 0;
+        RequestPending = false;
+        LastUpdate = 0;
+    }
+    
+    void RequestLobbies() {
+        if (!SteamMatchmaking() || RequestPending) return;
+        
+        SteamMatchmaking()->AddRequestLobbyListStringFilter(
+            "game", "cossacks2", k_ELobbyComparisonEqual
+        );
+        
+        SteamMatchmaking()->AddRequestLobbyListDistanceFilter(
+            k_ELobbyDistanceFilterWorldwide
+        );
+        
+        SteamMatchmaking()->RequestLobbyList();
+        RequestPending = true;
+    }
+    
+    void Update() {
+        // This would be called from a Steam callback
+        // For now, manually check
+        SteamAPI_RunCallbacks();
+        
+        int now = GetTickCount();
+        if (now - LastUpdate > 5000 && !RequestPending) {
+            RequestLobbies();
+        }
+    }
+    
+    void PopulateFromSteam(int numLobbies) {
+        NRooms = 0;
+        
+        for (int i = 0; i < numLobbies && i < 100; i++) {
+            CSteamID lobbyID = SteamMatchmaking()->GetLobbyByIndex(i);
+            if (!lobbyID.IsValid()) continue;
+            
+            RoomInfo& room = Rooms[NRooms];
+            
+            sprintf_s(room.RID, sizeof(room.RID), "%llu", lobbyID.ConvertToUint64());
+            
+            const char* name = SteamMatchmaking()->GetLobbyData(lobbyID, "name");
+            strncpy_s(room.Title, sizeof(room.Title), 
+                     name && name[0] ? name : "Unnamed Game", _TRUNCATE);
+            
+            CSteamID owner = SteamMatchmaking()->GetLobbyOwner(lobbyID);
+            const char* ownerName = SteamFriends()->GetFriendPersonaName(owner);
+            strncpy_s(room.Host, sizeof(room.Host),
+                     ownerName ? ownerName : "Unknown", _TRUNCATE);
+            
+            const char* type = SteamMatchmaking()->GetLobbyData(lobbyID, "game_type");
+            strncpy_s(room.Type, sizeof(room.Type),
+                     type && type[0] ? type : "Simple", _TRUNCATE);
+            
+            const char* level = SteamMatchmaking()->GetLobbyData(lobbyID, "level");
+            strncpy_s(room.Level, sizeof(room.Level),
+                     level && level[0] ? level : "Normal", _TRUNCATE);
+            
+            int members = SteamMatchmaking()->GetNumLobbyMembers(lobbyID);
+            int maxMembers = SteamMatchmaking()->GetLobbyMemberLimit(lobbyID);
+            sprintf_s(room.Players, sizeof(room.Players), "%d/%d", members, maxMembers);
+            
+            const char* version = SteamMatchmaking()->GetLobbyData(lobbyID, "version");
+            strncpy_s(room.Version, sizeof(room.Version),
+                     version && version[0] ? version : "1.0", _TRUNCATE);
+            
+            sprintf_s(room.IPAddr, sizeof(room.IPAddr), "%llu", lobbyID.ConvertToUint64());
+            
+            room.Ping = 50;
+            
+            NRooms++;
+        }
+        
+        LastUpdate = GetTickCount();
+        RequestPending = false;
+    }
+    
+    void GenerateRoomListData(char* buffer, int bufferSize) {
+        buffer[0] = 0;
+        
+        for (int i = 0; i < NRooms; i++) {
+            RoomInfo& room = Rooms[i];
+            
+            char row[512];
+            sprintf_s(row, sizeof(row),
+                "RL_ID=%s&RL_TITLE=%s&RL_HOST=%s&RL_TYPE=%s&"
+                "RL_LEVL=%s&RL_PLRS=%s&RL_VERS=%s&RL_IPADR=%s&RL_PING=%d\n",
+                room.RID, room.Title, room.Host, room.Type,
+                room.Level, room.Players, room.Version, room.IPAddr, room.Ping
+            );
+            
+            if (strlen(buffer) + strlen(row) < bufferSize - 1) {
+                strcat_s(buffer, bufferSize, row);
+            }
+        }
+    }
+};
+
+static SteamLobbyManager g_SteamLobbies;
+
+// ============================================================================
+// Steam Callback for Lobby List
+// ============================================================================
+
+class CSteamLobbyCallbacks {
+private:
+    STEAM_CALLBACK(CSteamLobbyCallbacks, OnLobbyMatchList, LobbyMatchList_t);
+};
+
+void CSteamLobbyCallbacks::OnLobbyMatchList(LobbyMatchList_t* pCallback) {
+    g_SteamLobbies.PopulateFromSteam(pCallback->m_nLobbiesMatching);
+}
+
+static CSteamLobbyCallbacks g_SteamCallbacks;
+
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
+void ExtractFilename(const char* request, char* filename, int maxLen) {
+    filename[0] = 0;
+    
+    // Look for .cml or .dcml
+    const char* ext = strstr(request, ".cml");
+    if (!ext) ext = strstr(request, ".dcml");
+    if (!ext) return;
+    
+    // Backtrack to start of filename
+    const char* start = ext;
+    while (start > request && *start != '&' && *start != '/' && *start != '\\' && *start != ' ') {
+        start--;
+    }
+    if (*start == '&' || *start == '/' || *start == '\\' || *start == ' ') start++;
+    
+    // Copy filename
+    int len = 0;
+    while (start <= ext + 5 && *start && len < maxLen - 1) {
+        filename[len++] = *start++;
+    }
+    filename[len] = 0;
+}
+
+DWORD LoadFileFromDisk(const char* filename) {
+    char filepath[512];
+    sprintf_s(filepath, sizeof(filepath), "Internet\\%s", filename);
+    
+    // Try to open file
+    ResFile F = RReset(filepath);
+    if (F == INVALID_HANDLE_VALUE) {
+        F = RReset((char*)filename);
+        if (F == INVALID_HANDLE_VALUE) return 0;
+    }
+
+    int size = RFileSize(F);
+
+    char* data = (char*)malloc(size + 1);
+    if (!data) {
+        RClose(F);
+        return 0;
+    }
+
+    RBlockRead(F, data, size);
+    data[size] = 0;
+    RClose(F);
+    
+    // Add to cache
+    return AddToCache(data, size);
+}
+
+void sicExplorer::Steam_CloseRequest(DWORD Handle) {
+    if (Handle != 0xFFFF0001) {
+        ClearCache(Handle);
+    }
+}
+
+extern "C" __declspec(dllexport)
+void InitSteamExplorer() {
+#ifdef USE_STEAM_NETWORKING
+    g_SteamLobbies.RequestLobbies();
+#endif
+}
+
+extern "C" __declspec(dllexport)
+void UpdateSteamExplorer() {
+#ifdef USE_STEAM_NETWORKING
+    SteamAPI_RunCallbacks();
+    g_SteamLobbies.Update();
+#endif
+}
+
+#endif
+
 extern int IBOR2;
 extern int IBOR0;
 /* communication with server
@@ -1330,6 +1601,7 @@ void sicExplorer::ChangeOutput(int x,int y,int x1,int y1){
 	};
 };
 void sicExplorer::NewWindow(char* request,char* WinID){
+#ifndef STEAM
 	if(CurWPosition<NWindows-1){
 		//erase higher windows
 		for(int i=CurWPosition+1;i<NWindows;i++)Windows[i]->Erase();
@@ -1346,6 +1618,27 @@ void sicExplorer::NewWindow(char* request,char* WinID){
 	Windows[NWindows]->EXP=this;
 	Windows[NWindows]->LoadDefaultSettings();
 	NWindows++;
+#else
+    if (CurWPosition < NWindows - 1) {
+        for (int i = CurWPosition + 1; i < NWindows; i++) Windows[i]->Erase();
+        NWindows = CurWPosition + 1;
+    }
+    if (NWindows >= MaxWindow) {
+        MaxWindow += 8;
+        Windows = (OneSicWindow**)realloc(Windows, MaxWindow * 4);
+    }
+    Windows[NWindows] = new OneSicWindow;
+    strcpy(Windows[NWindows]->WinID, WinID);
+    Windows[NWindows]->REF = (char*)malloc(strlen(request) + 1);
+    strcpy(Windows[NWindows]->REF, request);
+    Windows[NWindows]->EXP = this;
+    Windows[NWindows]->LoadDefaultSettings();
+    
+    // Update Steam lobbies
+    g_SteamLobbies.Update();
+    
+    NWindows++;
+#endif
 };
 
 void sicExplorer::StepBack(){
