@@ -6,6 +6,10 @@
 #include "bmptool.h"
 #include <assert.h>
 #include <exception>
+#include <mutex>
+static std::mutex g_memMutex;
+static std::atomic<int> g_totalSize(0);
+static std::atomic<int> g_allocSize(0);
 
 #define CEXPORT __declspec(dllexport)
 CEXPORT void* _ExMalloc(int Size);
@@ -172,56 +176,34 @@ int TotalSize=0;
 //#ifndef _USE3D
 
 //#include "FMM\FMM.H"
-void* FM_Malloc(int size){
-	if (size <= 0) return nullptr; 
-	void* ptr = calloc(size, 1);
-	if (ptr) {
-		TotalSize++;
-		((DWORD*)ptr)[0] = 0xCAFEBABE;
-	}
-	return ptr;
-};
-void FM_free(void* ptr){
-	try {
-		
-		if (!ptr) {
-
-			return;
-		}
-
-		DWORD* Ptr = (DWORD*)ptr;
-
-		
-		if ((uintptr_t)Ptr < 0x1000) {
-
-			return;
-		}
-
-		
-		if (Ptr[0] == 0xDEADBEEF) {
-
-			return; 
-		}
-
-
-		Ptr[0] = 0xDEADBEEF;
-
-
-		free(ptr);
-
-
-		if (TotalSize > 0) {
-			TotalSize--;
-		}
-		else {
-
-		}
-	}
-	catch (const std::exception& e) {
-	}
-	catch (...) {
-	}
-};
+void* FM_Malloc(int size) {
+    if (size <= 0) return nullptr;
+    
+    std::lock_guard<std::mutex> lock(g_memMutex);
+    
+    void* ptr = ::calloc(size + sizeof(DWORD), 1);  // Use :: to bypass macro
+    if (ptr) {
+        ((DWORD*)ptr)[0] = 0xCAFEBABE;
+        g_totalSize++;
+        return (void*)((DWORD*)ptr + 1);  // Return after header
+    }
+    return nullptr;
+}
+void FM_free(void* ptr) {
+    if (!ptr || (uintptr_t)ptr < 0x10000) return;
+    
+    std::lock_guard<std::mutex> lock(g_memMutex);
+    
+    DWORD* header = ((DWORD*)ptr) - 1;  // Get actual allocation
+    
+    // Validate header
+    if (header[0] != 0xCAFEBABE) return;
+    
+    header[0] = 0xDEADBEEF;
+    ::free(header);  // Use :: to bypass macro
+    
+    if (g_totalSize > 0) g_totalSize--;
+}
 
 //Using Global heap
 #define malloc FM_Malloc
@@ -271,42 +253,15 @@ public:
 };
 static GHEAP HEAP;
 */
-void* Gmalloc(int size){
-	int N=100;
-	do{
-		try{
-			if(ChechIfInit()){
-				void* ptr=HeapAlloc(GlobHeap,HEAP_ZERO_MEMORY,size);
-				if(ptr)return ptr;
-			}else return NULL;
-		}catch(...){};
-		try{
-			HeapValidate(GlobHeap,0,NULL);
-		}catch(...){};
-		N--;
-		size+=1024;
-	}while(N);
-	MemError();
-	return NULL;
-};
-void* Grealloc(void* ptr,int size){
-	if(!ptr) return Gmalloc(size);
-	int N=30;
-	do{
-		try{
-			if(ChechIfInit()){
-				void* ptr2=HeapReAlloc(GlobHeap,HEAP_ZERO_MEMORY,ptr,size);
-				if(ptr2)return ptr2;
-			}else return NULL;
-		}catch(...){};
-		try{
-			HeapValidate(GlobHeap,0,NULL);
-		}catch(...){};
-		N--;
-	}while(N);
-	MemError();
-	return NULL;
-};
+void* Gmalloc(int size) {
+    if (!ChechIfInit()) return nullptr;
+    return HeapAlloc(GlobHeap, HEAP_ZERO_MEMORY, size);
+}
+void* Grealloc(void* ptr, int size) {
+    if (!ptr) return Gmalloc(size);
+    if (!ChechIfInit()) return nullptr;
+    return HeapReAlloc(GlobHeap, HEAP_ZERO_MEMORY, ptr, size);
+}
 void Gfree(void* ptr){
 	try{
 		if(ChechIfInit()){
@@ -351,7 +306,6 @@ void Gfree(void* ptr){
 #define SAFEMEMORY
 #define NOERRORS
 #define SUPERSAFEREALLOC
-#ifndef SAFEMEMORY
 void CheckDynamicalPtr(void* ptr){
 };
 CEXPORT
@@ -366,107 +320,46 @@ void _ExFree(void* ptr){
 	}catch(...){
 	};
 };
-CEXPORT
-void* _ExMalloc(int Size){
-	TotalSize++;
-	void* ptr=NULL;
-	int N=100;
-	do{
-		try{
-			ptr=calloc(Size,1);
-			if(ptr)return ptr;
-		}catch(...){
-		};
-		N--;
-		Size+=256;
-		Sleep(2);
-	}while(N);
-
-};
-CEXPORT
-void* _ExRealloc(void* ptr,int Size){
-	void* pt=NULL;
-	int N=100;
-	do{
-		try{
-			pt=realloc(ptr,Size);
-			if(pt)return pt;
-		}catch(...){
-		};
-		N--;
-		Size+=256;
-		Sleep(3);
-	}while(N);
-};
-#else
-bool CheckMemBlock(byte* ptr){
-	try{
-		int size=((DWORD*)ptr)[0];
-		if(!(((DWORD*)ptr)[1]=='TRTS'&&((DWORD*)(ptr+size+8))[0]=='LNIF'))return false;
-#ifndef NOERRORS
-		assert(((DWORD*)ptr)[1]=='TRTS');
-		assert(((DWORD*)(ptr+size+8))[0]=='LNIF');
-#endif
-	}catch(...){
-#ifndef NOERRORS
-		assert(0);
-#endif
-		return false;
-	};
-	return true;
-};
-void CheckDynamicalPtr(void* ptr){
-	if(ptr)CheckMemBlock(((byte*)ptr)-8);
-};
+bool CheckMemBlock(byte* ptr) {
+    __try {
+        int size = ((DWORD*)ptr)[0];
+        if (size <= 0 || size > 100000000) return false;
+        return ((DWORD*)ptr)[1] == 'TRTS' && 
+               ((DWORD*)(ptr + size + 8))[0] == 'LNIF';
+    }
+    __except(EXCEPTION_EXECUTE_HANDLER) {
+        return false;
+    }
+}
 int AllocSize=0;
 CEXPORT
-void _ExFree(void* ptr){
-	if(!ptr)return;
-	byte* data=((byte*)ptr)-8;
-	if(!CheckMemBlock(data))return;
-	int size=((DWORD*)data)[0];
-	((DWORD*)data)[1]='EERF';
-	*((DWORD*)(data+8+size))='FDNE';
-
-	AllocSize-=size;
-	try{
-		free(data);
-	}catch(...){};
-};
+void* _ExMalloc(int Size) {
+    byte* data = (byte*)::calloc(Size + 12, 1);
+    if (!data) {
+        MessageBox(hwnd, "Out of memory!", "ERROR!", 0);
+        return nullptr;
+    }
+    
+    ((DWORD*)data)[0] = Size;
+    ((DWORD*)data)[1] = 'TRTS';
+    *((DWORD*)(data + 8 + Size)) = 'LNIF';
+    
+    g_allocSize.fetch_add(Size);
+    return data + 8;
+}
 CEXPORT
-void* _ExMalloc(int Size){
-	TotalSize++;
-	byte* data=(byte*)calloc(Size+12,1);
-	((DWORD*)data)[0]=Size; 
-	((DWORD*)data)[1]='TRTS';
-	*((DWORD*)(data+8+Size))='LNIF';
-	AllocSize+=Size;
-	return data+8;
-};
-CEXPORT
-void* _ExRealloc(void* ptr,int Size){
-	if(ptr){
-		byte* data=((byte*)ptr)-8;
-		CheckMemBlock(data);
-		int size=((DWORD*)data)[0];
-#ifdef SUPERSAFEREALLOC
-		void* PTR=ptr;
-		PTR=_ExMalloc(Size);
-		if(PTR){
-			try{
-				memcpy(PTR,ptr,Size>size?size:Size);
-				_ExFree(ptr);
-			}catch(...){};
-		};
-		return PTR;
-#else
-		data=(byte*)realloc(data,Size+12);
-		((DWORD*)data)[0]=Size;
-		((DWORD*)data)[1]='TRTS';
-		*((DWORD*)(data+8+Size))='LNIF';	
-		AllocSize+=Size-size;
-		return data+8;
-#endif
-	}else return _ExMalloc(Size);
-};
-#endif
+void* _ExRealloc(void* ptr, int Size) {
+    if (!ptr) return _ExMalloc(Size);
+    
+    byte* data = ((byte*)ptr) - 8;
+    if (!CheckMemBlock(data)) return nullptr;
+    
+    int oldSize = ((DWORD*)data)[0];
+    void* newPtr = _ExMalloc(Size);
+    
+    if (newPtr) {
+        memcpy(newPtr, ptr, min(Size, oldSize));
+        _ExFree(ptr);
+    }
+    return newPtr;
+}
