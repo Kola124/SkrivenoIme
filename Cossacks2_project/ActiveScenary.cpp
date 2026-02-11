@@ -4096,21 +4096,33 @@ void RegisterDynGroup(GAMEOBJ* Units){
 	Units->Serial=0;
 };
 DLLEXPORT
-void RegisterDynGroupEx(GAMEOBJ* Units,char* file,int Line){
-	Units->Type='UNIT';
-	if(SCENINF.NUGRP>=SCENINF.MaxUGRP){
-		SCENINF.MaxUGRP+=32;
-		SCENINF.UGRP=(UnitsGroup*)realloc(SCENINF.UGRP,SCENINF.MaxUGRP*sizeof UnitsGroup);
-	};
-	Units->Index=SCENINF.NUGRP;
-	UnitsGroup *UG=SCENINF.UGRP+SCENINF.NUGRP;
-	memset(UG,0,sizeof UnitsGroup);
-	UG->Index=SCENINF.NUGRP;
-	SCENINF.NUGRP++;
-	Units->Serial=0;
-	UG->file=file;
-	UG->Line=Line;
-};
+void RegisterDynGroupEx(GAMEOBJ* Units, char* file, int Line) {
+    Units->Type = 'UNIT';
+    
+    if(SCENINF.NUGRP >= SCENINF.MaxUGRP) {
+        // Grow by larger chunks to reduce fragmentation
+        int newMax = SCENINF.MaxUGRP == 0 ? 256 : SCENINF.MaxUGRP * 2;  // Double size
+        
+        UnitsGroup* newPtr = (UnitsGroup*)realloc(SCENINF.UGRP, newMax * sizeof(UnitsGroup));
+        
+        if(!newPtr) {
+            MessageBox(hwnd, "Failed to allocate UnitsGroup!", "ERROR!", 0);
+            return;
+        }
+        
+        SCENINF.UGRP = newPtr;
+        SCENINF.MaxUGRP = newMax;
+    }
+    
+    UnitsGroup* UG = SCENINF.UGRP + SCENINF.NUGRP;
+    memset(UG, 0, sizeof(UnitsGroup));
+    UG->Index = SCENINF.NUGRP;
+    Units->Index = SCENINF.NUGRP;
+    SCENINF.NUGRP++;
+    Units->Serial = 0;
+    UG->file = file;
+    UG->Line = Line;
+}
 DLLEXPORT
 int GetNUnits(GAMEOBJ* Units){
 	if(Units->Type!='UNIT'){
