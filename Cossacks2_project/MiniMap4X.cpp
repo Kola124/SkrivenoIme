@@ -288,7 +288,7 @@ void DrawTriangleL(int x,int y,int H1,int H2,int H3,
 	int tofs=(mrand()&15)+((mrand()&15)<<8);
 
 	int off;
-	byte c;
+	byte c=0;
 	int c0;
 	ofs--;
 	V+=Dvx;
@@ -400,8 +400,8 @@ void LiteTriangleR(int x,int y,int H1,int H2,int H3,
 	int H=H1;
 
 	int off;
-	byte c;
-	int c0;
+	//byte c;
+	//int c0;
 
 	for(int i=0;i<8;i++){
 		SETLIT;	
@@ -488,8 +488,8 @@ void LiteTriangleL(int x,int y,int H1,int H2,int H3,
 	int H=H1;
 
 	int off;
-	byte c;
-	int c0;
+	//byte c;
+	//int c0;
 	ofs--;
 
 	for(int i=0;i<8;i++){

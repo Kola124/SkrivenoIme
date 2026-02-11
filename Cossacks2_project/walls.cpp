@@ -1451,7 +1451,7 @@ void WallHandleMouse(){
 					//WSys.AddCluster(&TMPCluster);
 					SetWallBuildMode(0xFF,0);
 					Lpressed=false;
-					SpecCmd==0;
+					SpecCmd=0;
 					return;
 				};
 				int xx=mouseX-smapx;
@@ -2191,7 +2191,7 @@ bool CheckNTPresence(int x,int y,int R,byte NMask){
     int rx1=1;
     OneObject* DestObj=NULL;
     int mindist=10000000;
-    int dist;
+    //int dist;
     int rx2=3;
     int stcell=cell-rx1-(rx1<<VAL_SHFCX);
     byte* bpt=NPresence+stcell;
@@ -2269,7 +2269,7 @@ void ControlGates(){
 };
 void OpenGates(byte NI){
 	return;
-	int dx,dy;
+	//int dx,dy;
 	for(int i=0;i<NGates;i++){
 		Gate* gat=Gates+i; 
 		if((!gat->Locked)&&(gat->NI==NI||((gat->State>NGOpen-3)&&gat->NI!=0xFF))){
@@ -2364,7 +2364,7 @@ void OpenGates(byte NI){
 };
 void CloseGates(byte NI){
 	return;
-	int dx,dy;
+	//int dx,dy;
 	for(int i=0;i<NGates;i++){
 		Gate* gat=Gates+i; 
 		if(gat->NI==NI&&((gat->State<=NGOpen-3)&&gat->NI!=0xFF)){
@@ -2485,7 +2485,7 @@ void SquishUnits(int x,int y,int R,byte NMask){
     int rx1=1;
     OneObject* DestObj=NULL;
     int mindist=10000000;
-    int dist;
+    //int dist;
     int rx2=3;
     int stcell=cell-rx1-(rx1<<VAL_SHFCX);
     byte* bpt=NPresence+stcell;
@@ -2516,7 +2516,7 @@ void ControlSquish(){
 	};
 };
 void OpenCell(int x,int y){
-	int dx,dy;
+	//int dx,dy;
 	int LI=GetLI(x,y);
 	x<<=2;
 	y<<=2;
@@ -2575,7 +2575,7 @@ void OpenCell(int x,int y){
 	};
 };
 void CloseCell(int x,int y){
-	int dx,dy;
+	//int dx,dy;
 	int LI=GetLI(x,y);
 	x<<=2;
 	y<<=2;

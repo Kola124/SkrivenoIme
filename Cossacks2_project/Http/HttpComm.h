@@ -8,11 +8,11 @@ enum ConnectionStage{csConnecting,csSending,csReceiving,csWaiting,csError};
 
 typedef struct SHttpQuery
 {
-	DWORD				m_dwHandle;			// handle
-	SOCKET				m_Socket;			// socket
-	LPSTR				m_lpszQuery;		// query
-	LPVOID				m_lpvBuffer;		// receive buffer
-	DWORD				m_dwDataSize;		// received data size
+	DWORD				m_dwHandle=0;			// handle
+	SOCKET				m_Socket=0;			// socket
+	LPSTR				m_lpszQuery=0;		// query
+	LPVOID				m_lpvBuffer=0;		// receive buffer
+	DWORD				m_dwDataSize=0;		// received data size
 	ConnectionStage		m_Stage;			// connection stage
 }*PHttpQuery;
 
@@ -26,13 +26,13 @@ public:
 	CHttpComm();
 	virtual ~CHttpComm();
 protected:
-	BOOL		m_bInitialized;
-	CHAR		m_szProxyAddr[255];
-	DWORD		m_bUseProxy;
-	DWORD		m_dwProxyPort;
-	DWORD		m_dwRequestCount;
-	DWORD		m_dwHandleAuto;
-	PHttpQuery	m_pRequestList;
+	BOOL		m_bInitialized=0;
+	CHAR		m_szProxyAddr[255]={0};
+	DWORD		m_bUseProxy=0;
+	DWORD		m_dwProxyPort=0;
+	DWORD		m_dwRequestCount=0;
+	DWORD		m_dwHandleAuto=0;
+	PHttpQuery	m_pRequestList=0;
 };
 
 

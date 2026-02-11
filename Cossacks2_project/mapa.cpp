@@ -1506,7 +1506,7 @@ void ShowAllMarkers(){
 #endif
 void GFieldShow(){
 	PrepareSound();
-	int i;
+	//int i;
 	int uuu=(tmt&31);
 	char ggg[600];
 	tmt++;
@@ -2063,7 +2063,7 @@ void GFieldShow(){
 			else if(s<10&&m>=10)sprintf(cc1,"%d:%d:0%d",h,m,s);
 			else if(s>10&&m<10)sprintf(cc1,"%d:0%d:%d",h,m,s);
 			else sprintf(cc1,"%d:%d:%d",h,m,s);	
-			char cc4[100];
+			//char cc4[100];
 			//cc4[0]=0;
 			//AddRecordAndRatingSymbols(cc4);
 			ShowString(minix+2/*+GetRLCStrWidth(cc4,&SmallBlackFont)*/,miniy-22+2-4+DY,cc1,&SmallBlackFont);

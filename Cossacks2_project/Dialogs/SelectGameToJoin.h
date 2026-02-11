@@ -58,7 +58,7 @@ bool MPL_JoinGame(int ID){
 	Cancel->OnUserClick=&MMItemChoose;
 	Cancel->UserParam=mcmCancel;
 
-	int LBY;
+	//int LBY;
 	ListBox* LB=MENU.addGP_ListBox(NULL,446,256,9,LBX.GPID,0,26,&WhiteFont,&YellowFont,NULL);
 	TextButton* SelGame=MENU.addTextButton(NULL,603,528,"                                                            ",&WhiteFont,&WhiteFont,&WhiteFont,0);
 	
@@ -69,7 +69,7 @@ bool MPL_JoinGame(int ID){
 	LB->CurItem=-1;
 	//LB->M_Over=9;
 	if(LB->NItems) LB->CurItem=0;
-StartJoin:;
+//StartJoin:;
 	int pp=1;	
 	
 	StartMixing();

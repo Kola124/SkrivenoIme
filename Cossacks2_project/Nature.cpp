@@ -262,7 +262,7 @@ void LoadRDS(){
 	char s1[128];
 	char s2[128];
 	char s3[128];
-	int	z0,z1,z2,z3,z4,z5,z6,z7;
+	int	z0,z1,z2,z3,/*z4,*/ z5, z6, z7;
 	int	mode=0;
 	z5=0;
 	char sss[64];
@@ -436,11 +436,11 @@ void LoadRDS(){
 					IncOrdID=GetIconByName(cc);
 				}else
 				if(!strcmp(s1,"ADDRANGE")){
-					char cc[128];
+					//char cc[128];
 					Gscanf(f,"%d",&ADDRANGE);
 				}else
 				if(!strcmp(s1,"ADDPAUSE")){
-					char cc[128];
+					//char cc[128];
 					Gscanf(f,"%d",&ADDPAUSE);
 				}else
 				if(!strcmp(s1,"DOGUARD")){
@@ -794,7 +794,7 @@ void FormGroupDescription::Load(GFILE* f){
 	int z=Gscanf(f,"%d",&NGrp);
 	if(z!=1)FGError();
 	Grp=new SingleGroup[NGrp];
-	int x,y,n;
+    int x; // y, n;
 	char cc[64];
 	for(int j=0;j<NGrp;j++){
 		z=Gscanf(f,"%s%d",cc,&Grp[j].NCommon);

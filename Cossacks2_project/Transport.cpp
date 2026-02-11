@@ -161,7 +161,7 @@ bool ParkWaterNewMonster(OneObject* OB,int x,int y,byte Prio,byte OrdType){
 	};
 	if(!SearchTransportPlace(&xx1,&yy1,LX))return true;
 	if(OB->PrioryLevel>Prio)return false;
-	char DIREC;
+	//char DIREC;
 	//if(!FindCostPosition(OB,&xx,&yy,&DIREC)){
 	//	if(OB->GLock)MFI->BSetBar(OB->x,OB->y,LX);
 	//	return false;
@@ -1155,7 +1155,7 @@ void GoToTransportLink(OneObject* OBJ){
 		};
 		return;
 	};
-    int xx,yy,xm,ym;
+    int xx, yy;// xm, ym;
     NewMonster* NM=OBJ->newMons;
 	NewMonster* MiNM=OB->newMons;
 	xx=OB->DstX;
@@ -1271,7 +1271,7 @@ void LeaveTransportLink(OneObject* OBJ){
 	};
 	OB->ShowMe();
 	NewMonster* MiNM=OBJ->newMons;
-	int xx,yy;
+	//int xx,yy;
 	OB->RealX=OBJ->RealX;
 	OB->RealY=OBJ->RealY;
 	OB->UnlimitedMotion=0;

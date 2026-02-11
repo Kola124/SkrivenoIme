@@ -4674,8 +4674,8 @@ void LocalSendShips(Brigade* BR,int x,int y,byte Type){
 	int fdy= dx;
 	byte Matrix[8*32];
 	MTRPTR=Matrix;
-	byte NInLine[16];
-	int NSLines;
+	//byte NInLine[16];
+	//int NSLines;
 	int NTot=Nc;
 	int NP,Nx,Ny;
 
@@ -5510,7 +5510,7 @@ void MakeDiversionLink(Brigade* BR){
 							UNI=Group[UG->IDS[UG->N-1]];
 							UG->N--;
 						};
-UNIFOUND:
+//UNIFOUND:
 						if(UNI){
 							CT->UnRegisterNewUnit(UNI);
 							UNI->NewMonsterSmartSendTo(TRANS->DstX>>4,TRANS->DstY>>4,0,0,128+16,0);

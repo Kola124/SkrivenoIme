@@ -24,7 +24,7 @@ void GetRect(OneObject* ZZ,int* x,int* y,int* Lx,int* Ly);
 void OneObject::SetDstPoint(int xd,int yd){
 	//if(!Ready)return;
 	if(!Ref.General->CanDest)return;
-	int x0,y0,x1,y1;
+	//int x0,y0,x1,y1;
 	//GetRect(this,&x0,&y0,&x1,&y1);
 	//x1+=x0;
 	//y1+=y0;

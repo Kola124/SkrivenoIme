@@ -4829,7 +4829,7 @@ bool NationIsErased(byte Nat){
 		//int NThemPeasants=0;
 		//int NThemCenters=0;
 		int MyMask=1<<Nat;
-		byte LockN[8];
+		//byte LockN[8];
 		//memset(LockN,1,8);
 		//for(int i=0;i<8;i++)if(NATIONS[i].VictState==1)LockN[i]=0;
 		int NMyUnits=0;

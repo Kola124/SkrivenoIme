@@ -974,7 +974,7 @@ void SaveWaterCost(ResFile f1){
 	};
 };
 void LoadWaterCost(ResFile f1){
-	int i,Lx,Ly;
+	int Lx,Ly; //i,
 	RBlockRead(f1,&Lx,4);
 	RBlockRead(f1,&Ly,4);
 	int dsx=(MaxWX);
@@ -1674,7 +1674,7 @@ void SavePreview(ResFile f1){
 			//RClose(F2);
 		};
 	};
-	char ccc[128];
+	//char ccc[128];
 		
 	free(Preview);
 };

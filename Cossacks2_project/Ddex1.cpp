@@ -473,10 +473,10 @@ bool Loading()
 	RivDir=NULL;
 	MemReport("Start");
 	Init_GP_IMG();
-	DWORD SectorsPerCluster;
-	DWORD BytesPerSector; 
-	DWORD NumberOfFreeClusters; 
-	DWORD TotalNumberOfClusters;
+	//DWORD SectorsPerCluster;
+	//DWORD BytesPerSector; 
+	//DWORD NumberOfFreeClusters; 
+	//DWORD TotalNumberOfClusters;
 	char CRDIR[200];
 	GetWindowsDirectory(CRDIR,200);
 	CRDIR[3]=0;
@@ -938,8 +938,8 @@ void OnWTPacket(WPARAM wSerial, LPARAM hCtx);
 long FAR PASCAL WindowProc( HWND hWnd, UINT message, 
                             WPARAM wParam, LPARAM lParam )
 {
-    PAINTSTRUCT ps;
-    RECT        rc;
+    //PAINTSTRUCT ps;
+    //RECT        rc;
     static BYTE phase = 0;
 //    HDC         hdc;
 	
@@ -2485,7 +2485,7 @@ void PlayVideo(){
 		return;
 	};
 
-plavi:
+//plavi:
 	StopPlayCD();
 	ClearScreen();
 	InVideo=1;
@@ -3595,7 +3595,6 @@ bool RunSMD(){
 			MidiSound=0;
             int ex_window_x, ex_window_y, ex_x, ex_y;
             int dummy;
-            int FPSTimeSF;
             if (window_mode)
             {
                 ex_window_x = exRealLx;
@@ -3611,11 +3610,7 @@ bool RunSMD(){
                 ex_window_y = ex_other_RealLy;
             }
 			if(fff){
-#ifdef SPEEDFIX
-                Gscanf(fff, "%d%d%d%d%d%d%d%d%d%d", &exRealLx, &exRealLy, &WarSound, &OrderSound, &OrderSound, &MidiSound, &FPSTimeSF, &ScrollSpeed, &exFMode, &PlayMode);
-#else
                 Gscanf(fff,"%d%d%d%d%d%d%d%d%d%d%d%d%d",&ex_window_x,&ex_window_y,&WarSound,&OrderSound,&OrderSound,&MidiSound,&dummy, &FPSTime,&ScrollSpeed,&exFMode,&PlayMode,&ex_x ,&ex_y);
-#endif
                 SetCDVolume(MidiSound);
 				Gclose(fff);
                 
@@ -4102,7 +4097,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
         
         // Save settings...
         int ex_window_x, ex_window_y, ex_x, ex_y;
-        int FPSTimeSF;
         
         if (window_mode)
         {
@@ -4121,11 +4115,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 
         GFILE* fff=Gopen("mode.dat","wt");
         if(fff){
-				#ifdef SPEEDFIX
-				Gprintf(fff,"%d %d %d %d %d %d %d %d %d %d",exRealLx,exRealLy,WarSound,OrderSound,OrderSound,MidiSound,FPSTimeSF,ScrollSpeed,exFMode,PlayMode);
-				#else
 				Gprintf(fff,"%d %d %d %d %d %d %d %d %d %d %d %d %d",ex_window_x,ex_window_y,WarSound,OrderSound,OrderSound,MidiSound, 0,FPSTime,ScrollSpeed,exFMode,PlayMode,ex_x ,ex_y);
-				#endif
             Gclose(fff);
         };
         

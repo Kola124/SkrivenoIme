@@ -437,7 +437,7 @@ void CreateTopListEnArmyBtl(word* IDS,byte NI,int MinPS){
 		if(OB&&!((OB->NMask&Mask)||OB->Sdoxlo||OB->NewBuilding||OB->NNUM==7)){	//OB->newMons->MeatTransformIndex==0xFF
 			int top=GetTopZone(OB->RealX>>4,OB->RealY>>4);
 			if(top<NA){				
-				int NIn;
+				//int NIn;
 				NPS[top]++;
 				IDS[top]=i;
 			};

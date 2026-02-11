@@ -176,7 +176,7 @@ void UpdateEBufs(){
 	word FirstRand=0xFFFF;
 	word OtherRand=0xFFFF;
 	//sortong by color;
-	byte CSORT[MaxPL];
+	//byte CSORT[MaxPL];
 	int cp=0;
 	bool savmad=0;
 	memset(SYNBAD,0,8);
@@ -1791,7 +1791,7 @@ void ComeInGame(){
 	for(int i=0;i<8;i++){
 		PLNAT[i]=-1;
 	};
-	int x;
+	//int x;
 	
 	FlipPages();
 	if(CurrentMap[0]=='R'&&CurrentMap[1]=='N'&&CurrentMap[3]==' ')CreateNationalMaskForRandomMap(CurrentMap);

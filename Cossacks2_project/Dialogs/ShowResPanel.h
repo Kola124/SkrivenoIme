@@ -35,7 +35,7 @@ void ShowRMap(){
 	for(int i=0;i<6;i++){
 		char gg[100];
 		sprintf(gg,"%d",MON[i]);
-		int x;
+		//int x;
 		int ii=i;
 		if(i==FoodID)//GetResID("FOOD"))
 			ii-=2;

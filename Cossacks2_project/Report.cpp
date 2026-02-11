@@ -335,7 +335,7 @@ extern int NNations;
 extern char** NatNames;
 void MakeGlobalReport(){
 	return;
-	char ccc[100];
+	//char ccc[100];
 	for(int i=0;i<NNations;i++){
 		char ccc[100];
 		sprintf_s(ccc,sizeof(ccc),"Units_%s.txt",NatNames[i]);

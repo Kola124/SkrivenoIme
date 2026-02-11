@@ -165,7 +165,7 @@ bool SaveArch24(char* Name,byte* Data,int Lx,int Ly){
 	return true;
 };
 bool ReadArch24(char* Name,BMPformat* BM,byte** data){
-	char str[128];
+	//char str[128];
 	ResFile f1=RReset(Name);
 	if(IOresult())return false;
 	int Lx,Ly;
@@ -189,7 +189,8 @@ bool ReadArch24(char* Name,BMPformat* BM,byte** data){
 	byte* Data=*data;
 	int APos=0;
 	int NPos=0;
-	int Cmd,Len,i,j;
+    int Cmd, Len;
+    //int i, j;
 	while(APos<DSize&&NPos<DstLen){
 		Cmd=NData[APos];
 		if(!(Cmd&0x80)){

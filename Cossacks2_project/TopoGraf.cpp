@@ -452,7 +452,7 @@ void InitAreas(){
 	NAreas=0;
 };
 void EraseAreas(){
-	int i;
+	//int i;
 
 #ifdef HASH_TOP
 	for(int i=0;i<NMFIELDS;i++){

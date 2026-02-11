@@ -649,8 +649,8 @@ void ShowProp(){
 		int	xx=0;
 		int x1=PrpX;
 		int y1=PrpY;
-		OneSlide* OC;
-		char str[32];
+		//OneSlide* OC;
+		//char str[32];
 		for( i=0;i<NINF;i++){
 			MI=&(MList[i]);
 			OBJ=Group[MI->Last];
@@ -1810,9 +1810,9 @@ int ShowUniqAbility(){
 	RunPF(1,"ShowUniqAbility");
 	WIcon* MI;
 	int IREF;
-	char str[32];
-	int p,q,spr,fid;
-	Visuals* VS;
+	//char str[32];
+	int spr,fid; //p,q,
+	//Visuals* VS;
     OneIcon* OI;
 	for(int i=0;i<NABL;i++){
 		bool DrawIt=true;
@@ -1889,7 +1889,7 @@ bool ShowCommonAbl(){
 	bool isLand=false;
 
     OneIcon* OI;
-	char sxt[128];
+	//char sxt[128];
 	if(!(isAir||isLand||isWater))return false;
 	RunPF(2,"ShowCommonAbility");
 	Nation* NT=&NATIONS[MyNation];
@@ -1931,12 +1931,12 @@ bool ShowCommonAbl(){
 	int xx=0;
 	int x1=AblX;
 	int y1=AblY;
-	OneSlide* OC;
+	//OneSlide* OC;
 	WIcon* MI;
 	int IREF;
-	char str[32];
-	int p,q,spr,fid;
-	Visuals* VS;
+	//char str[32];
+	//int p,q,spr,fid;
+	//Visuals* VS;
 	//MaxMagic=0;
 	for(int i=0;i<NABL;i++){
 		if(SubIcon==-1){
@@ -2002,7 +2002,7 @@ void ShowAbility(){
 	StopPF(0);
 	//InitZones();
 	NABL=0;
-	word MID;
+	//word MID;
 	OneObject* OBJ;
 	GeneralObject* GO;
 	AblInf* MI;
@@ -2162,10 +2162,10 @@ void ShowAbility(){
 	int x1=AblX+(IconLx+AddIconLx)*(xx&3);
 	int y1=AblY+(IconLy+AddIconLy)*(xx>>2);
 	xx=xx&3;
-	OneSlide* OC;
+	//OneSlide* OC;
     OneIcon* OI;
     int GA,GP;
-	char str[512];
+	//char str[512];
 	int MaxProgr;
 
 	bool P1Present=0;

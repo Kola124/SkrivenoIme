@@ -89,11 +89,11 @@ bool MPL_WaitingBattleGame(bool Host,int BattleID){
 #endif
 	
 
-	GPPicture*  NameBack[2];
-	GPPicture*  NationBack[2];
+	//GPPicture*  NameBack[2];
+	//GPPicture*  NationBack[2];
 	GPPicture*  ColorBack[2];
 	GPPicture*  Flags[2];
-	GPPicture*  CD_Back[2];
+	//GPPicture*  CD_Back[2];
 	GPPicture*  CD_Present[2];
 	GPPicture*  ReadyBack[2];
 	
@@ -101,7 +101,7 @@ bool MPL_WaitingBattleGame(bool Host,int BattleID){
 	ComboBox*   MNATION[2];
 	TextButton* ReadyFlow[2];
 	//ColoredBar* MCOLOR [8];
-	TextButton* VersTextShadow[8];
+	//TextButton* VersTextShadow[8];
 	TextButton* VersText[8];
 	GPPicture*  MREADY[2];
 	

@@ -175,9 +175,9 @@ void LoadWeapon(){
 	int	mode=0;
 	int line=1;
 	int wid=0;
-	int cam,zz1,zz2;
+	int zz1,zz2; //cam,
 	int p1,p2,p3,p4;
-	int mindam,maxdam;
+	//int mindam,maxdam;
 	memset(&WPLIST,0,sizeof WPLIST);
 	GFILE* f=Gopen("weapon.nds","rt");
 	AFile("weapon.nds");
@@ -867,14 +867,14 @@ void LoadNation(char* fn,byte msk,byte NIndex,byte NatID){
 	char gg[128];
 	char gx[128];
 	char gy[128];
-	char gz[128],gg1[128];
+    char gz[128];// gg1[128];
 	int	mode=0;
 	int line=0;
 	int wid=0;
-	int	zz1,zz2,knd;
-	int parm0,parm1,parm2,parm3,parm4,parm5,parm6;
-	int parm7,parm8,parm9,parm10,parm11;
-	int mindam,maxdam,gold;
+    int	zz1, zz2;// knd;
+	int parm1,parm2,parm3;  //parm0,parm4,parm5,parm6
+	//int parm7,parm8,parm9,parm10,parm11;
+    //int mindam, maxdam, gold;
 	GFILE* f1=Gopen(fn,"r");
 	AFile(fn);
 	if(!int(f1)){
@@ -1841,7 +1841,7 @@ void LoadAI(char* fn,Nation* NT){
 		Errx(gg);
 		return;
 	};
-	int i,j,zz1,z,parm1,parm2,parm3;
+	int z,parm1,parm2,parm3; //i,j,zz1,
 	char* grp[32];
 	int ngrp=0;
 	NT->NGrp=0;

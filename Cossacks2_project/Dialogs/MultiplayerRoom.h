@@ -235,7 +235,7 @@ bool MPL_WaitingGame(bool Host,bool SINGLE){
 	//GPPicture*  NationBack[8];
 	GPPicture*  ColorBack[8];
 	GPPicture*  Flags[8];
-	GPPicture*  CD_Back[8];
+	//GPPicture*  CD_Back[8];
 	GPPicture*  CD_Present[8];
 	//GPPicture*  ReadyBack[8];
 	GPPicture*  AliasBack[8];
@@ -768,7 +768,7 @@ bool MPL_WaitingGame(bool Host,bool SINGLE){
 	//VICT->CurLine=0;
 	//VICT->Visible=0;
 	//VICT->Enabled=0;
-ffe1:;
+//ffe1:;
 	for(int i=0;i<=9;i++){
 		char ccx[32];
 		sprintf(ccx,"TIME%d",i);
@@ -777,7 +777,7 @@ ffe1:;
 			TIME->AddLine(cc2);
 		}//else goto ffe2;
 	};
-ffe2:;
+//ffe2:;
 	if(!Host){
 		for(int j=0;j<5;j++)CMGRP1[j]->Enabled=false;
 		GPP->Enabled=false;

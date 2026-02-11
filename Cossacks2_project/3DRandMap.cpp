@@ -1342,7 +1342,7 @@ void GenerateRelief(int Style){
 	GMAP.VertHi=znew(short,MaxPointIndex);
 	GMAP.VertType=znew(byte,MaxPointIndex);
 	GMAP.Clear();	
-	BiSegment BS;
+	//BiSegment BS;
 	InitHillAmp();
 	GMAP.Free();
 };
@@ -1631,7 +1631,7 @@ void MakeUndo(){
 		if(DoUndo=UNDO1.Read(&Type)){
 			int vint;
 			byte vbyte;
-			byte fc,fw;
+			//byte fc,fw;
 			short vshort;
 			switch(Type){
 			case 0://sect
@@ -2268,7 +2268,7 @@ void RM_LoadObjEmpty(ResFile F,int xc,int yc){
 		RBlockRead(F,&NT,1);
 		NT=MyNation;
 		RBlockRead(F,ONAME,31);
-ttt:;
+//ttt:;
 	};
 };
 void RM_SaveZonesAndGroups(ResFile F,int x0,int y0,int Lx,int Ly,int xc,int yc){

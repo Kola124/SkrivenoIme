@@ -173,7 +173,7 @@ bool RecordGame::Extract(){
 			};
 		};
 	};
-AGAIN:
+//AGAIN:
 	byte RBUF[16384];
 	int sz=0;
 	int szz=-1;

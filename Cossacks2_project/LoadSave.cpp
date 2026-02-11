@@ -2779,7 +2779,7 @@ byte PL_NatRefTBL[8];
 void LS_LoadTopology(SaveBuf* SB);
 void ActivateDipDialog(char* request);
 SFLB_DLLEXPORT SFLB_PreLoadGame(SaveBuf* SB,bool LoadNation){
-	int i,y;
+    int i; //y;
 	UnLoading();
 	InitExplosions();
 	xBlockRead(SB,&i,4);

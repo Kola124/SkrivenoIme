@@ -532,7 +532,7 @@ void CmdSaveNetworkGame(byte NI,int ID,char* Name){
 };
 //[29][ni][ID:32][Length:8][Name...]
 void CmdLoadNetworkGame(byte NI,int ID,char* Name){
-	byte mm[8];
+	//byte mm[8];
 	SCMD;
 	ExBuf[EBPos]=41;
 	ExBuf[EBPos+1]=NI;

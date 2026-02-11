@@ -276,7 +276,7 @@ lpp2:	mov		eax,[BlobVx+ecx*4]
 		//jne      lpp21
 //stop delete
 		dec		byte ptr [BlobTime+ecx]
-lpp21:
+//lpp21:
 		mov		eax,[BlobX+ecx*4]
 		cmp		eax,ebx
 		jl		NoShow

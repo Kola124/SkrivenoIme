@@ -71,7 +71,7 @@ bool EnterName(){
 	InputBox* IB=MENU.addInputBox(NULL,594,524,PlName,16,308,40,FYellow,FWhite,0);	
 	IB->Active=true;
 	UniversalButton* TBS[14];
-	GPPicture* GPP[14];
+	//GPPicture* GPP[14];
 	
 	const int NPlayers = 10;
 	int XL0=446;

@@ -1125,9 +1125,9 @@ word PositionOrder::CreateOrdPos(int x,int y,byte dir,int NIDS,word* IDS,OrderDe
     //Getting of the maximal size of Unit
     int maxR=FORMDIST;
     word* IDE=Ids;
-    word MID;
-    int rr;
-    OneObject* OB;
+    //word MID;
+    //int rr;
+    //OneObject* OB;
 	/*
     for(iy=0;iy<NU;iy++){
         MID=IDE[iy];

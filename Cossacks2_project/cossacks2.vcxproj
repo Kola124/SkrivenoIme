@@ -17,6 +17,10 @@
       <Configuration>Release No Speedfix</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release STEAM|Win32">
+      <Configuration>Release STEAM</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release3d_inl|Win32">
       <Configuration>Release3d_inl</Configuration>
       <Platform>Win32</Platform>
@@ -56,6 +60,12 @@
     <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v143</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
@@ -104,6 +114,10 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
@@ -125,6 +139,12 @@
     <_ProjectFileVersion>17.0.34511.75</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>..\bin\</OutDir>
+    <IntDir>.\../_release\dmcr\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>dmcr</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">
     <OutDir>..\bin\</OutDir>
     <IntDir>.\../_release\dmcr\</IntDir>
     <LinkIncremental>true</LinkIncremental>
@@ -224,6 +244,74 @@
       <IgnoreSpecificDefaultLibraries>libc.lib;</IgnoreSpecificDefaultLibraries>
       <EnableUAC>false</EnableUAC>
       <ImportLibrary>.\../lib/dmcr.lib</ImportLibrary>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\../_release/cossacks2.bsc</OutputFile>
+    </Bscmake>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\../_release/cossacks2.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>InetRaiting;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeaderOutputFile>.\../_release/cossacks2.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\../_release/</AssemblerListingLocation>
+      <ObjectFileName>.\../_release/</ObjectFileName>
+      <ProgramDataBaseFileName>.\../_release/</ProgramDataBaseFileName>
+      <BrowseInformation>false</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;CRASHTESTFIX;MULTITHREAD;AIFIX;VIEW_TOP;STEAM;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <ShowIncludes>false</ShowIncludes>
+      <RemoveUnreferencedCodeData>true</RemoveUnreferencedCodeData>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0419</Culture>
+      <ResourceOutputFileName>$(IntDir)%Script1.res</ResourceOutputFileName>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/FIXED:NO /MAPINFO:EXPORTS %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>msvcrt.lib;libcmtd.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;oldnames.lib;dxguid.lib;strmiids.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>..\bin\dmcr.exe</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>../lib;../../lib;../bin;../../bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>.\../_release/dmcr.pdb</ProgramDatabaseFile>
+      <GenerateMapFile>true</GenerateMapFile>
+      <MapFileName>..\bin\dmcr.map</MapFileName>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <IgnoreSpecificDefaultLibraries>libc.lib;</IgnoreSpecificDefaultLibraries>
+      <EnableUAC>false</EnableUAC>
+      <ImportLibrary>.\../lib/dmcr.lib</ImportLibrary>
+      <LargeAddressAware>true</LargeAddressAware>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -664,7 +752,9 @@
     <ClInclude Include="Bink\Rad.h" />
     <ClInclude Include="Bink\radbase.h" />
     <ClInclude Include="bmptool.h" />
-    <ClInclude Include="BrigadeAI.h" />
+    <ClInclude Include="BrigadeAI.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="Cdirsnd.h" />
     <ClInclude Include="CEngine\goaceng.h" />
     <ClInclude Include="Chat\chat.h" />
@@ -730,9 +820,11 @@
     <ClInclude Include="Fex\Include\MultiMon.h" />
     <ClInclude Include="FMM\FMM.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="FMM\FMManager.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="fog.h" />
     <ClInclude Include="Fonts.h" />
@@ -742,6 +834,7 @@
     <ClInclude Include="GameSpy\Nonport.h" />
     <ClInclude Include="GameSpy\Peer.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">false</ExcludedFromBuild>
@@ -759,6 +852,7 @@
     <ClInclude Include="IconTool.h" />
     <ClInclude Include="InetRaiting\darray.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">true</ExcludedFromBuild>
@@ -767,6 +861,7 @@
     <ClInclude Include="InetRaiting\gp.h" />
     <ClInclude Include="InetRaiting\hashtable.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">true</ExcludedFromBuild>
@@ -775,9 +870,11 @@
     <ClInclude Include="InetRaiting\md5.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="InetRaiting\nonport.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">true</ExcludedFromBuild>
@@ -786,14 +883,17 @@
     <ClInclude Include="InetRaiting\stats\gbucket.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="InetRaiting\stats\gpersist.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="InetRaiting\stats\gstats.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="IR.h" />
     <ClInclude Include="Limitations.h" />
@@ -819,7 +919,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">true</ExcludedFromBuild>
     </CustomBuild>
     <ClInclude Include="NewUpgrade.h" />
-    <ClInclude Include="New\UdpHolePuncher.h" />
+    <ClInclude Include="New\UdpHolePuncher.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="Nucl.h" />
     <ClInclude Include="Path.h" />
     <ClInclude Include="peer.h" />
@@ -835,148 +937,202 @@
     <ClInclude Include="Safety.h" />
     <ClInclude Include="Scape3D.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Sort.h" />
-    <ClInclude Include="SpraySystem.h" />
-    <ClInclude Include="SquareObject.h" />
+    <ClInclude Include="SpraySystem.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="SquareObject.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="Steam\isteamapps.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteamappticket.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteamclient.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteamcontroller.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteamdualsense.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteamfriends.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteamgamecoordinator.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteamgameserver.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteamgameserverstats.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteamhtmlsurface.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteamhttp.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteaminput.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteaminventory.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteammatchmaking.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteammusic.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteammusicremote.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteamnetworking.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteamnetworkingmessages.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteamnetworkingsockets.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteamnetworkingutils.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteamparentalsettings.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteamps3overlayrenderer.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteamremoteplay.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteamremotestorage.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteamscreenshots.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteamtimeline.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteamugc.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteamuser.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteamuserstats.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteamutils.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\isteamvideo.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\matchmakingtypes.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\steamclientpublic.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Steam\SteamCommCore.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\steamencryptedappticket.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\steamhttpenums.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\steamnetworkingfakeip.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\steamnetworkingtypes.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\steamps3params.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\steamtypes.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\steamuniverse.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\steam_api.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\steam_api_common.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\steam_api_flat.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\steam_api_internal.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Steam\steam_gameserver.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="StrategyResearch.h" />
     <ClInclude Include="StringHash.h" />
@@ -1010,11 +1166,13 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">Disabled</Optimization>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">EditAndContinue</DebugInformationFormat>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Disabled</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">Disabled</Optimization>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EditAndContinue</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">EditAndContinue</DebugInformationFormat>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">EditAndContinue</DebugInformationFormat>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">EditAndContinue</DebugInformationFormat>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">EditAndContinue</DebugInformationFormat>
@@ -1024,6 +1182,7 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release3d|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Disabled</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">Disabled</Optimization>
@@ -1040,7 +1199,9 @@
     <ClCompile Include="Bink\PlayBink.cpp" />
     <ClCompile Include="bmptool.cpp" />
     <ClCompile Include="Brigade.cpp" />
-    <ClCompile Include="BrigadeAI.cpp" />
+    <ClCompile Include="BrigadeAI.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Build.cpp" />
     <ClCompile Include="Cdirsnd.cpp" />
     <ClCompile Include="ChkInet.cpp" />
@@ -1049,6 +1210,7 @@
     <ClCompile Include="Danger.cpp" />
     <ClCompile Include="Ddex1.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Disabled</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">Disabled</Optimization>
@@ -1073,6 +1235,7 @@
     <ClCompile Include="Fex\FEXSysInfo.cpp" />
     <ClCompile Include="FMM\FMManager.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="fog.cpp" />
     <ClCompile Include="Fractal.cpp" />
@@ -1102,6 +1265,7 @@
     <ClCompile Include="IconTool.cpp" />
     <ClCompile Include="InetRaiting\darray.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">true</ExcludedFromBuild>
@@ -1109,6 +1273,7 @@
     </ClCompile>
     <ClCompile Include="InetRaiting\hashtable.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">true</ExcludedFromBuild>
@@ -1116,13 +1281,16 @@
     </ClCompile>
     <ClCompile Include="InetRaiting\IR_Main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="InetRaiting\md5c.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="InetRaiting\nonport.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">true</ExcludedFromBuild>
@@ -1131,21 +1299,25 @@
     <ClCompile Include="InetRaiting\stats\gbucket.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="InetRaiting\stats\gstats.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="InteractiveScenario.cpp" />
     <ClCompile Include="Interface.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">Disabled</Optimization>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">EditAndContinue</DebugInformationFormat>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Disabled</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">Disabled</Optimization>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EditAndContinue</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">EditAndContinue</DebugInformationFormat>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">EditAndContinue</DebugInformationFormat>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">EditAndContinue</DebugInformationFormat>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">EditAndContinue</DebugInformationFormat>
@@ -1156,6 +1328,7 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release3d|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Disabled</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">Disabled</Optimization>
@@ -1167,11 +1340,13 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">Disabled</Optimization>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">EditAndContinue</DebugInformationFormat>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Disabled</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">Disabled</Optimization>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EditAndContinue</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">EditAndContinue</DebugInformationFormat>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">EditAndContinue</DebugInformationFormat>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">EditAndContinue</DebugInformationFormat>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">EditAndContinue</DebugInformationFormat>
@@ -1183,6 +1358,7 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">MaxSpeed</Optimization>
       <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">Speed</FavorSizeOrSpeed>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Disabled</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">Disabled</Optimization>
@@ -1192,6 +1368,7 @@
     <ClCompile Include="Mechanics.cpp" />
     <ClCompile Include="Megapolis.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Disabled</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">Disabled</Optimization>
@@ -1208,11 +1385,13 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">Disabled</Optimization>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">EditAndContinue</DebugInformationFormat>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">MaxSpeed</Optimization>
       <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Speed</FavorSizeOrSpeed>
+      <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">Speed</FavorSizeOrSpeed>
       <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">Speed</FavorSizeOrSpeed>
       <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">Speed</FavorSizeOrSpeed>
       <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">Speed</FavorSizeOrSpeed>
@@ -1227,11 +1406,13 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">MaxSpeed</Optimization>
       <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">Speed</FavorSizeOrSpeed>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">MaxSpeed</Optimization>
       <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Speed</FavorSizeOrSpeed>
+      <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">Speed</FavorSizeOrSpeed>
       <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">Speed</FavorSizeOrSpeed>
       <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">Speed</FavorSizeOrSpeed>
       <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">Speed</FavorSizeOrSpeed>
@@ -1251,11 +1432,13 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">Disabled</Optimization>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">EditAndContinue</DebugInformationFormat>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Disabled</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">Disabled</Optimization>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EditAndContinue</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">EditAndContinue</DebugInformationFormat>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">EditAndContinue</DebugInformationFormat>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">EditAndContinue</DebugInformationFormat>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">EditAndContinue</DebugInformationFormat>
@@ -1266,6 +1449,7 @@
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release3d|Win32'">EditAndContinue</DebugInformationFormat>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">EditAndContinue</DebugInformationFormat>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EditAndContinue</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">EditAndContinue</DebugInformationFormat>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">EditAndContinue</DebugInformationFormat>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">EditAndContinue</DebugInformationFormat>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">EditAndContinue</DebugInformationFormat>
@@ -1280,11 +1464,13 @@
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release3d|Win32'">All</AssemblerOutput>
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">All</AssemblerOutput>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Disabled</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">Disabled</Optimization>
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">All</AssemblerOutput>
+      <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">All</AssemblerOutput>
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">All</AssemblerOutput>
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">All</AssemblerOutput>
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">All</AssemblerOutput>
@@ -1297,7 +1483,9 @@
     <ClCompile Include="NewUpgrade.cpp" />
     <ClCompile Include="New\MapOptionsEncoder.cpp" />
     <ClCompile Include="New\SecureDivision.cpp" />
-    <ClCompile Include="New\UdpHolePuncher.cpp" />
+    <ClCompile Include="New\UdpHolePuncher.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Nuclear.cpp" />
     <ClCompile Include="OnWater.cpp" />
     <ClCompile Include="path.cpp">
@@ -1306,6 +1494,7 @@
     </ClCompile>
     <ClCompile Include="PeerClass.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">true</ExcludedFromBuild>
@@ -1314,6 +1503,7 @@
     <ClCompile Include="PiroObjects.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release3d|Win32'">Disabled</Optimization>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release3d|Win32'">EditAndContinue</DebugInformationFormat>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="RealWater.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release3d|Win32'">Disabled</Optimization>
@@ -1331,6 +1521,7 @@
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release3d|Win32'">EditAndContinue</DebugInformationFormat>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">true</ExcludedFromBuild>
@@ -1343,26 +1534,36 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">MaxSpeed</Optimization>
       <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">Speed</FavorSizeOrSpeed>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">MaxSpeed</Optimization>
       <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Speed</FavorSizeOrSpeed>
+      <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">Speed</FavorSizeOrSpeed>
       <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">Speed</FavorSizeOrSpeed>
       <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">Speed</FavorSizeOrSpeed>
       <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">Speed</FavorSizeOrSpeed>
       <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">Speed</FavorSizeOrSpeed>
     </ClCompile>
     <ClCompile Include="ShipTrace.cpp" />
-    <ClCompile Include="SpraySystem.cpp" />
+    <ClCompile Include="SpraySystem.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="SquareObject.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release3d|Win32'">Disabled</Optimization>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release3d|Win32'">EditAndContinue</DebugInformationFormat>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Steam\SteamCommCore.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="StrategyResearch.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release3d|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Disabled</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">Disabled</Optimization>
@@ -1375,11 +1576,13 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">Disabled</Optimization>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">EditAndContinue</DebugInformationFormat>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Disabled</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">Disabled</Optimization>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EditAndContinue</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">EditAndContinue</DebugInformationFormat>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">EditAndContinue</DebugInformationFormat>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">EditAndContinue</DebugInformationFormat>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">EditAndContinue</DebugInformationFormat>
@@ -1395,11 +1598,13 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">Disabled</Optimization>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">EditAndContinue</DebugInformationFormat>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Disabled</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">Disabled</Optimization>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EditAndContinue</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">EditAndContinue</DebugInformationFormat>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">EditAndContinue</DebugInformationFormat>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">EditAndContinue</DebugInformationFormat>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">EditAndContinue</DebugInformationFormat>
@@ -1415,6 +1620,7 @@
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release3d|Win32'">EditAndContinue</DebugInformationFormat>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Disabled</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">Disabled</Optimization>
@@ -1428,11 +1634,13 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">MaxSpeed</Optimization>
       <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">Speed</FavorSizeOrSpeed>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">MaxSpeed</Optimization>
       <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Speed</FavorSizeOrSpeed>
+      <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">Speed</FavorSizeOrSpeed>
       <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">Speed</FavorSizeOrSpeed>
       <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">Speed</FavorSizeOrSpeed>
       <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">Speed</FavorSizeOrSpeed>
@@ -1444,6 +1652,7 @@
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release3d|Win32'">EditAndContinue</DebugInformationFormat>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release_CII_test|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Disabled</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">Disabled</Optimization>
@@ -1453,6 +1662,7 @@
   <ItemGroup>
     <Library Include="..\bin\CommCore.lib">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">false</ExcludedFromBuild>
@@ -1465,19 +1675,24 @@
     <Library Include="..\lib\d3dx8.lib" />
     <Library Include="..\lib\DipServer.lib">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </Library>
     <Library Include="..\lib\IChat.lib">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </Library>
     <Library Include="..\lib\IntExplorer.lib">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </Library>
     <Library Include="..\lib\LF_Server.lib" />
     <Library Include="..\lib\steam_api.lib">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </Library>
     <Library Include="Bink\binkw32.lib">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">false</ExcludedFromBuild>
@@ -1487,6 +1702,7 @@
     <Library Include="include\SDL2_mixer.lib" />
     <Library Include="InetRaiting\GP.lib">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">true</ExcludedFromBuild>
@@ -1494,6 +1710,7 @@
     </Library>
     <Library Include="Peer.lib">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">true</ExcludedFromBuild>
@@ -1501,6 +1718,7 @@
     </Library>
     <Library Include="peerc.lib">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">true</ExcludedFromBuild>
@@ -1508,6 +1726,7 @@
     </Library>
     <Library Include="Pinger.lib">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">false</ExcludedFromBuild>
@@ -1515,6 +1734,7 @@
     </Library>
     <Library Include="ProTest.lib">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">false</ExcludedFromBuild>
@@ -1522,6 +1742,7 @@
     </Library>
     <Library Include="Winmm.lib">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">false</ExcludedFromBuild>
@@ -1529,6 +1750,7 @@
     </Library>
     <Library Include="wintab\Wintab32.lib">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release No Speedfix|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release European Warfare No Speedfix|Win32'">false</ExcludedFromBuild>
@@ -1539,11 +1761,13 @@
     <None Include="..\Bat\all.bat" />
     <None Include="..\lib\steam_api.dll">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </None>
     <None Include="cpp.hint" />
     <None Include="mode.dat" />
     <None Include="Steam\steam_api.json">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release STEAM|Win32'">false</ExcludedFromBuild>
     </None>
   </ItemGroup>
   <ItemGroup>

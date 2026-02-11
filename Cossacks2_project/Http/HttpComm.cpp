@@ -86,7 +86,7 @@ DWORD CHttpComm::AddRequest(LPCSTR lpcszURL)
 		return 0;
 
 	CHAR		szHostName[255];
-	LPSTR		lpszTemp;
+	LPSTR		lpszTemp=0;
 
 	m_pRequestList=(PHttpQuery)realloc(m_pRequestList,(++m_dwRequestCount)*sizeof(SHttpQuery));
 // -- completing structure -----------------------------------------------

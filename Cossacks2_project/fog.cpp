@@ -104,19 +104,20 @@ lab4:	mov		dx,[esi+ecx-FMSX2_C]
 		shr		ax,2
 		shr		dx,10
 		sub		ax,dx	
-ioo:	
-lab6:
+//ioo:	
+//lab6:
 		mov		word ptr [edi+ecx],ax
 		add		ecx,2
 		dec		bl
 		jnz		lab4
-lab7:	sub		ecx,fDH
+//lab7:	
+        sub		ecx,fDH
 		add		ecx,FMSX2_C
 		mov		bl,byte ptr mlx
 		dec		bl
 		dec		bh
 		jnz		lab4
-ProcessFinished:
+//ProcessFinished:
 
 		pop		edi
 		pop		esi
@@ -159,19 +160,20 @@ lab4:	mov		dx,[esi+ecx-FMSX2_C]
 		shr		ax,2
 		shr		dx,10
 		sub		ax,dx	
-ioo:	
-lab6:
+//ioo:	
+//lab6:
 		mov		word ptr [edi+ecx],ax
 		add		ecx,2
 		dec		bl
 		jnz		lab4
-lab7:	sub		ecx,fDH
+//lab7:	
+        sub		ecx,fDH
 		add		ecx,FMSX2_C
 		mov		bl,byte ptr mlx
 		dec		bl
 		dec		bh
 		jnz		lab4
-ProcessFinished:
+//ProcessFinished:
 
 		pop		edi
 		pop		esi
@@ -215,19 +217,20 @@ lab4:	mov		dx,[esi+ecx-FMSX2_C]
 		shr		ax,2
 		shr		dx,10
 		sub		ax,dx	
-ioo:	
-lab6:
+//ioo:	
+//lab6:
 		mov		word ptr [edi+ecx],ax
 		add		ecx,2
 		dec		bx
 		jnz		lab4
-lab7:	sub		ecx,fDH
+//lab7:
+        sub		ecx,fDH
 		add		ecx,FMSX2_C
 		mov		bx,word ptr mlx
 		dec		bx
 		dec		mly
 		jnz		lab4
-ProcessFinished:
+//ProcessFinished:
 
 		pop		edi
 		pop		esi
@@ -521,7 +524,8 @@ iug:		mov		ecx,8
 		};
 		return;
 	}else{
-		int a,b,p,q,r;
+        int a, b, p;
+        //int q,r;
 		int c=(z3-z1)>>4;
 		int d=(z1+z4-z3-z2)>>9;
 		__asm{
@@ -821,7 +825,8 @@ iug:		mov		ecx,4
 		};
 		return;
 	}else{
-		int a,b,c,d,p,q,r;
+        int a, b, c, d, p;
+        //int q, r;
 		__asm{
 			push	edi
 			push	esi
@@ -1010,7 +1015,8 @@ iug:		mov		ecx,4
 		int a,b;
 		int c=div(z3-z1,12).quot;
 		int d=div(z1+z4-z3-z2,192).quot;
-		int p,q,r;
+        int p;
+        //int q,r;
 		__asm{
 			push	edi
 			push	esi

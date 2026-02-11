@@ -530,7 +530,7 @@ CLIPLR_CHECK_RIGHT_CLIPPING:
 				sub     CURCLIP2,eax
 				jg      CLIPLR_PARTIAL_RIGHT_CLIP
 				//full right clipping
-CLIPLR_FULL_RIGHT_CLIPPING:
+//CLIPLR_FULL_RIGHT_CLIPPING:
 				add		esi,ecx
 				add		edi,ecx
 				dec		TEMP1
@@ -611,7 +611,7 @@ CLIPLR_CHECK_COMPLEX_RIGHT_CLIPPING:
 				cmp     CURCLIP2,0
 				jg      CLIPLR_PARTIAL_COMPLEX_RIGHT_CLIP
 				//full right clipping
-CLIPLR_FULL_COMPLEX_RIGHT_CLIPPING:
+//CLIPLR_FULL_COMPLEX_RIGHT_CLIPPING:
 				add		esi,ecx
 				add		edi,ecx
 				dec		TEMP1

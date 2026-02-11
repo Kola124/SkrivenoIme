@@ -1010,7 +1010,7 @@ void CurrentGame::AssignKick(char* Nick){
 void SetNormAttr();
 void CurrentGame::SaveGameToFile(){
 	if(!Active)return;
-	char ccc[100];
+	//char ccc[100];
 	int t0=(StartTime.Min+StartTime.Hour*60)%200;
 	ResFile F1=RReset("cew.dll");
 	if(F1==INVALID_HANDLE_VALUE)return;
@@ -1101,7 +1101,7 @@ NEXTFILE:
 void CurrentGame::DeleteThisGameFromFile(){
 	int cur=0;
 	int sz=0;
-	char ccc[100];
+	//char ccc[100];
 	ResFile F=RReset("cew.dll");
 	if(F==INVALID_HANDLE_VALUE)return;
 	int t0=(StartTime.Min+StartTime.Hour*60)%200;
@@ -2158,7 +2158,7 @@ void TestHash(){
 
 
 	DWORD Hash=0;
-	char URL[4096];
+	//char URL[4096];
 	SECCOD0=30209;
 	SECCOD1=22165;
 	SECCOD2=29993;
@@ -2313,7 +2313,7 @@ void SendAllRequests(char* clan,char* nick,char* mail){
 };
 char CLANX[256];
 void SendPlayerRequest(char* Nick,char* mail){
-	char ccc[256];
+	//char ccc[256];
 	char CLAN[256];
 	strcpy(CLAN,Nick);
 	if(Nick[0]!='['){

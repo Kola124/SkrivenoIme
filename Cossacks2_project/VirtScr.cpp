@@ -1594,8 +1594,8 @@ lopp1:		mov		ax,[ebx]
 	int vsptr=int(SVSC.VirtualScreenPointer)+vsx+vsy*SVSC.RealVLx;
 	int dof=vsptr-ofst;
 	int ddof=SVSC.RealVLx-ScrWidth;
-	int TempDI;
-	int  FinalESI;
+	//int TempDI;
+	//int  FinalESI;
 	int MaxNY=SVSC.RealVLy-vsy;
 	int SVSZ=SVSC.RealVLx*SVSC.RealVLy;
 	__asm{
