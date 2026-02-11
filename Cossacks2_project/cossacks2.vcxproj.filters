@@ -108,6 +108,9 @@
     <Filter Include="Steam\Steam Header">
       <UniqueIdentifier>{a96cef58-7cb7-47fa-b52d-de542f2a6f62}</UniqueIdentifier>
     </Filter>
+    <Filter Include="others\WinTab">
+      <UniqueIdentifier>{332817d2-7883-4ba1-8b7d-6e547c3cc748}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Dplay.h">
@@ -473,12 +476,6 @@
     <ClInclude Include="StringHash.h">
       <Filter>others</Filter>
     </ClInclude>
-    <ClInclude Include="wintab\Wintab.h">
-      <Filter>others</Filter>
-    </ClInclude>
-    <ClInclude Include="wintab\Wintabx.h">
-      <Filter>others</Filter>
-    </ClInclude>
     <ClInclude Include="SpraySystem.h">
       <Filter>Effects</Filter>
     </ClInclude>
@@ -748,6 +745,15 @@
     </ClInclude>
     <ClInclude Include="New\UdpHolePuncher.h">
       <Filter>New</Filter>
+    </ClInclude>
+    <ClInclude Include="Steam\SteamCommCore.h">
+      <Filter>Steam</Filter>
+    </ClInclude>
+    <ClInclude Include="wintab\Wintab.h">
+      <Filter>others\WinTab</Filter>
+    </ClInclude>
+    <ClInclude Include="wintab\Wintabx.h">
+      <Filter>others\WinTab</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1123,9 +1129,6 @@
     <ClCompile Include="Waves.cpp">
       <Filter>others</Filter>
     </ClCompile>
-    <ClCompile Include="wintab\WTSupport.cpp">
-      <Filter>others</Filter>
-    </ClCompile>
     <ClCompile Include="PiroObjects.cpp">
       <Filter>Effects</Filter>
     </ClCompile>
@@ -1165,6 +1168,12 @@
     </ClCompile>
     <ClCompile Include="New\SecureDivision.cpp">
       <Filter>New</Filter>
+    </ClCompile>
+    <ClCompile Include="Steam\SteamCommCore.cpp">
+      <Filter>Steam</Filter>
+    </ClCompile>
+    <ClCompile Include="wintab\WTSupport.cpp">
+      <Filter>others\WinTab</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -411,7 +411,7 @@ char* RIFLEATTACK=NULL;
 byte FCLR[8]={39,39,126,126,194,194,208,208};
 int FEARMAX=30;
 int GetFScaled(int x){
- 	int v=50+atan(float(FEARMAX)*log(float(x)/30.0)/60.0)*31.83;
+ 	int v=(int)round(50+atan(float(FEARMAX)*log(float(x)/30.0)/60.0)*31.83);
 	if(v<0)v=0;
 	if(v>100)v=100;
 	return v;

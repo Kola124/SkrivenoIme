@@ -221,31 +221,31 @@ public:
 #define NAttTypes 4 
 #endif
 struct FogRec{
-	word  NWeap;
-	int   WProb;
-	word* Weap;
+	word  NWeap=0;
+	int   WProb=0;
+	word* Weap=nullptr;
 };
 class AdvCharacter;
 class OrderClassDescription{
 public:
-	char* ID;
-	char* Message;
-	int IconPos;
-	int IconID;
+	char* ID=nullptr;
+	char* Message=nullptr;
+	int IconPos=0;
+	int IconID=0;
 	OrderClassDescription();
 	~OrderClassDescription();
 };
 struct SingleGroup{
-	int ClassIndex;
-	int NCommon;
-	byte* IDX;
-	int NForms;
-	word* Forms;
+	int ClassIndex=0;
+	int NCommon=0;
+	byte* IDX=nullptr;
+	int NForms=0;
+	word* Forms=nullptr;
 };
 class FormGroupDescription{
 public:
-	int NGrp;
-	SingleGroup* Grp;
+	int NGrp=0;
+	SingleGroup* Grp=nullptr;
 	FormGroupDescription();
 	~FormGroupDescription();
 	void Load(GFILE* f);
@@ -253,89 +253,89 @@ public:
 extern FormGroupDescription FormGrp;
 class OrderDescription{
 public:
-	char* ID;
-	int NLines;
-	short** Lines;
-	word*   LineNU;
-	int NCom;
-	short* ComX;
-	short* ComY;
-	short YShift;
-	int NUnits;
-	short BarX0;
-	short BarY0;
-	short BarX1;
-	short BarY1;
+	char* ID=nullptr;
+	int NLines=0;
+	short** Lines=nullptr;
+	word*   LineNU=nullptr;
+	int NCom=0;
+	short* ComX=nullptr;
+	short* ComY=nullptr;
+	short YShift=0;
+	int NUnits=0;
+	short BarX0=0;
+	short BarY0=0;
+	short BarX1=0;
+	short BarY1=0;
 	//symmetry groups
-	word* Sym4f;
-	word* Sym4i;
-	word* SymInv;
+	word* Sym4f=nullptr;
+	word* Sym4i=nullptr;
+	word* SymInv=nullptr;
 	//additional parameters
-	char AddDamage1;
-	char AddShield1;
-	char AddDamage2;
-	char AddShield2;
-	char FAddDamage;
-	char FAddShield;
-	byte GroupID;
-	bool DirectionalBonus;
+	char AddDamage1=0;
+	char AddShield1=0;
+	char AddDamage2=0;
+	char AddShield2=0;
+	char FAddDamage=0;
+	char FAddShield=0;
+	byte GroupID=0;
+	bool DirectionalBonus=0;
 	//------special for COSSACKS2-----
-	int FirstActualLine;
-	int NActualLines;
-	int Width;//V pikselah
-	int Hight;
+	int FirstActualLine=0;
+	int NActualLines=0;
+	int Width=0;//V pikselah
+	int Hight=0;
 	//---------------
 	OrderDescription();
 	~OrderDescription();
 };
 class StroiDescription{
 public:
-	byte ID;
-	word NAmount;
-	word* Amount;
-	word* LocalID;
-	word NUnits;
-	word* Units;
+	byte ID=0;
+	word NAmount=0;
+	word* Amount=nullptr;
+	word* LocalID=nullptr;
+	word NUnits=0;
+	word* Units=nullptr;
 };
 class OfficerRecord{
 public:
-	word BarabanID;
-	word FlagID;
-	word NStroi;
-	StroiDescription SDES[5];
+	word BarabanID=0;
+	word FlagID=0;
+	word NStroi=0;
+    StroiDescription SDES[5] = {0};
 };
 struct Flags3D{
-	int N;
-	short Xr;
-	short Points[48];
+	int N=0;
+	short Xr=0;
+    short Points[48] = {0};
 };
 struct OneAddSprite{
-	word SpriteID;
-	short SortX;
-	short SortY;
+	word SpriteID=0;
+	short SortX=0;
+	short SortY=0;
 };
 struct OneAddStage{
-	word GPID;
+	word GPID=0;
 
 	OneAddSprite Empty;
 	OneAddSprite Stage1;
 	OneAddSprite Ready;
 	OneAddSprite Dead;
 
-	word AddPoints;
+	word AddPoints=0;
 
-	int NExplPoints;
-	short* ExplCoor;
+	int NExplPoints=0;
+	short* ExplCoor=nullptr;
 
 	short* FireX[2];
 	short* FireY[2];
 	short  NFires[2];
 
-	int Cost[8];
+    int Cost[8] = {0};
 };
 #define MaxAStages 5
 struct ComplexBuilding{
-	byte Mask;
+	byte Mask=0;
 	OneAddStage Stages[MaxAStages];
 };
 struct ComplexUnitRecord{
@@ -345,17 +345,17 @@ struct ComplexUnitRecord{
 	byte TransformTo[16];
 };
 struct ExRect{
-	int NRects;
-	int Coor[4];
+	int NRects=0;
+    int Coor[4] = {0};
 };
 struct WeaponInSector{
-	int AttIndex;
-	int RMin,RMax,Angle;
-	int MaxDamage,MinDamage,AnglFactor;
+	int AttIndex=0;
+	int RMin=0,RMax=0,Angle=0;
+	int MaxDamage=0,MinDamage=0,AnglFactor=0;
 };
 
 #ifdef _USE3D
-	class NewMon3D;
+	class NewMon3D=0;
 #endif // _USE3D
 
 class NewMonster{

@@ -73,13 +73,13 @@ struct GenArea{
 PaintHills PHILL[1];
 class GenMap{
 public:
-	word*  GTopRef;//[TopLx*TopLy];
-	GenArea* GTopMap;
-	int   NGAreas;
-	int   MaxGArea;
-	short*  VertHi;//[MaxPointIndex];
-	byte*  VertType;//[MaxPointIndex];
-	int SIZE;
+	word*  GTopRef=nullptr;//[TopLx*TopLy];
+	GenArea* GTopMap=nullptr;
+	int   NGAreas=0;
+	int   MaxGArea=0;
+	short*  VertHi=nullptr;//[MaxPointIndex];
+	byte*  VertType=nullptr;//[MaxPointIndex];
+	int SIZE=0;
 	void CreateNet();
 	bool AddGArea(int x,int y);
 	void AddGLink(int N1,int N2);
@@ -1500,7 +1500,7 @@ void CreateRandomMap(char* Name){
 	GPROG.AddPosition('FTEX',5*S0,1);
 	GPROG.AddPosition('LINK',10*S0,1);
 	GPROG.AddPosition('TRES',60,1);
-	GPROG.AddPosition('CORD',10*sqrt(S0),1);
+	GPROG.AddPosition('CORD',(int)round(10*sqrt(S0)),1);
 	GPROG.AddPosition('SETH',20*S0,1);
 	GPROG.AddPosition('NATR',10*S0,1);
 	GPROG.AddPosition('SAVM',30*S0,1);
@@ -5601,35 +5601,35 @@ void LoadSMSInMap(ResFile F){
 };
 #define MaxType 128
 struct SampleStamp{
-	char Name[64];
-	int NS;
-	int maxS;
+    char Name[64] = {0};
+	int NS=0;
+	int maxS=0;
 
-	int * Coor;
+	int * Coor=nullptr;
 };
 struct OneLinkStart{
-	int x;
-	int y;
-	DWORD Mask;
-	byte Type;
+	int x=0;
+	int y=0;
+	DWORD Mask=0;
+	byte Type=0;
 };
 
 class LinkSys{
 public:
 	SamplesSet LINKS;
-	word* Map;
-	word* Map2;
-	int Nx;
-	SampleStamp* STM;
-	int NStm;
-	OneLinkStart* LIS;
-	int NLis;
-	int MaxLis;
+	word* Map=nullptr;
+	word* Map2=nullptr;
+	int Nx=0;
+	SampleStamp* STM=nullptr;
+	int NStm=0;
+	OneLinkStart* LIS=nullptr;
+	int NLis=0;
+	int MaxLis=0;
 
 
-	word NSMP[MaxType][8];
-	word* SMP[MaxType][8];
-	byte* SMIDX[MaxType][8];
+    word NSMP[MaxType][8] = {0};
+    word* SMP[MaxType][8] = {0};
+    byte* SMIDX[MaxType][8] = {0};
 	void LoadOneLink(char* Name);
 	void Init(int Nx,int Ny);
 	void Close();
@@ -6978,7 +6978,7 @@ void EraseBlockPt(){
 		int zx=(z2+z4-z1-z3)/2;
 		int zy=(z1+z2-z3-z4)/2;
 		int zz=64;
-		int rr=sqrt(zx*zx+zy*zy);
+		int rr=(int)round(sqrt(zx*zx+zy*zy));
 		if(rr>35){
 			LockBars.BC[np].x=x;
 			LockBars.BC[np].y=y;

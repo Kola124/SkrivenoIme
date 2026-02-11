@@ -2888,7 +2888,7 @@ void PreDrawGameProcess() {
 	if(tima!=time(NULL)){
 		Flips=tmtim;	
 		tmtim=0;
-		tima=time(NULL);
+		tima=(int)round(time(NULL));
 	};
 	if(!(tmtmt&63)){
 		LASTRAND=rando();

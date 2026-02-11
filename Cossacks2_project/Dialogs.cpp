@@ -1979,7 +1979,7 @@ static bool InputBox_OnDraw(SimpleDialog* SD){
 		};
 		int xx=0;
 		if(IB->CursPos>strlen(IB->Str))IB->CursPos=strlen(IB->Str);
-		for(int j=0;j<IB->CursPos;j++){
+		for(unsigned int j=0;j<IB->CursPos;j++){
 			xx+=GetRLCWidth(IB->Font->RLC,base[j]);
 		};
 		if(xx<IB->totdx){

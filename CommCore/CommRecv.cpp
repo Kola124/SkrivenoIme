@@ -43,7 +43,7 @@ u_short CCommCore::ReceiveData(LPBYTE lpbBuffer, LPPEER_ID lpPeerId)
 		return 0x00;
 
 	//m_dwLastPacketTime=GetTickCount();
-    m_dwLastPacketTime=GetTickCount64();
+    m_dwLastPacketTime=GetTickCount();
 
 	lpFrame=(LPCC_PK_RAW_FRAME)m_lpbRecvBuffer;
 

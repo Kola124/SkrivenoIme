@@ -1860,7 +1860,7 @@ void AddStrToURL(char* url,char* var,char* value,DWORD* HASH){
 	char VAL[512];
 	strcpy(VAL,value);
 	int CODE=0;
-	for(int i=0;i<strlen(VAL);i++){
+	for(unsigned int i=0;i<strlen(VAL);i++){
 		byte c=VAL[i];
 		if(c<=32||c==34 ||c=='%'||c=='&' ||c=='*'
 			    ||c==39 ||c=='+'||c=='\\'||c=='/'
@@ -2328,7 +2328,7 @@ void SendPlayerRequest(char* Nick,char* mail){
 	_strupr(CLAN);
 	char* nick=CC2+1;
 	_strupr(nick);
-	for(int i=0;i<strlen(nick);i++){
+	for(unsigned int i=0;i<strlen(nick);i++){
 		char c=nick[i];
 		if(c=='['||c==']'||c=='?'||c=='&'||c=='%'||c==39||c=='"'||c=='+'||c=='-'||c=='^')c='_';
 		nick[i]=c;

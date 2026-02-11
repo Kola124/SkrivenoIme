@@ -46,7 +46,7 @@ CSteamCommCore::CSteamCommCore()
     m_dwRxBytes = 0;
     m_dwTxBytes = 0;
     m_dwOptions = 0;
-    m_dwLastPacketTime = GetTickCount64();
+    m_dwLastPacketTime = GetTickCount();
     
     // Clear peer list
     memset(m_PeerList, 0, sizeof(m_PeerList));
@@ -287,7 +287,7 @@ u_short CSteamCommCore::ReceiveData(LPBYTE lpbBuffer, LPPEER_ID lpPeerId)
         return 0;
     
     m_dwRxBytes += bytesRead;
-    m_dwLastPacketTime = GetTickCount64();
+    m_dwLastPacketTime = GetTickCount();
     
     // Find sender in peer list
     u_short senderPeerNum = GetPeerBySteamID(senderSteamID);

@@ -414,7 +414,7 @@ public:
 	byte* Ptr=nullptr;
 	int OneLx=0;
 	int OneLy=0;
-	int Nx,Ny=0;
+	int Nx=0,Ny=0;
 	int RealNy=0;
 	int PosY=0;
 	int ChoosedPos=0;

@@ -376,7 +376,7 @@ VOID CCommCore::NewCommCoreUID(LPSTR lpszCCUID)
 	szComputerName[iRand]='\0';
 
 	//dwTicks=GetTickCount();
-    dwTicks=unsigned int (GetTickCount64());
+    dwTicks=unsigned int (GetTickCount());
 
 	srand(dwTicks);
 

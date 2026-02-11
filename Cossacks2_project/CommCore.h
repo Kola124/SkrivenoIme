@@ -384,7 +384,7 @@ public:
     DWORD	GetRecvTimeOut()
     {
         //return (GetTickCount() - m_dwLastPacketTime);
-        return (GetTickCount64() - m_dwLastPacketTime);
+        return (GetTickCount() - m_dwLastPacketTime);
     }
 
     // ---------------------------------------------------------------------------------------------

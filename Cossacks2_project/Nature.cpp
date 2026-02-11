@@ -283,7 +283,7 @@ void LoadRDS(){
 				z6=Gscanf(f,"%d%d",&z0,&z1);	
 				z7=Gscanf(f,"%s",RDS[z0].ResIDS);
 				if(z6+z7!=3){
-					sprintf(sss,"NRES.DAT:[RESTYPE]:%s:Invalid parameters.");
+					sprintf(sss,"NRES.DAT:[RESTYPE]:%s:Invalid parameters.",z7);
 					Errr(sss);
 				};
 				for(z2=0;z2<8;z2++)SetXRESRC(z2,z0,z1);

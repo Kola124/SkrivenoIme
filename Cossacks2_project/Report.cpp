@@ -299,7 +299,7 @@ void MakeBriefReport(Nation* NT,int NIndex,GFILE* f){
 	GeneralObject* GO=NT->Mon[NIndex];
 	char ccc[128];
 	strcpy(ccc,GO->Message);
-	for(int j=0;j<strlen(ccc);j++)if(ccc[j]==' ')ccc[j]='_';
+	for(unsigned int j=0;j<strlen(ccc);j++)if(ccc[j]==' ')ccc[j]='_';
 	Gprintf(f,"%s %d %d ",ccc,GO->MoreCharacter->Life,GO->MoreCharacter->ProduceStages);
 	NewMonster* NM=GO->newMons;
 	AdvCharacter* OLD=new AdvCharacter;

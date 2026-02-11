@@ -241,7 +241,7 @@ void SetPoint(short* Wave,int x,int y,int r,int h){
 	int pos=x+y*WaveLx;
 	for(int i=-r1;i<=r1;i++)
 		for(int j=-r1;j<=r1;j++){
-			int rr=sqrt((i-r0)*(i-r0)+(j-r0)*(j-r0));
+			int rr=(int)round(sqrt((i-r0)*(i-r0)+(j-r0)*(j-r0)));
 			if(rr<r0){
 				Wave[pos+i-5+(j-5)*WaveLx]+=h*exp(-double(rr*rr)/rrr);
 			};
@@ -578,7 +578,7 @@ void SetDeepSpot(int x,int y,int r,int dr,int dh){
 		for(int ya=y0;ya<y1;ya++){
 			int dx=x-(xa<<5);
 			int dy=y-(ya<<5);
-			int ra=sqrt(dx*dx+dy*dy);
+			int ra=(int)round(sqrt(dx*dx+dy*dy));
 			int dhi=0;
 			if(ra<r)dhi=dh;
 			else if(ra>=r+dr)dhi=0;
@@ -672,7 +672,7 @@ void ClearDeepSpot(int x,int y,int r,int dr,int dh){
 		for(int ya=y0;ya<y1;ya++){
 			int dx=x-(xa<<5);
 			int dy=y-(ya<<5);
-			int ra=sqrt(dx*dx+dy*dy);
+			int ra=(int)round(sqrt(dx*dx+dy*dy));
 			int dhi=0;
 			if(ra<r)dhi=dh;
 			else if(ra>=r+dr)dhi=0;

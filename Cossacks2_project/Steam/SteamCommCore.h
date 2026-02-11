@@ -140,7 +140,7 @@ public:
     DWORD GetTxBytes() { return m_dwTxBytes; }
     DWORD GetNxBytes() { return 0; }  // Not tracked in Steam
     
-    ULONGLONG GetRecvTimeOut() { return (GetTickCount64() - m_dwLastPacketTime); }
+    ULONGLONG GetRecvTimeOut() { return (GetTickCount() - m_dwLastPacketTime); }
 
 protected:
     // ---------------------------------------------------------------------------------------------

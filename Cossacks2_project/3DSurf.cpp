@@ -62,7 +62,7 @@ int LightDY;
 int LightDZ;
 void ClearRender();
 void SetLight(int Ldx,int Ldy,int Ldz){
-	int Ab=sqrt(Ldx*Ldx+Ldy*Ldy+Ldz*Ldz);
+	int Ab=(int)round(sqrt(Ldx*Ldx+Ldy*Ldy+Ldz*Ldz));
 	LightDX=div(Ldx<<8,Ab).quot;
 	LightDY=div(Ldy<<8,Ab).quot;
 	LightDZ=div(Ldz<<8,Ab).quot;
@@ -77,7 +77,7 @@ void SetLight(int Ldx,int Ldy,int Ldz){
 void SetAngLight(int Theta,int Phi){
 	double teta=Theta*3.1415/180;
 	double phi=Phi*3.1415/180;
-	SetLight(100*sin(teta)*cos(phi),100*sin(teta)*cos(phi),100*cos(teta));
+	SetLight((int)round(100*sin(teta)*cos(phi)),(int)round(100*sin(teta)*cos(phi)),(int)round(100*cos(teta)));
 };
 void RotateTeta(){
 	Theta+=2;
@@ -99,7 +99,7 @@ int GetLight(int x,int y){
 	int dy=xGetHeight(x+1,y)-xGetHeight(x-1,y);
 	int dx=xGetHeight(x,y+1)-xGetHeight(x,y-1);
 	int FF=abs(dx*dx+dy*dy+64*64);
-	int lig=16+(div(dx*LightDX+dy*LightDY+64*LightDZ,sqrt(FF)).quot>>4); 
+	int lig=16+(div(dx*LightDX+dy*LightDY+64*LightDZ,(int)round(sqrt(FF))).quot>>4); 
 	if(lig<2)lig=2;
 	if(lig>31)lig=31;
 
@@ -110,7 +110,7 @@ int GetLightP(int x,int y){
 	int dx=GetHeight(x+32,y)-GetHeight(x-32,y);
 	int dy=GetHeight(x,y-32)-GetHeight(x,y+32);
 	int FF=abs(dx*dx+dy*dy+64*64);
-	int lig=64+(div(dx*LightDX+dy*LightDY+64*LightDZ,sqrt(FF)).quot>>2); 
+	int lig=64+(div(dx*LightDX+dy*LightDY+64*LightDZ,(int)round(sqrt(FF))).quot>>2); 
 	if(lig<8)lig=8;
 	if(lig>31*4)lig=31*4;
 
@@ -143,7 +143,7 @@ void CreateBlob(int x,int y,int h,int r){
 	int r2=r*r;
 	for(int i=x0;i<x1;i++)
 		for(int j=y0;j<y1;j++){
-			AddHeight(i,j,h*exp(-double((x-i)*(x-i)+(y-j)*(y-j))/r2));
+			AddHeight(i,j,(int)round(h*exp(-double((x-i)*(x-i)+(y-j)*(y-j))/r2)));
 		};
 };
 void InitRenderMap(){

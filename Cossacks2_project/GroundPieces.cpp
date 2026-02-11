@@ -668,12 +668,12 @@ int GetTexStartOfs(int x,int ys){
 	int N=NTexPages>>1;
 	float ang0=3.1415/NTexPages/2.0;
 	if(ang>0){
-		int pag=(ang+ang0)/(2*ang0);
+		int pag=(int)round((ang+ang0)/(2*ang0));
 		if(pag<0)pag=0;
 		if(pag>N)pag=N;
 		return pag!=0?pag<<16:0;
 	}else{
-		int pag=(-ang+ang0)/(2*ang0);
+		int pag=(int)round((-ang+ang0)/(2*ang0));
 		if(pag<0)pag=0;
 		if(pag>N)pag=N;
 		return pag!=0?(N+pag)<<16:0;
@@ -708,7 +708,7 @@ void SetPixSpot(int x,int y,int R,int h0,int h1){
 				for(int ix=0;ix<32;ix++){
 					int dx=x-x0-ix;
 					int dy=y-y0-iy;
-					int r=sqrt(dx*dx+dy*dy);
+					int r=(int)round(sqrt(dx*dx+dy*dy));
 					
 					if(r<R){
 						int c=h1-(((h1-h0)*FuncPrecomp[r<<4])>>8)>>1;
@@ -952,7 +952,7 @@ void SetPixLine(int x0,int y0,int x1,int y1,int R,int R1,int h0,int h1,int h01){
 	float D=Dx*Dx+Dy*Dy;
 
 	if(!D){
-		SetPixSpot(x1,y1,MaxR,maxh,h1);
+		SetPixSpot(x1,y1,(int)round(MaxR),maxh,h1);
 		return;
 	};
 	float fx0=x0;
@@ -992,7 +992,7 @@ void SetPixLine(int x0,int y0,int x1,int y1,int R,int R1,int h0,int h1,int h01){
 					};
 					if(r<MaxR){
 						float DFF=(fR-r)*(fR-r);
-						int h=N*h01+(1-N)*h0;
+						int h=(int)round(N*h01+(1-N)*h0);
 						int RR=int(r*16*R/(N*R1+(1-N)*R));
 						int c=(h1-(((h1-h)*FuncPrecomp[RR])>>8))>>1;
 						if(c<0)c=0;
@@ -1895,7 +1895,7 @@ void SetGroundTexRound(int TxIdx,int x0,int y0,int r,int dr){
 		for(int iy=cy0;iy<=cy1;iy++){
 			int xx=ix<<5;
 			int yy=iy<<6;
-			int rr=sqrt((xx-x0)*(xx-x0)+(yy-y0)*(yy-y0));
+			int rr=(int)round(sqrt((xx-x0)*(xx-x0)+(yy-y0)*(yy-y0)));
 			if(GETTEXMOD){
 				if(rr<32){
 					CurGroundTexture=GetPTexture(ix,iy)>>6;
@@ -1961,7 +1961,7 @@ void ClearGroundTexRound(int x0,int y0,int r,int dr){
 		for(int iy=cy0;iy<=cy1;iy++){
 			int xx=ix<<5;
 			int yy=iy<<6;
-			int rr=sqrt((xx-x0)*(xx-x0)+(yy-y0)*(yy-y0));
+			int rr=(int)round(sqrt((xx-x0)*(xx-x0)+(yy-y0)*(yy-y0)));
 			bool change=0;
 			int cw=(15*(rr-r))/dr;
 			if(cw<MinBri)cw=MinBri;
@@ -2888,12 +2888,12 @@ void WaterStreams::Process(){
 			int dx=DR-DL;
 			int dy=(DD-DU)>>1;
 			int n=dx*dx+dy*dy;
-			int n0=sqrt(vx*vx+vy*vy);
+			int n0=(int)round(sqrt(vx*vx+vy*vy));
 			if(n){
 				int scl=(dx*vx+dy*vy);
 				vx-=(sclx*scl*dx/n)>>7;
 				vy-=(sclx*scl*dy/n)>>7;
-				int n1=sqrt(vx*vx+vy*vy);
+				int n1=(int)round(sqrt(vx*vx+vy*vy));
 				if(n1){
 					vx=(vx*n0/n1)>>8;
 					vy=(vy*n0/n1)>>8;
@@ -2932,7 +2932,7 @@ void WaterStreams::Draw(){
 		int dt=Pena[i]->time-Pena[i]->time0;
 		if(dt<200&&x>-16&&y>-16&&x<RealLx+16&&y<RealLy+16){
 			GPS.SetWhiteFont(PENA_GP);
-			int sp=sin(float(dt)*3.1415/3000.0)*11.0;
+			int sp=(int)round(sin(float(dt)*3.1415/3000.0)*11.0);
 			if(sp>8)sp=8;
 			if(sp<0)sp=0;
 			/*
@@ -3401,8 +3401,8 @@ bool OneWavesGroup::BornAt(int x,int y){
 			int DY=(DD*RY)/9;
 			int Speed;
 			if(abs(RY+RY)>abs(RX)){
-				Speed=256+sin((Phase+dx)/20.0)*20;
-			}else Speed=256+sin((Phase+dx)/10.0)*32;
+				Speed=(int)round(256+sin((Phase+dx)/20.0)*20);
+			}else Speed=(int)round(256+sin((Phase+dx)/10.0)*32);
 
 			int x0=x+DX+(rand()&1)-(vv*RY)/64;
 			int y0=y-DY+(rand()&1)-(vv*RX)/64;

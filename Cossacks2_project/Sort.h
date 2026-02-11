@@ -1,10 +1,10 @@
 class SortClass{
 public:
-    word* Uids;
+    word* Uids=nullptr;
     //word* Usn;
-    int*  Parms;
-    int NUids;
-    int MaxUID;
+    int*  Parms=nullptr;
+    int NUids=0;
+    int MaxUID=0;
     SortClass();
     ~SortClass();
     void Sort();
@@ -21,13 +21,13 @@ extern SortClass UNISORT;
 word SortUnitsByR(word* urefs,word* usn,int nu,int x,int y);
 class PositionOrder{
 public:
-    int NUnits;
-    int MaxUnit;
-	int CenterX;
-	int CenterY;
-    word* Ids;
-    int* px;
-    int* py;
+    int NUnits=0;
+    int MaxUnit=0;
+	int CenterX=0;
+	int CenterY=0;
+    word* Ids=nullptr;
+    int* px=nullptr;
+    int* py=nullptr;
     PositionOrder();
     ~PositionOrder();
     void CheckSize(int Size);

@@ -1807,7 +1807,7 @@ int GetLight2(int x,int y){
 	int dx=GetHeight(x+32,y)-GetHeight(x-32,y);
 	int dy=GetHeight(x,y-32)-GetHeight(x,y+32);
 	int FF=abs(dx*dx+dy*dy+32*32);
-	int lig=16+(div(dx*LightDX+dy*LightDY+32*LightDZ,sqrt(FF)).quot>>4); 
+	int lig=(int)round(16+(div(dx*LightDX+dy*LightDY+32*LightDZ,(int)round(sqrt(FF))).quot>>4)); 
 	if(lig<2)lig=2;
 	if(lig>31)lig=31;
 	if(lig<1)lig=1;
@@ -2075,11 +2075,11 @@ struct VertOver{
 };
 class OverTriangle{
 public:
-	VertOver** TRIANG;
-	word*      NTRIANG;
-	byte** Buffer;
-	int MaxElm;
-	int CurElm;
+	VertOver** TRIANG=nullptr;
+	word*      NTRIANG=nullptr;
+	byte** Buffer=nullptr;
+	int MaxElm=0;
+	int CurElm=0;
 	OverTriangle();
 	~OverTriangle();
 	void Clear();

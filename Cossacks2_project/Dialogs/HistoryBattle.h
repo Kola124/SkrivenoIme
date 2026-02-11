@@ -150,7 +150,7 @@ bool MPL_WaitingBattleGame(bool Host,int BattleID){
 	int PageW = 130;
 	
 	UniversalButton* Page0=MENU.addUniversalButton(PageX,PageY,PageW,GetTextByID("INTF_Game"),BTN.GPID,Set0,0,1,0,FPSwitch,FPSwitch,FASwitch);
-	UniversalButton* Page1=MENU.addUniversalButton(PageX+PageW*1.1,PageY,PageW,GetTextByID("INTF_Historical"),BTN.GPID,Set0,0,0,0,FPSwitch,FPSwitch,FASwitch);
+	UniversalButton* Page1=MENU.addUniversalButton((int)round(PageX+PageW*1.1),PageY,PageW,GetTextByID("INTF_Historical"),BTN.GPID,Set0,0,0,0,FPSwitch,FPSwitch,FASwitch);
 
 	Page0->FontDy -= 1;
 	Page1->FontDy -= 1;

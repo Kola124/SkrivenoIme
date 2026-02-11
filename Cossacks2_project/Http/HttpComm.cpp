@@ -179,7 +179,7 @@ DWORD CHttpComm::AddRequest(LPCSTR lpcszURL)
 
 VOID CHttpComm::ProcessRequests()
 {
-	for(int i=0;i<m_dwRequestCount;i++)
+	for(unsigned int i=0;i<m_dwRequestCount;i++)
 		switch(m_pRequestList[i].m_Stage){
 		case csConnecting	:	{	
 			fd_set write_fds;
@@ -240,12 +240,12 @@ VOID CHttpComm::ProcessRequests()
 
 int CHttpComm::GetData(DWORD dwHandle, LPVOID lpvBuffer, DWORD dwBufferSize)
 {
-	for(int i=0;i<m_dwRequestCount;i++)
+	for(unsigned int i=0;i<m_dwRequestCount;i++)
 		if(m_pRequestList[i].m_dwHandle==dwHandle)
 			if(m_pRequestList[i].m_Stage==csWaiting){
 				if(dwBufferSize<m_pRequestList[i].m_dwDataSize)
 					return 0;
-				int j=0;
+				unsigned int j=0;
 				while( (*(LPDWORD)((LPBYTE)m_pRequestList[i].m_lpvBuffer+(j++))!=0x0A0D0A0D) && (j<m_pRequestList[i].m_dwDataSize) );
 				memcpy(lpvBuffer,(LPBYTE)m_pRequestList[i].m_lpvBuffer+j,m_pRequestList[i].m_dwDataSize-j);
 				return m_pRequestList[i].m_dwDataSize-j;
@@ -256,7 +256,7 @@ int CHttpComm::GetData(DWORD dwHandle, LPVOID lpvBuffer, DWORD dwBufferSize)
 
 VOID CHttpComm::FreeData(DWORD dwHandle)
 {
-	for(int i=0;i<m_dwRequestCount;i++)
+	for(unsigned int i=0;i<m_dwRequestCount;i++)
 		if(m_pRequestList[i].m_dwHandle==dwHandle){
 			if(m_pRequestList[i].m_lpszQuery)
 				free(m_pRequestList[i].m_lpszQuery);

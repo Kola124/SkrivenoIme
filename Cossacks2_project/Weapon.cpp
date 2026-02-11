@@ -302,7 +302,7 @@ void ShowExpl(){
 					//angl+=(3.14152927/NDir);
 					if(angl>=3.1415297)angl-=3.14152927*2;
 					if(angl<0)angl=-angl;
-					spr=angl*double(NDir)/3.14152927;
+					spr=(int)round(angl*double(NDir)/3.14152927);
 					if(spr>=NDir)spr=NDir-1;
 					spr=(spr+1)>>1;
 					if(bdir){
@@ -620,9 +620,9 @@ bool Create3DAnmObjectEX(Weapon* Weap,int xs,int ys,int zs1,
 				int nx=zL-zR;
 				int ny=zD-zU;
 				int nz=32;
-				int norma=sqrt(nx*nx+ny*ny+nz*nz);
+				int norma=(int)round(sqrt(nx*nx+ny*ny+nz*nz));
 				int vn=2*(vx*nx+vy*ny+vz*nz)/norma;
-				int vv=sqrt(vx*vx+vy*vy+vz*vz);
+				int vv=(int)round(sqrt(vx*vx+vy*vy+vz*vz));
 				vx-=(vn*nx)/norma;
 				vy-=(vn*ny)/norma;
 				vz-=(vn*nz)/norma;
@@ -666,7 +666,7 @@ bool Create3DAnmObjectEX(Weapon* Weap,int xs,int ys,int zs1,
 			AO->x=xs<<WEPSH;
 			AO->y=ys<<WEPSH;
 			AO->z=zs<<WEPSH;
-			dist=sqrt((xs-xd)*(xs-xd)+(ys-yd)*(ys-yd));
+			dist=(int)round(sqrt((xs-xd)*(xs-xd)+(ys-yd)*(ys-yd)));
 			time=div(dist,SPEED).quot;
 			AO->NTimes=Weap->Times;
 			if(!time)time=1;
@@ -676,7 +676,7 @@ bool Create3DAnmObjectEX(Weapon* Weap,int xs,int ys,int zs1,
 			int vx=AO->vx>>8;
 			int vy=AO->vy>>8;
 			int vz=AO->vz>>8;
-			int v=sqrt(vx*vx+vy*vy+vz*vz);
+			int v=(int)round(sqrt(vx*vx+vy*vy+vz*vz));
 			int d=((int(rando()>>7)-128)*v)>>7;
 			d=(d*Weap->RandomAngle)/100;
 			AO->vx+=d<<8;
@@ -692,7 +692,7 @@ bool Create3DAnmObjectEX(Weapon* Weap,int xs,int ys,int zs1,
 		AO->x=xs<<WEPSH;
 		AO->y=ys<<WEPSH;
 		AO->z=zs<<WEPSH;
-		dist=sqrt((xs-xd)*(xs-xd)+(ys-yd)*(ys-yd));
+		dist=(int)round(sqrt((xs-xd)*(xs-xd)+(ys-yd)*(ys-yd)));
 		time=div(dist,SPEED).quot;
 		AO->NTimes=Weap->Times;
 		if(time){
@@ -771,10 +771,10 @@ bool Create3DAnmObjectEX(Weapon* Weap,int xs,int ys,int zs1,
 				EUsage[i]=false;
 				return false;
 			};
-			t=4*sqrt(double(t<<(WEPSH-3))/AO->az);
+			t=(int)round(4*sqrt(double(t<<(WEPSH-3))/AO->az));
 			AO->vx=div((xd-xs)<<WEPSH,t).quot;
 			AO->vy=div((yd-ys)<<WEPSH,t).quot;
-			int vxy=sqrt(double(AO->vx)*double(AO->vx)+double(AO->vy)*double(AO->vy));
+			int vxy=(int)round(sqrt(double(AO->vx)*double(AO->vx)+double(AO->vy)*double(AO->vy)));
 			AO->vz=int(double(vxy)*tan(Weap->Speed*3.1415/180));
 			AO->x=xs<<WEPSH;
 			AO->y=ys<<WEPSH;
@@ -880,7 +880,7 @@ int PredictShot(Weapon* Weap,int xs,int ys,int zs,int xd,int yd,int zd,word Inde
 		bool NoCheck=1;
 		switch(WP->Propagation){
 		case 3://FLY
-			dist=sqrt((xs-xd)*(xs-xd)+(ys-yd)*(ys-yd));
+			dist=(int)round(sqrt((xs-xd)*(xs-xd)+(ys-yd)*(ys-yd)));
 			time=div(dist,SPEED).quot;
 			vx=div((xd-xs)<<WEPSH,time+1).quot;
 			vy=div((yd-ys)<<WEPSH,time+1).quot;
@@ -898,10 +898,10 @@ int PredictShot(Weapon* Weap,int xs,int ys,int zs,int xd,int yd,int zd,word Inde
 				int rxy=int(sqrt((xd-xs)*(xd-xs)+(yd-ys)*(yd-ys)));
 				int t1=zd-zs-int(double(rxy)*tan(WP->Speed*3.1415/180));
 				if(t1>=0)return 0xFFFE;
-				int t=4*sqrt(double(t1<<(WEPSH-3))/g);
+				int t=(int)round(4*sqrt(double(t1<<(WEPSH-3))/g));
 				vx=div((xd-xs)<<WEPSH,t).quot;
 				vy=div((yd-ys)<<WEPSH,t).quot;
-				int vxy=sqrt(double(vx)*double(vx)+double(vy)*double(vy));
+				int vxy=(int)round(sqrt(double(vx)*double(vx)+double(vy)*double(vy)));
 				vz=int(double(vxy)*tan(WP->Speed*3.1415/180));
 			};
 			break;
@@ -937,7 +937,7 @@ bool TraceObjectsInLine(int xs,int ys,int zs,int* xD,int* yD,int* zD,int damage,
 	int dy=*yD-ys;
 	int dz=*zD-zs;
 
-	int Len=sqrt(dx*dx+dy*dy+dz*dz);
+	int Len=(int)round(sqrt(dx*dx+dy*dy+dz*dz));
 	if(!Len)return false;
 	int N=(Len>>4)+1;
 	int N2=N+N;
@@ -1041,7 +1041,7 @@ int CheckFriendlyUnitsInLine(int xs,int ys,int zs,int* xD,int* yD,int* zD,byte M
 	int dy=*yD-ys;
 	int dz=*zD-zs;
 
-	int Len=sqrt(dx*dx+dy*dy+dz*dz);
+	int Len = (int)round(sqrt(dx*dx + dy*dy + dz*dz));
 	if(!Len)return -1;
 	int N=(Len>>4)+1;
 	int N2=N+N;
@@ -1151,7 +1151,7 @@ void MiniShowExpl(){
 					//angl+=(3.14152927/NDir);
 					if(angl>=3.1415297)angl-=3.14152927*2;
 					if(angl<0)angl=-angl;
-					spr=angl*double(NDir)/3.14152927;
+					spr=(int)round(angl*double(NDir)/3.14152927);
 					if(spr>=NDir)spr=NDir-1;
 					spr=(spr+1)>>1;
 					if(bdir){

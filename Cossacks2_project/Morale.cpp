@@ -1223,7 +1223,7 @@ int CreateMoraleInterface(DialogsSystem* DSS,int LX,int y0,OneObject* OB){
 			};
 			if(MINR<PANIC_CCR0*4){
 				float RR=float(MINR)/float(PANIC_CCR0);
-				int v=1000.0/(1+float(PANIC_CCA-1)*exp(-RR*RR));
+				int v=(int)round(1000.0/(1+float(PANIC_CCA-1)*exp(-RR*RR)));
 				sprintf(str0,FEAR_MULC,int(MINR));
 				AddTextToDS(DSS,&x,&y,&x1,&y1,&SmallYellowFont,str0,FEAR_MULCH);
 				CB=DSS->addColoredBar(x-4,y-2,BLX,y1-y+3,FCOLOR);
