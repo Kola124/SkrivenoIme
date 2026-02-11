@@ -1,35 +1,35 @@
 struct GAMEOBJ{
-	word Index;
-	word Serial;
-	int  Type;
+	word Index=0;
+	word Serial=0;
+	int  Type=0;
 };
 class UnitsGroup;
 struct GrpOrder;
 typedef void GrpLink(UnitsGroup* UG);
 struct GrpOrder{
-	GrpOrder* Next;
-	GrpLink* Link;
-	void* Data;
-	int DataSize;
-	DWORD ID;
+	GrpOrder* Next=nullptr;
+	GrpLink* Link=nullptr;
+	void* Data=nullptr;
+	int DataSize=0;
+	DWORD ID=0;
 };
 void CheckDynamicalPtr(void* ptr);
 class UnitsGroup;
 class UnitsGroup{
 public:
-	word* IDS;
-	word* SNS;
-	int N;
-	int Max;
+	word* IDS=nullptr;
+	word* SNS=nullptr;
+	int N=0;
+	int Max=0;
 
-	byte NI;
-	byte NMASK;
-	int Index;
-	GrpOrder* GOrder;
+	byte NI=0;
+	byte NMASK=0;
+	int Index=0;
+	GrpOrder* GOrder=nullptr;
 
 	//-----------debug---------
-	char* file;
-	int   Line;
+	char* file=nullptr;
+	int   Line=0;
 	//-------------------------
 
 	GrpOrder* CreateOrder(byte Type);
@@ -85,80 +85,80 @@ public:
 	};
 };
 struct UnitsPosition{
-	word* Type;
-	int*  coor;
-	int N;
+	word* Type=nullptr;
+	int*  coor=nullptr;
+	int N=0;
 };
 struct ZonesGroup{
-	word* ZoneID;
-	int N;
+	word* ZoneID=nullptr;
+	int N=0;
 };
 typedef void StdVoid();
 struct GTimer{
-	int Time;
-	bool Used;
-	bool First;
+	int Time=0;
+	bool Used=0;
+	bool First=0;
 };
 struct LightSpot{
-	int x,y,Type;
+	int x=0,y=0,Type=0;
 };
 class ScenaryInterface{
 public:
-	void** SaveZone;
-	int *  SaveSize;
-	int    NSaves;
-	int    MaxSaves;
-	HINSTANCE hLib;
-	char*  DLLName;
+	void** SaveZone=nullptr;
+	int *  SaveSize=nullptr;
+	int    NSaves=0;
+	int    MaxSaves=0;
+	HINSTANCE hLib=0;
+	char*  DLLName=nullptr;
 
-	UnitsGroup* UGRP;
-	int    NUGRP;
-	int    MaxUGRP;
+	UnitsGroup* UGRP=nullptr;
+	int    NUGRP=0;
+	int    MaxUGRP=0;
 	
-	UnitsPosition* UPOS;
-	int    NUPOS;
-	int    MaxUPOS;
+	UnitsPosition* UPOS=nullptr;
+	int    NUPOS=0;
+	int    MaxUPOS=0;
 
-	ZonesGroup* ZGRP;
-	int    NZGRP;
-	int    MaxZGRP;
+	ZonesGroup* ZGRP=nullptr;
+	int    NZGRP=0;
+	int    MaxZGRP=0;
 
-	char** Messages;
-	int    NMess;
-	int    MaxMess;
+	char** Messages=nullptr;
+	int    NMess=0;
+	int    MaxMess=0;
 
-	char** Sounds;
-	int    NSnd;
-	int    MaxSnds;
+	char** Sounds=nullptr;
+	int    NSnd=0;
+	int    MaxSnds=0;
 
-	int NErrors;
+	int NErrors=0;
 
 	//char*  MissText;
 	//int    TextSize;
 
-	int NPages;
-	int MaxPages;
-	char** Page;
-	int*   PageSize;
-	char** PageID;
-	char** PageBMP;
+	int NPages=0;
+	int MaxPages=0;
+	char** Page=nullptr;
+	int*   PageSize=nullptr;
+	char** PageID=nullptr;
+	char** PageBMP=nullptr;
 
 	bool   TextDisable[52];
 	
-	bool   StandartVictory;
-	bool   Victory;
-	char*  VictoryText;
+	bool   StandartVictory=0;
+	bool   Victory=0;
+	char*  VictoryText=nullptr;
 
-	bool   LooseGame;
-	char*  LooseText;
+	bool   LooseGame=0;
+	char*  LooseText=nullptr;
 
-	char*  CentralText;
-	int CTextTime;
+	char*  CentralText=nullptr;
+	int CTextTime=0;
 
 	GTimer TIME[32];
 	word   TRIGGER[512];
 	LightSpot LSpot[64];
-	StdVoid* ScenaryHandler;
+	StdVoid* ScenaryHandler=nullptr;
 	ScenaryInterface();
 	~ScenaryInterface();
 	void Load(char* Name,char* Text);
@@ -167,22 +167,22 @@ public:
 extern ScenaryInterface SCENINF;
 class SingleMission{
 public:
-	char* ID;
-	char* DLLPath;
-	char* MapName;
-	char* Name;
-	char* Description;
-	int NIntro;
-	char** Intro;
+	char* ID=nullptr;
+	char* DLLPath=nullptr;
+	char* MapName=nullptr;
+	char* Name=nullptr;
+	char* Description=nullptr;
+	int NIntro=0;
+	char** Intro=nullptr;
 };
 class MissPack{
 public:
-	SingleMission* MISS;
-	int NMiss;
-	int MaxMiss;
-	int CurrentMission;
-	int* SingleMS;
-	int MSMiss;
+	SingleMission* MISS=nullptr;
+	int NMiss=0;
+	int MaxMiss=0;
+	int CurrentMission=0;
+	int* SingleMS=nullptr;
+	int MSMiss=0;
 	void LoadMissions();
 	MissPack();
 	~MissPack();
@@ -190,52 +190,52 @@ public:
 
 class OneBattle{
 public:
-	char* ID;
-	char* Map;
-	char* Text;
-	char* Brief;
-	char* BigMap;
-	char* MiniMap;
-	char* BigHeader;
-	char* SmallHeader;
-	char* Date;
-	char* RedUnits;
-	char* BlueUnits;
-	int NHints;
-	char** Hints;
-	int* Coor;
+	char* ID=nullptr;
+	char* Map=nullptr;
+	char* Text=nullptr;
+	char* Brief=nullptr;
+	char* BigMap=nullptr;
+	char* MiniMap=nullptr;
+	char* BigHeader=nullptr;
+	char* SmallHeader=nullptr;
+	char* Date=nullptr;
+	char* RedUnits=nullptr;
+	char* BlueUnits=nullptr;
+	int NHints=0;
+	char** Hints=nullptr;
+	int* Coor=nullptr;
 };
 class OneWar{
 public:
-	char* Name;
-	char* Date;
-	char* Text;
-	int NBatles;
-	int* BattleList;
+	char* Name=nullptr;
+	char* Date=nullptr;
+	char* Text=nullptr;
+	int NBatles=0;
+	int* BattleList=nullptr;
 };
 class WarPack{
 public:
-	int NWars;
-	OneWar* Wars;
-	int NBattles;
-	OneBattle* Battles;
+	int NWars=0;
+	OneWar* Wars=nullptr;
+	int NBattles=0;
+	OneBattle* Battles=nullptr;
 	WarPack();
 	~WarPack();
 };
 extern WarPack WARS;
 extern MissPack MISSLIST;
 struct SingleCampagin{
-	char* CampMessage;
-	char* CampText;
-	char* CampBmp;
-	int NMiss;
-	int* Miss;
-	DWORD* OpenIndex;
+	char* CampMessage=nullptr;
+	char* CampText=nullptr;
+	char* CampBmp=nullptr;
+	int NMiss=0;
+	int* Miss=nullptr;
+	DWORD* OpenIndex=nullptr;
 };
 class CampaginPack{
 public:
-	int NCamp;
-	SingleCampagin* SCamp;
+	int NCamp=0;
+	SingleCampagin* SCamp=nullptr;
 	CampaginPack();
 	~CampaginPack();
 };

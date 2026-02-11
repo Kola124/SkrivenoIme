@@ -1,47 +1,47 @@
 class WallCharacter{
 public:
-    char* Name;
-    word RIndex;
-    word NBuild;
-    word Ndamage;
-    short dx,dy;
-	word GateFile;
-	short GateDx;
-	short GateDy;
-	short UpgradeGateIcon;
-	short OpenGateIcon;
-	short CloseGateIcon;
-	short UpgradeTower1;
-	short UpgradeTower2;
-	word  GateCost[8];
-	short TexRadius;
-	short NTex;
-	short TexPrec;
-	short* Tex;
-	short OpenGateSoundID;
-	short CloseGateSoundID;
-	byte  OpenKeyFrame;
-	byte  CloseKeyFrame;
+    char* Name = {0};
+    word RIndex=0;
+    word NBuild=0;
+    word Ndamage=0;
+    short dx=0,dy=0;
+	word GateFile=0;
+	short GateDx=0;
+	short GateDy=0;
+	short UpgradeGateIcon=0;
+	short OpenGateIcon=0;
+	short CloseGateIcon=0;
+	short UpgradeTower1=0;
+	short UpgradeTower2=0;
+    word  GateCost[8] = {0};
+	short TexRadius=0;
+	short NTex=0;
+	short TexPrec=0;
+	short* Tex=nullptr;
+	short OpenGateSoundID=0;
+	short CloseGateSoundID=0;
+	byte  OpenKeyFrame=0;
+	byte  CloseKeyFrame=0;
 };
 class WallCluster;
 class WallCell{
 public:
-    short x;
-    short y;
-    byte DirMask;
-    byte Type;
-    byte NI;
-    byte Stage;
-    byte MaxStage;
-    word Health;
-    word MaxHealth;
-    byte Sprite;
-    byte SprBase;
-	word ClusterIndex;
-	word OIndex;
-	word GateIndex;
-	int Locks;
-    bool Visible;
+    short x=0;
+    short y=0;
+    byte DirMask=0;
+    byte Type=0;
+    byte NI=0;
+    byte Stage=0;
+    byte MaxStage=0;
+    word Health=0;
+    word MaxHealth=0;
+    byte Sprite=0;
+    byte SprBase=0;
+	word ClusterIndex=0;
+	word OIndex=0;
+	word GateIndex=0;
+	int Locks=0;
+    bool Visible=0;
     bool CheckPosition();
 	int GetLockStatus();
 	void SetLockStatus();
@@ -53,20 +53,20 @@ public:
 class WallSystem;
 class WallCluster{
 public:
-    byte Type;
-    int NCornPt;
-    word* CornPt;
-    int NCells;
-    WallCell* Cells;
-    WallSystem* WSys;
-    short LastX;
-    short LastY;
-    short FinalX;
-    short FinalY;
-    NewMonster* NM;
-	word  NIndex;
-	byte  NI;
-    bool  WallLMode;
+    byte Type=0;
+    int NCornPt=0;
+    word* CornPt=nullptr;
+    int NCells=0;
+    WallCell* Cells = {0};
+    WallSystem* WSys={0};
+    short LastX=0;
+    short LastY=0;
+    short FinalX=0;
+    short FinalY=0;
+    NewMonster* NM = {0};
+	word  NIndex=0;
+	byte  NI=0;
+    bool  WallLMode=0;
 //------------------//
     WallCluster();
     ~WallCluster();
@@ -88,7 +88,7 @@ public:
 };
 class WallSystem{
 public:
-    int NClusters;
+    int NClusters=0;
     WallCluster** WCL;
 //-------------------//
     WallSystem();
@@ -117,14 +117,14 @@ void SetLife(WallCell* WC,int Health);
 #define NGOpen 9
 class Gate{
 public:
-	short x;
-	short y;
-	byte NI;
-	byte NMask;
-	byte State;
-	byte delay;
-	byte Locked;
-	byte CharID;
+	short x=0;
+	short y=0;
+	byte NI=0;
+	byte NMask=0;
+	byte State=0;
+	byte delay=0;
+	byte Locked=0;
+	byte CharID=0;
 };
 extern Gate* Gates;
 extern int NGates;
