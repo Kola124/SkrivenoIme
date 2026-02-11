@@ -34,7 +34,7 @@
 #include "bmptool.h"
 #include "GP_Draw.h"
 #include "DrawForm.h"
-//#include "Fonts.h"
+#include "Fonts.h"
 #include <crtdbg.h>
 #include "activezone.h"
 int MinLinkDist=9;
@@ -1352,12 +1352,12 @@ extern int NNations;
 void CreateNationalMaskForRandomMap(char* Name){
 	LOADNATMASK=0xFFFFFFFF;
 	return;
-	//char cc1[128];
+	char cc1[128];
 	char cc2[32]="00000000";
 	word NatUnit[8]={0,0,0,0,0,0,0,0};
-	//int x1,x2;
-	//sscanf(Name,"%s%x%x%s",cc1,&x1,&x2,cc2);
-    sscanf(Name, "%*s %*s %*s %s", cc2);
+	int x1,x2;
+	sscanf(Name,"%s%x%x%s",cc1,&x1,&x2,cc2);
+    //sscanf(Name, "%*s %*s %*s %s", cc2);
 	LOADNATMASK=0;
 	for(int i=0;i<8;i++){
 		char c=cc2[7-i];
