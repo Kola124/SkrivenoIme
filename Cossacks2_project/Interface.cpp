@@ -6370,12 +6370,12 @@ void PlayGame(){
 	GSSetup800();
 	LoadFog(0);
 	InitGame();
+    InGame = true;
 	if(exRealLx!=RealLx)SetGameDisplayModeAnyway(exRealLx,exRealLy);
 	DrawAllScreen();
 	GameNeedToDraw=false;
 	GameExit=false;
 	MakeMenu=false;
-	InGame = true;
 	ShowPostScreen=0;
 	if(PlayGameMode)StartAboutTime=GetTickCount();
 StartPlay:

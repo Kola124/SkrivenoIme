@@ -684,6 +684,17 @@ bool CreateDDObjects(HWND hwnd)
     DDLog("Creating SDL renderer\n");
     Uint32 rendererFlags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
     
+    //"0" - Nearest neighbor (no filtering, sharp pixels)
+    //"1" - Linear interpolation (smooth/blurred)
+    //"2" - Anisotropic filtering (highest quality, hardware dependent)
+    extern bool InGame, InEditor;
+    if (InGame || InEditor) {
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+    }
+    else {
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
+    }
+    
     sdlRenderer = SDL_CreateRenderer(sdlWindow, -1, rendererFlags);
     
     if (!sdlRenderer) {
@@ -702,20 +713,6 @@ bool CreateDDObjects(HWND hwnd)
     } else {
         DDLog("Created accelerated renderer\n");
     }
-    
-
-    //"0" - Nearest neighbor (no filtering, sharp pixels)
-    //"1" - Linear interpolation (smooth/blurred)
-    //"2" - Anisotropic filtering (highest quality, hardware dependent)
-    extern bool InGame, InEditor;
-    if (!InGame || !InEditor) {
-        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
-    }
-    else {
-        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
-    }
-    
-
     
     extern bool bStretchMode;
     if (bStretchMode) {
