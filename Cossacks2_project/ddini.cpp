@@ -1,10 +1,12 @@
-﻿/*********************************************************************** 
+﻿ /*********************************************************************** 
  * SDL2 initialisation module (migrated from DirectDraw)                  
  *
  * This module creates the SDL2 window with renderer
  * and sets up display modes.
  *
  ***********************************************************************/
+#include <vector>
+#include <algorithm>
 #define __ddini_cpp_
 #include "ddini.h"
 #include "ResFile.h"
@@ -18,10 +20,10 @@
 
 #include "include\SDL.h"
 #include "include\SDL_syswm.h"
-#include <vector>
-#include <algorithm>
-//#include <string>
 
+#define TITLE "American Conquest"
+
+//#include <string>
 LPDIRECTDRAW lpDD = nullptr;
 LPDIRECTDRAWSURFACE lpDDSPrimary = nullptr;
 LPDIRECTDRAWSURFACE lpDDSBack = nullptr;
@@ -30,6 +32,10 @@ DDSURFACEDESC ddsd;
 extern HWND hwnd;
 extern int mouseX;
 extern int mouseY;
+
+static SDL_PixelFormat* cachedFormat = NULL;
+static int lastPaletteUpdate = -1;
+extern int CurPalette;
 
 #ifdef _WIN32
     #undef main  // SDL2 redefines main on Windows
@@ -157,7 +163,6 @@ void ClearRGB() {
 
 word PAL16[256];
 int P16Idx = -1;
-extern int CurPalette;
 
 void CheckPal16() {
     P16Idx = CurPalette;
@@ -174,20 +179,18 @@ void CheckPal16x() {
 
 void ChangeColorFF() {
     if (!RealScreenPtr) return;
-    try {
-        int DD = 10000;
-        int c = 0xFF;
-        for (int i = 0; i < 255; i++) {
-            int D = 255 + 255 + 255 - GPal[i].b - GPal[i].g - GPal[i].r;
-            if (D < DD) {
-                c = i;
-                DD = D;
-            }
+    
+    int DD = 10000;
+    int c = 0xFF;
+    for (int i = 0; i < 255; i++) {
+        int D = 255 + 255 + 255 - GPal[i].b - GPal[i].g - GPal[i].r;
+        if (D < DD) {
+            c = i;
+            DD = D;
         }
-        int sz = RSCRSizeX * RealLy;
-        for (int i = 0; i < sz; i++) ((byte*)RealScreenPtr)[i] = 0;
     }
-    catch (...) {}
+    int sz = RSCRSizeX * RealLy;
+    memset(RealScreenPtr, 0, sz);
 }
 
 void UpdateSDLPalette() {
@@ -327,56 +330,42 @@ void FlipPages(void)
     IRS->ClearDeviceZBuffer();
     return;
 #endif
-
-    if (!bActive) {
-        //DDLog("FlipPages: Not active, skipping\n");
-        //return;
-    }
+    if (!bActive || !sdlRenderer || !sdlTexture || !sdlSurface || !offScreenPtr) return;
     
-    if (!sdlRenderer || !sdlTexture || !sdlSurface || !offScreenPtr) {
-        DDLog("FlipPages: Missing required objects - renderer=%p, texture=%p, surface=%p, offscreen=%p\n",
-              sdlRenderer, sdlTexture, sdlSurface, offScreenPtr);
-        return;
-    }
-    
-    // Lock SDL surface
+    // Lock and copy to 8-bit surface
     if (SDL_MUSTLOCK(sdlSurface)) {
         if (SDL_LockSurface(sdlSurface) < 0) return;
     }
     
-    // Copy from offscreen buffer to SDL surface
     byte* src = (byte*)ScreenPtr;
     byte* dst = (byte*)sdlSurface->pixels;
-    int srcPitch = MaxSizeX;
-    int dstPitch = sdlSurface->pitch;
     
     for (int y = 0; y < RealLy; y++) {
-        memcpy(dst + y * dstPitch, src + y * srcPitch, RealLx);
+        memcpy(dst + y * sdlSurface->pitch, src + y * MaxSizeX, RealLx);
     }
     
-    // Unlock SDL surface
     if (SDL_MUSTLOCK(sdlSurface)) {
         SDL_UnlockSurface(sdlSurface);
     }
     
-    // Update palette
-    if (sdlSurface->format->palette) {
+    // Update palette only when changed
+    if (CurPalette != lastPaletteUpdate && sdlSurface->format->palette) {
         SDL_SetPaletteColors(sdlSurface->format->palette, GPal, 0, 256);
+        lastPaletteUpdate = CurPalette;
     }
     
-    // Convert to 32-bit and update texture
-    SDL_PixelFormat* format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888);
-    if (format) {
-        SDL_Surface* rgbSurface = SDL_ConvertSurface(sdlSurface, format, 0);
-        SDL_FreeFormat(format);
-        
-        if (rgbSurface) {
-            SDL_UpdateTexture(sdlTexture, NULL, rgbSurface->pixels, rgbSurface->pitch);
-            SDL_FreeSurface(rgbSurface);
-        }
+    // Cache the pixel format
+    if (!cachedFormat) {
+        cachedFormat = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888);
     }
     
-    // Render (logical size handles scaling automatically)
+    // Convert using SDL (reuses internal SDL buffers)
+    SDL_Surface* rgbSurface = SDL_ConvertSurface(sdlSurface, cachedFormat, 0);
+    if (rgbSurface) {
+        SDL_UpdateTexture(sdlTexture, NULL, rgbSurface->pixels, rgbSurface->pitch);
+        SDL_FreeSurface(rgbSurface);
+    }
+    
     SDL_RenderClear(sdlRenderer);
     SDL_RenderCopy(sdlRenderer, sdlTexture, NULL, NULL);
     SDL_RenderPresent(sdlRenderer);
@@ -574,7 +563,7 @@ bool CreateDDObjects(HWND hwnd)
 #endif
 
     InitSDLIfNeeded();
-    
+
     DDError = false;
     CurrentSurface = true;
 
@@ -683,7 +672,7 @@ bool CreateDDObjects(HWND hwnd)
     // Create renderer with specific flags
     DDLog("Creating SDL renderer\n");
     Uint32 rendererFlags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
-    
+
     //"0" - Nearest neighbor (no filtering, sharp pixels)
     //"1" - Linear interpolation (smooth/blurred)
     //"2" - Anisotropic filtering (highest quality, hardware dependent)
@@ -696,7 +685,7 @@ bool CreateDDObjects(HWND hwnd)
     }
     
     sdlRenderer = SDL_CreateRenderer(sdlWindow, -1, rendererFlags);
-    
+
     if (!sdlRenderer) {
         DDLog("Accelerated renderer failed: %s, trying software\n", SDL_GetError());
         sdlRenderer = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_SOFTWARE);
@@ -713,7 +702,7 @@ bool CreateDDObjects(HWND hwnd)
     } else {
         DDLog("Created accelerated renderer\n");
     }
-    
+
     extern bool bStretchMode;
     if (bStretchMode) {
     // Stretch mode - disable logical size, render directly
@@ -1089,6 +1078,11 @@ void FreeDDObjects(void)
     if (sdlWindow) {
         SDL_DestroyWindow(sdlWindow);
         sdlWindow = NULL;
+    }
+
+    if (cachedFormat) {
+        SDL_FreeFormat(cachedFormat);
+        cachedFormat = NULL;
     }
     
     SDL_Quit();
