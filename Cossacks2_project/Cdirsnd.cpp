@@ -93,17 +93,40 @@ void CSDLSound::ReleaseAll()
     // Stop all sounds
     Mix_HaltChannel(-1);
     
-    // Free all sound chunks, considering reference counts
-    for (unsigned int x = 0; x < MAXSND1; ++x)
+    // First, collect unique chunks and their reference counts
+    Mix_Chunk* uniqueChunks[MAXSND1] = {NULL};
+    int uniqueRefCounts[MAXSND1] = {0};
+    int uniqueCount = 0;
+    
+    // Count references for each unique chunk
+    for (unsigned int x = 1; x <= m_currentBufferNum && x < MAXSND1; ++x)
     {
-        if (m_chunks[x] != NULL && m_refCount[x] > 0)
-        {
-            m_refCount[x]--;
-            if (m_refCount[x] == 0)
-            {
-                Mix_FreeChunk(m_chunks[x]);
-                m_chunks[x] = NULL;
+        if (m_chunks[x] == NULL) continue;
+        
+        // Check if we've seen this chunk before
+        int found = -1;
+        for (int i = 0; i < uniqueCount; i++) {
+            if (uniqueChunks[i] == m_chunks[x]) {
+                found = i;
+                break;
             }
+        }
+        
+        if (found >= 0) {
+            // Already seen, add to ref count
+            uniqueRefCounts[found] += m_refCount[x];
+        } else {
+            // New unique chunk
+            uniqueChunks[uniqueCount] = m_chunks[x];
+            uniqueRefCounts[uniqueCount] = m_refCount[x];
+            uniqueCount++;
+        }
+    }
+    
+    // Free unique chunks (only once per unique chunk)
+    for (int i = 0; i < uniqueCount; i++) {
+        if (uniqueChunks[i] != NULL && uniqueRefCounts[i] > 0) {
+            Mix_FreeChunk(uniqueChunks[i]);
         }
     }
     
@@ -111,10 +134,14 @@ void CSDLSound::ReleaseAll()
     memset(BufIsRun, 0, sizeof(BufIsRun));
     ClearSoundCategories();
     
-    // Reset reference counts
+    // Reset all arrays
     for (unsigned int x = 0; x < MAXSND1; ++x)
     {
+        m_chunks[x] = NULL;
         m_refCount[x] = 0;
+        m_bufferSizes[x] = 0;
+        m_filenames[x][0] = '\0';
+        m_bufferInstanceCount[x] = 0;
     }
     
     m_initialized = false;
@@ -134,21 +161,18 @@ unsigned int CSDLSound::LoadWAV(const char* filename)
     
     unsigned int bufferNum = ++m_currentBufferNum;
     
-    //printf("Loading WAV: %s -> buffer %d\n", filename, bufferNum);
-    
     // Load the WAV file
     m_chunks[bufferNum] = Mix_LoadWAV(filename);
     if (m_chunks[bufferNum] == NULL)
     {
-        //fprintf(stderr, "Mix_LoadWAV failed for %s: %s\n", filename, Mix_GetError());
         --m_currentBufferNum;
         return 0;
     }
     
     m_bufferSizes[bufferNum] = m_chunks[bufferNum]->alen;
-    m_refCount[bufferNum] = 1;
+    m_refCount[bufferNum] = 1;  // First reference
     
-    // Store filename for duplication
+    // Store filename for reference
     strncpy(m_filenames[bufferNum], filename, 255);
     m_filenames[bufferNum][255] = '\0';
     
@@ -172,28 +196,17 @@ unsigned int CSDLSound::DuplicateSound(unsigned int bufferNum)
     
     unsigned int newBufferNum = ++m_currentBufferNum;
     
-    // Load a new copy if we have filename
-    if (m_filenames[bufferNum][0] != '\0')
-    {
-        m_chunks[newBufferNum] = Mix_LoadWAV(m_filenames[bufferNum]);
-        if (m_chunks[newBufferNum] == NULL)
-        {
-            //fprintf(stderr, "Failed to duplicate sound: %s\n", Mix_GetError());
-            --m_currentBufferNum;
-            return 0;
-        }
-    }
-    else
-    {
-        // Can't duplicate without filename
-        //fprintf(stderr, "Cannot duplicate sound: no filename stored\n");
-        --m_currentBufferNum;
-        return 0;
-    }
+    // SHARE the same chunk instead of loading a new copy
+    m_chunks[newBufferNum] = m_chunks[bufferNum];  // Just copy the pointer!
     
     // Copy properties
     m_bufferSizes[newBufferNum] = m_bufferSizes[bufferNum];
-    m_refCount[newBufferNum] = 1;
+    
+    // Increase reference count for the shared chunk
+    m_refCount[bufferNum]++;  // Increment original's ref count
+    m_refCount[newBufferNum] = 1;  // This buffer has 1 reference to the shared chunk
+    
+    // Copy filename for reference (optional)
     strcpy(m_filenames[newBufferNum], m_filenames[bufferNum]);
     
     SoundCtg[newBufferNum] = SoundCtg[bufferNum];
@@ -583,17 +596,12 @@ bool CSDLSound::StopSound(unsigned int bufferNum)
         if (instanceSlot >= 0 && instanceSlot < MAX_INSTANCES && 
             m_activeInstances[instanceSlot].active) {
             
-            // Stop the channel
             Mix_HaltChannel(m_activeInstances[instanceSlot].channel);
-            
-            // Mark as inactive
             m_activeInstances[instanceSlot].active = false;
         }
     }
     
-    // Clear the instance list for this buffer
     m_bufferInstanceCount[bufferNum] = 0;
-    
     BufIsRun[bufferNum] = 0;
     return true;
 }

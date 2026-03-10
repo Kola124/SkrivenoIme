@@ -11,8 +11,8 @@
 #include "cwave.h"
 #include <mmsystem.h>
 
-#define MAXSND 600 
-#define MAXSND1 601
+#define MAXSND 1024 
+#define MAXSND1 2048
 #define MAX_INSTANCES 1024
 
 class CSDLSound
