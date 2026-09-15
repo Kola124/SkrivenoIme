@@ -2138,7 +2138,7 @@ OneObject* TryToFindEnemy(int x,int y,int r0,int r1,byte mask){
 	int mindx=-(x>>11);
 	int maxdx=(msx>>2)+mindx;
 	int mindy=-(y>>11);
-	int maxdy=(msx>>2)+mindy;
+    int maxdy=(msy>>2)+mindy;                             
     int rx1=(r1>>7)+1;
     byte nmask=~mask;
     OneObject* DestObj=NULL;
@@ -2157,7 +2157,7 @@ OneObject* TryToFindEnemy(int x,int y,int r0,int r1,byte mask){
 		int dx=((rando()*rx2)>>15)-rx1;
 		int dy=((rando()*rx2)>>15)-rx1;
 		int rr=Norma(dx,dy);
-		if(dx<=maxdx&&dx>=mindx&&dy>=mindx&&dy<=maxdx){
+        if(dx<=maxdx&&dx>=mindx&&dy>=mindy&&dy<=maxdy){
 			stcell=cell+dx+(dy<<VAL_SHFCX);
 			if(stcell>=0&&stcell<VAL_MAXCIOFS){
 				if(NPresence[stcell]&nmask){
