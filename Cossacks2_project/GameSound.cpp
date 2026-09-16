@@ -179,9 +179,7 @@ void PlayEffect(int n,int pan,int vol){
 				int sid=SndTable[n][nnn];
 				bool poss=CDS->IsPlaying(sid);
 				if(!poss){
-					CDS->SetVolume(sid,vol/*+CDS->Volume[sid]*/);
-					CDS->SetPan(sid,pan);
-					CDS->PlaySoundSDL(sid,0);
+					CDS->PlaySoundSDL(sid,vol,pan,false);
 					sndmade=false;
 				}else{
 					u--;
@@ -192,15 +190,20 @@ void PlayEffect(int n,int pan,int vol){
 			/*
 			if(sndmade&&srando()<200){
 				int nnn=(srando()*maxsnd)>>15;
-				CDS->SetVolume(SndTable[n][nnn],vol);
-				CDS->SetPan(SndTable[n][nnn],pan);
-				CDS->PlaySoundSDL(SndTable[n][nnn]);
+				CDS->PlaySoundSDL(SndTable[n][nnn],vol,pan,false);
 			};
 			*/
 		};
 	};
 };
 void PlayCoorEffect(int n,int x,int y,int pan,int vol){
+	// NOTE: 'pan' (computed by the caller, AddEffectV) is not used here --
+	// PlayCoorSound() derives its own left/right pan from x, and now
+	// also factors in 'y' (the real vertical screen position, wired
+	// through from AddEffectV as of this change) for a small volume
+	// adjustment, since stereo has no way to represent "higher on
+	// screen" except via loudness/depth cues. A pan value computed here
+	// would just be redundant with what PlayCoorSound already does.
 	if(!SoundOK)return;
 	vol-=(100-WarSound)*40;
 	if(n<NSounds){
@@ -216,9 +219,7 @@ void PlayCoorEffect(int n,int x,int y,int pan,int vol){
 				bool poss=CDS->IsPlaying(sid);
 				lastsid=sid;
 				if(!poss){
-					CDS->SetVolume(sid,vol/*+CDS->Volume[sid]*/);
-					CDS->SetPan(sid,pan);
-					CDS->PlayCoorSound(sid,x,y);
+					CDS->PlayCoorSound(sid,x,y,vol);
 					sndmade=false;
 				}else{
 					u--;
@@ -232,9 +233,7 @@ void PlayCoorEffect(int n,int x,int y,int pan,int vol){
 			/*
 			if(sndmade&&srando()<200){
 				int nnn=(srando()*maxsnd)>>15;
-				CDS->SetVolume(SndTable[n][nnn],vol);
-				CDS->SetPan(SndTable[n][nnn],pan);
-				CDS->PlaySoundSDL(SndTable[n][nnn]);
+				CDS->PlaySoundSDL(SndTable[n][nnn],vol,pan,false);
 			};
 			*/
 		};
@@ -259,9 +258,7 @@ void PlaySingleEffect(int n,int pan,int vol){
 				int sid=SndTable[n][nnn];
 				bool poss=CDS->IsPlaying(sid);
 				if(!poss){
-					CDS->SetVolume(sid,vol);
-					CDS->SetPan(sid,pan);
-					CDS->PlaySoundSDL(sid,0);
+					CDS->PlaySoundSDL(sid,vol,pan,false);
 					sndmade=false;
 				}else{
 					u--;
@@ -272,9 +269,7 @@ void PlaySingleEffect(int n,int pan,int vol){
 			/*
 			if(sndmade&&srando()<200){
 				int nnn=(srando()*maxsnd)>>15;
-				CDS->SetVolume(SndTable[n][nnn],vol);
-				CDS->SetPan(SndTable[n][nnn],pan);
-				CDS->PlaySoundSDL(SndTable[n][nnn]);
+				CDS->PlaySoundSDL(SndTable[n][nnn],vol,pan,false);
 			};
 			*/
 		};
@@ -315,10 +310,15 @@ void AddEffectV(int x,int y,int vx,int id){
 	if(pan<-4000)pan=-4000;
 	if(pan>4000)pan=4000;
 	//int pan=-9999;
+	// NOTE: this used to pass 'vx' here (always 0 -- nothing in the
+	// codebase ever calls AddEffectV with a nonzero velocity), which
+	// meant the real vertical position never reached PlayCoorSound at
+	// all. Passing the actual 'y' now lets pan/volume account for
+	// where on screen the sound really is, not just its x.
 	if(x>=SMinX&&y>=SMinY&&x<SMaxX&&y<SMaxY){
-		PlayCoorEffect(id,x,vx,pan,0);	
+		PlayCoorEffect(id,x,y,pan,0);	
 	}else{
-		PlayCoorEffect(id,x,vx,pan,-800);
+		PlayCoorEffect(id,x,y,pan,-800);
 	};
 };
 void AddEffect(int x,int y,int id){

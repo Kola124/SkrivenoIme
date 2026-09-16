@@ -1,222 +1,160 @@
+///////////////////////////////////////////////////////////
+// OGGVOR.CPP -- in-process OGG music playback via SDL_mixer
+//
+// This used to launch a separate helper process (vopl.exe) and talk
+// to it through a named shared memory mapping + mutex (see the old
+// vopl_globals.h). That's gone now: SDL_mixer already knows how to
+// stream Ogg Vorbis directly (Mix_Music), so music plays on the same
+// audio device as the WAV sound effects (see Cdirsnd.cpp), inside
+// this process, with no IPC and no second executable to ship.
+//
+// The public API below (ov_Init/ov_Play/ov_Stop/...) is unchanged on
+// purpose, so nothing else in the codebase (PlayMP3.cpp, DeviceCD.cpp,
+// Ddex1.cpp) needs to change.
+///////////////////////////////////////////////////////////
+
+#include <..\include\SDL.h>
+#include <..\include\SDL_mixer.h>
 #include <windows.h>
-#include <basetyps.h>
 #include <stdio.h>
 #include <stdlib.h>
-//#include <dsconf.h>
-#include <stdlib.h>
 
-#include "vopl_globals.h"
 #include "oggvor.h"
 
-#define WAIT_TIME 50
+static Mix_Music*  g_pMusic          = NULL;
+static volatile BOOL g_bStreamFinished = TRUE;
+static int          g_iVolume        = MIX_MAX_VOLUME; // SDL_mixer scale: 0-128
 
-static HANDLE hMutex=0;
-static HANDLE hMapping=0;
-static LP_COMMAND_BUFFER pbExchange=NULL;
-static BOOL bInitialized=FALSE;
-
-void VoplError(const char* pcszError){
-	MessageBox(NULL,pcszError,"VOPL-C Critical Error",MB_OK | MB_ICONHAND);
-	ExitProcess(1);
+///////////////////////////////////////////////////////////
+// Called by SDL_mixer (may be on the audio thread) when the
+// current track finishes playing on its own. We only ever set
+// a flag here -- no SDL_mixer calls -- so it's safe regardless
+// of which thread invokes it.
+///////////////////////////////////////////////////////////
+static void OnMusicFinishedHook()
+{
+	g_bStreamFinished = TRUE;
 }
 
+///////////////////////////////////////////////////////////
+// ov_Init()
+//
+// The audio device itself (SDL_Init(SDL_INIT_AUDIO) + Mix_OpenAudio)
+// is owned by CSDLSound::CreateSDLSound() in Cdirsnd.cpp, which is
+// called right after this from Ddex1.cpp's doInit(). There's nothing
+// left to spawn or synchronize with here -- just register the
+// finished-callback. hExtWnd is kept only so the existing call site
+// doesn't need to change; it's unused now.
+///////////////////////////////////////////////////////////
 void ov_Init(HWND hExtWnd)
 {
-	if(bInitialized)
-		return;
-
-	char	szOVSD[512],szDIR[512];
-	DWORD	dwSTime;
-
-	GetModuleFileName(NULL,szOVSD,512);
-	*(strrchr(szOVSD,'\\'))='\0';
-	strcpy(szDIR,szOVSD);
-	strcat(szOVSD,"\\vopl.exe");
-
-	char				szRunLine[1024];
-	STARTUPINFO			r_si;
-	PROCESS_INFORMATION r_pi;
-
-	sprintf(szRunLine,"/HWND=%lu",hExtWnd);
-
-	ZeroMemory(&r_si,sizeof(STARTUPINFO));
-	ZeroMemory(&r_pi,sizeof(PROCESS_INFORMATION));
-
-	r_si.cb=sizeof(STARTUPINFO);
-
-	BOOL bStart;
-
-	bStart=CreateProcess(
-		szOVSD,
-		szRunLine,
-		NULL,
-		NULL,
-		FALSE,
-		0x00,
-		NULL,
-		szDIR,
-		&r_si,
-		&r_pi);
-
-	if(!bStart)
-		VoplError("Can not launch server process (1-1)");
-
-	// Waiting for the process to become visible
-	dwSTime=GetTickCount();
-	do{
-		Sleep(50);
-		hMapping=OpenFileMapping(
-			FILE_MAP_ALL_ACCESS,
-			FALSE,
-			VOPL_MAPPING_NAME);
-
-		if(hMapping)
-			break;
-
-		if((GetTickCount()-dwSTime)>10000)
-			VoplError("Can not open file mapping (1-2)");
-	}while(1);
-
-	// Mapping memory
-	pbExchange=(LP_COMMAND_BUFFER)MapViewOfFile(
-		hMapping,
-		FILE_MAP_ALL_ACCESS,
-		0,0,
-		sizeof(COMMAND_BUFFER));
-
-	if(!pbExchange)
-		VoplError("Can not map view of file (1-3)");
-
-	Sleep(100);
-
-	// Creating mutex 
-	hMutex=CreateMutex(
-		NULL,
-		FALSE,
-		VOPL_MUTEX_NAME);
-
-	if(!hMutex)
-		VoplError("Can not create mutex object (1-4)");
-
-	Sleep(100);
-
-	bInitialized=TRUE;
+	Mix_HookMusicFinished(OnMusicFinishedHook);
 }
 
+///////////////////////////////////////////////////////////
+// ov_Play()
+///////////////////////////////////////////////////////////
 void ov_Play(LPCSTR pcszFileName)
 {
-	if(!bInitialized)
-		return;
+	// Stop and free whatever track was loaded before.
+	Mix_HaltMusic();
+	if (g_pMusic)
+	{
+		Mix_FreeMusic(g_pMusic);
+		g_pMusic = NULL;
+	}
 
-	while(1){
-		WaitForSingleObject(hMutex,INFINITE);
-		if(pbExchange->Command==vcFree){
-			pbExchange->Command=vcPlay;
-			strcpy(pbExchange->szFileName,pcszFileName);
-			pbExchange->Finished=FALSE;
-			pbExchange->Length=0;
-			ReleaseMutex(hMutex);
-			break;
-		};
-		ReleaseMutex(hMutex);
-		Sleep(WAIT_TIME);
-	};
+	g_pMusic = Mix_LoadMUS(pcszFileName);
+	if (!g_pMusic)
+	{
+		// Bad/missing file: behave as if the stream is already finished
+		// so PlayMP3.cpp's random picker moves on to the next track.
+		g_bStreamFinished = TRUE;
+		return;
+	}
+
+	g_bStreamFinished = FALSE;
+	Mix_VolumeMusic(g_iVolume);
+	Mix_PlayMusic(g_pMusic, 1); // play once; PlayMP3.cpp drives track changes itself
 }
 
+///////////////////////////////////////////////////////////
+// ov_Stop()
+///////////////////////////////////////////////////////////
 void ov_Stop(void)
 {
-	if(!bInitialized)
-		return;
-#ifdef _USE3D
-	int T0=GetTickCount();
-	while(GetTickCount()-T0<1000){
-#else	
-	while(1){
-#endif
-		WaitForSingleObject(hMutex,INFINITE);
-		if(pbExchange->Command==vcFree){
-			pbExchange->Command=vcStop;
-			ReleaseMutex(hMutex);
-			break;
-		};
-		ReleaseMutex(hMutex);
-		Sleep(WAIT_TIME);
-	};
+	Mix_HaltMusic();
+	if (g_pMusic)
+	{
+		Mix_FreeMusic(g_pMusic);
+		g_pMusic = NULL;
+	}
+	g_bStreamFinished = TRUE;
 }
 
+///////////////////////////////////////////////////////////
+// ov_Done()
+///////////////////////////////////////////////////////////
 void ov_Done(void)
 {
-	if(!bInitialized)
-		return;
-#ifdef _USE3D
-	int T0=GetTickCount();
-	while(GetTickCount()-T0<1000){
-#else
-	while(1){
-#endif
-		WaitForSingleObject(hMutex,INFINITE);
-		if(pbExchange->Command==vcFree){
-			pbExchange->Command=vcKill;
-			ReleaseMutex(hMutex);
-			break;
-		};
-		ReleaseMutex(hMutex);
-		Sleep(WAIT_TIME);
-	};
-	
-	bInitialized=FALSE;
+	ov_Stop();
+	Mix_HookMusicFinished(NULL);
 }
 
+///////////////////////////////////////////////////////////
+// ov_SetVolume()
+//
+// Callers (PlayMP3.cpp, via MidiSound/Vol) pass a plain 0-100
+// linear volume, NOT the -10000..0 dB-style scale that
+// CSDLSound::SetVolume() uses for sound effects. Keep that
+// distinction explicit here rather than silently reusing the
+// effects conversion curve.
+///////////////////////////////////////////////////////////
 void ov_SetVolume(DWORD dwVolume)
 {
-	if(!bInitialized)
-		return;
-	
-	while(1){
-		WaitForSingleObject(hMutex,INFINITE);
-		if((pbExchange->Command==vcFree)||(pbExchange->Command==vcVolume)){
-			pbExchange->Command=vcVolume;
-			pbExchange->Volume=dwVolume;
-			ReleaseMutex(hMutex);
-			break;
-		};
-		ReleaseMutex(hMutex);
-		Sleep(WAIT_TIME);
-	};
+	int vol = (int)dwVolume;
+	if (vol < 0)   vol = 0;
+	if (vol > 100) vol = 100;
+
+	g_iVolume = (vol * MIX_MAX_VOLUME) / 100;
+	Mix_VolumeMusic(g_iVolume);
 }
 
+///////////////////////////////////////////////////////////
+// ov_GetStreamLength()
+//
+// Returns length in milliseconds. Mix_MusicDuration() only exists in
+// SDL_mixer 2.6+; on older SDL_mixer this stays a stub returning 0,
+// same as it effectively was before (nothing in the given code paths
+// consumes this value).
+///////////////////////////////////////////////////////////
 DWORD ov_GetStreamLength(void)
 {
-	DWORD dwLen=0;
+	if (!g_pMusic)
+		return 0;
 
-	if(!bInitialized)
-		return dwLen;
-	
-	WaitForSingleObject(hMutex,INFINITE);
-	dwLen=pbExchange->Length;
-	ReleaseMutex(hMutex);
-
-	return dwLen;
+#if defined(SDL_MIXER_VERSION_ATLEAST) && SDL_MIXER_VERSION_ATLEAST(2,6,0)
+	double secs = Mix_MusicDuration(g_pMusic);
+	if (secs < 0.0)
+		return 0;
+	return (DWORD)(secs * 1000.0);
+#else
+	return 0;
+#endif
 }
 
+///////////////////////////////////////////////////////////
+// ov_StreamFinished()
+///////////////////////////////////////////////////////////
 DWORD ov_StreamFinished(void)
 {
-	DWORD dwFin=1;
-
-	if(!bInitialized)
-		return dwFin;
-
-	WaitForSingleObject(hMutex,INFINITE);
-	dwFin=pbExchange->Finished;
-	ReleaseMutex(hMutex);
-
-	return dwFin;
+	return g_bStreamFinished ? 1 : 0;
 }
 
-typedef HRESULT (__stdcall *PDLLFUNC)(REFCLSID,REFIID,LPVOID*);
-
-DRIVER_TYPE ov_DriverType(void){
-	DRIVER_TYPE dtType=dtEmulated;
-
-	return dtType;
+///////////////////////////////////////////////////////////
+// ov_DriverType()
+///////////////////////////////////////////////////////////
+DRIVER_TYPE ov_DriverType(void)
+{
+	return dtEmulated;
 }
