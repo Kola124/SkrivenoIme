@@ -1,28 +1,28 @@
 #define MaxPL 8
 struct EXBUFFER{
-	DWORD Size;
-	bool Enabled;
-	DWORD Sign;//0xF376425E
-	DWORD RealTime;//if(??==0xFFFFFFFF)-empty buffer
-	DWORD RandIndex;
-	byte  Data[4096];
+	DWORD Size=0;
+	bool Enabled=0;
+	DWORD Sign=0;//0xF376425E
+	DWORD RealTime=0;//if(??==0xFFFFFFFF)-empty buffer
+	DWORD RandIndex=0;
+    byte  Data[4096] = {0};
 };
 struct OnePing{
-	int FromTime;
-	int ToTime;
-	int BackTime;
+	int FromTime=0;
+	int ToTime=0;
+	int BackTime=0;
 };
 class PingsSet{
 public:
-	DWORD DPID;
-	int NPings;
-	int MaxPings;
-	OnePing* Pings;
+	DWORD DPID=0;
+	int NPings=0;
+	int MaxPings=0;
+	OnePing* Pings=nullptr;
 };
 class PingSumm{
 public:
-	int NPL;
-	PingsSet* PSET;
+	int NPL=0;
+	PingsSet* PSET=nullptr;
 	PingSumm();
 	~PingSumm();
 	void ClearPingInfo();
@@ -33,15 +33,15 @@ public:
 };
 extern PingSumm PSUMM;
 struct BACKUPSTR{
-	DWORD  ID;
-	DWORD RealTime;
-	byte* Data;
-	int   L;
+	DWORD  ID=0;
+	DWORD RealTime=0;
+    byte* Data = nullptr;
+	int   L=0;
 };
 class PLAYERSBACKUP{
 public:
-	BACKUPSTR BSTR[32];
-	int NBDATA;
+    BACKUPSTR BSTR[32] = {0};
+	int NBDATA=0;
 	PLAYERSBACKUP();
 	~PLAYERSBACKUP();
 	void Clear();
@@ -49,15 +49,15 @@ public:
 	void SendInfoAboutTo(DWORD ID,DWORD TO,DWORD RT);
 };
 struct SingleRetr{
-	DWORD IDTO;
-	DWORD IDFROM;
-	DWORD RT;
+	DWORD IDTO=0;
+	DWORD IDFROM=0;
+	DWORD RT=0;
 };
 class RETRANS{
 public:
-	SingleRetr* TOT;
-	int NRET;
-	int MaxRET;
+	SingleRetr* TOT=nullptr;
+	int NRET=0;
+	int MaxRET=0;
 	RETRANS();
 	~RETRANS();
 	void AddOneRet(DWORD TO,DWORD From,DWORD RT);
@@ -68,18 +68,18 @@ public:
 extern PLAYERSBACKUP PBACK;
 extern RETRANS RETSYS;
 struct RoomInfo{
-	char Name[128];
-	char Nick[64];
-	char RoomIP[32];
-	DWORD Profile;
-	char GameID[64];
-	int MaxPlayers;
+    char Name[128] = {0};
+    char Nick[64] = {0};
+    char RoomIP[32] = {0};
+	DWORD Profile=0;
+    char GameID[64] = {0};
+	int MaxPlayers=0;
 
     //Additional members to pass data from server to main exe / CommCore
-    long player_id; //Necessary for host to send udp hole punching packets
-    unsigned short port; //Udp hole punching port or real port of game host
-    unsigned udp_interval; //Udp hole punching packet interval
-    char udp_server[16]; //IP of udp hole punching server
+    long player_id=0; //Necessary for host to send udp hole punching packets
+    unsigned short port=0; //Udp hole punching port or real port of game host
+    unsigned udp_interval=0; //Udp hole punching packet interval
+    char udp_server[16] = {0}; //IP of udp hole punching server
 };
 CIMPORT
 int Process_GSC_ChatWindow(bool Active,RoomInfo* RIF);
@@ -90,13 +90,13 @@ void LeaveGSCRoom();
 CIMPORT
 void StartGSCGame(char* Options,char* Map,int NPlayers,int* Profiles,char** Nations,int* Teams,int* Colors);
 struct OnePlayerReport{
-	DWORD Profile;
-	byte State;
-	word Score;
-	word Population;
-	DWORD ReachRes[6];
-	word NBornP;
-	word NBornUnits;
+	DWORD Profile=0;
+	byte State=0;
+	word Score=0;
+	word Population=0;
+    DWORD ReachRes[6] = {0};
+	word NBornP=0;
+	word NBornUnits=0;
 };
 CIMPORT
 void ReportGSCGame(int time,int NPlayers,OnePlayerReport* OPR);
