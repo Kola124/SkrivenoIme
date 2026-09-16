@@ -806,21 +806,21 @@ void SetPixLine(int x0,int y0,int x1,int y1,int R,int h0,int h1){
 	byte Buf[1200];
 	byte Buf0[1200];
 
-	float Dx=x1-x0;
-	float Dy=y1-y0;
+	float Dx=(float)(x1-x0);
+	float Dy=(float)(y1-y0);
 	float D=Dx*Dx+Dy*Dy;
 
 	if(!D){
 		SetPixSpot(x0,y0,R,h0,h1);
 		return;
 	};
-	float fx0=x0;
-	float fx1=x1;
-	float fy0=y0;
-	float fy1=y1;
-	float fR=R;
-	float fh0=h0;
-	float fh1=h1;
+	float fx0=(float)(x0);
+	float fx1=(float)(x1);
+	float fy0=(float)(y0);
+	float fy1=(float)(y1);
+	float fR=(float)(R);
+	float fh0=(float)(h0);
+	float fh1=(float)(h1);
 	float fr4=fR*fR*fR*fR;
 	bool first=1;
 	for(int vx=cx0;vx<=cx1;vx++){
@@ -835,8 +835,8 @@ void SetPixLine(int x0,int y0,int x1,int y1,int R,int h0,int h1){
 			bool change=0;
 			for(int iy=0;iy<32;iy++){
 				for(int ix=0;ix<32;ix++){
-					float x=xx0+ix;
-					float y=yy0+iy;
+					float x=(float)(xx0+ix);
+					float y=(float)(yy0+iy);
 					float N=(((x-x0)*Dx+(y-y0)*Dy))/D;
 					float r;
 					if(N<0)r=sqrt((x-fx0)*(x-fx0)+(y-fy0)*(y-fy0));
@@ -925,7 +925,7 @@ void SetPixLine(int x0,int y0,int x1,int y1,int R,int R1,int h0,int h1,int h01){
 	if(R1<1)R1=1;
 	if(R>63)R=63;
 	if(R1>63)R1=63;
-	float MaxR=R1>R?R1:R;
+	float MaxR=(float)(R1>R?R1:R);
 	int maxh=h0>h01?h0:h01;
 	CheckPrecomp(R);
 	int stofs=GetTexStartOfs(x0,y0);
@@ -947,21 +947,21 @@ void SetPixLine(int x0,int y0,int x1,int y1,int R,int R1,int h0,int h1,int h01){
 	byte Buf[1200];
 	byte Buf0[1200];
 
-	float Dx=x1-x0;
-	float Dy=y1-y0;
+	float Dx=(float)(x1-x0);
+	float Dy=(float)(y1-y0);
 	float D=Dx*Dx+Dy*Dy;
 
 	if(!D){
 		SetPixSpot(x1,y1,(int)round(MaxR),maxh,h1);
 		return;
 	};
-	float fx0=x0;
-	float fx1=x1;
-	float fy0=y0;
-	float fy1=y1;
-	float fR=R;
-	float fh0=h0;
-	float fh1=h1;
+	float fx0=(float)(x0);
+	float fx1=(float)(x1);
+	float fy0=(float)(y0);
+	float fy1=(float)(y1);
+	float fR=(float)(R);
+	float fh0=(float)(h0);
+	float fh1=(float)(h1);
 	float fr4=fR*fR*fR*fR;
 	bool first=1;
 	for(int vx=cx0;vx<=cx1;vx++){
@@ -976,8 +976,8 @@ void SetPixLine(int x0,int y0,int x1,int y1,int R,int R1,int h0,int h1,int h01){
 			bool change=0;
 			for(int iy=0;iy<32;iy++){
 				for(int ix=0;ix<32;ix++){
-					float x=xx0+ix;
-					float y=yy0+iy;
+					float x=(float)(xx0+ix);
+					float y=(float)(yy0+iy);
 					float N=(((x-x0)*Dx+(y-y0)*Dy))/D;
 					float r;
 					if(N<0){
@@ -2766,7 +2766,7 @@ void DynDrawWaterFlow(int x,int y,int cx,int cy){
 	if(cx<0||cx>=MaxWX||cy<=0||cy>(MaxWX>>1))return;
 	int ofs=cx+(cy*MaxWX*2);
 
-	float v=cx*cy;
+	float v=(float)(cx*cy);
 	v=40.0;//+27.0*sin(v/10.0);
 	int z1=int(WaterDeep[ofs])-127;
 	int z2=int(WaterDeep[ofs+1])-127;
@@ -3386,7 +3386,7 @@ bool OneWavesGroup::BornAt(int x,int y){
 	int DD=GetDeep2(x,y+16);
 	int DX=DR-DL;
 	int DY=DD-DU;
-	float Phase=rand();
+	float Phase=(float)(rand());
 	if(DX||DY){
 		byte dir=GetDir(-DX,-DY)+(rand()&15)-7;
 		int RX=(TSin[dir]*3)>>5;
