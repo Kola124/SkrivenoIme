@@ -178,37 +178,29 @@ int TotalSize=0;
 //#include "FMM\FMM.H"
 void* FM_Malloc(int size) {
     if (size <= 0) return nullptr;
-    
     std::lock_guard<std::mutex> lock(g_memMutex);
-    
-    void* ptr = ::calloc(size + sizeof(DWORD), 1);  // Use :: to bypass macro
-    if (ptr) {
-        ((DWORD*)ptr)[0] = 0xCAFEBABE;
-        g_totalSize++;
-        return (void*)((DWORD*)ptr + 1);  // Return after header
-    }
-    return nullptr;
+    void* ptr = ::calloc(size, 1);
+    if (ptr) g_totalSize++;
+    return ptr;
 }
 void FM_free(void* ptr) {
     if (!ptr || (uintptr_t)ptr < 0x10000) return;
-    
     std::lock_guard<std::mutex> lock(g_memMutex);
-    
-    DWORD* header = ((DWORD*)ptr) - 1;  // Get actual allocation
-    
-    // Validate header
-    if (header[0] != 0xCAFEBABE) return;
-    
-    header[0] = 0xDEADBEEF;
-    ::free(header);  // Use :: to bypass macro
-    
+    ::free(ptr);
     if (g_totalSize > 0) g_totalSize--;
+}
+void* FM_Realloc(void* ptr, size_t size) {
+    if (!ptr) return FM_Malloc((int)size);
+    if (size == 0) { FM_free(ptr); return nullptr; }
+    std::lock_guard<std::mutex> lock(g_memMutex);
+    return ::realloc(ptr, size);
 }
 
 //Using Global heap
 #define malloc FM_Malloc
 #define calloc(a,b) FM_Malloc((a)*(b))
 #define free FM_free
+#define realloc(p,s) FM_Realloc((p),(s))
 
 //#endif //_USE3D
 
@@ -310,15 +302,20 @@ void CheckDynamicalPtr(void* ptr){
 };
 CEXPORT
 void _ExFree(void* ptr){
-	if(!ptr)return;
-	DWORD* Ptr=(DWORD*)ptr;
-	try{
-		//if(Ptr&&Ptr[0]!=0xcdcdcdcd){
-			free(ptr);
+	if(!ptr || (uintptr_t)ptr < 0x10000) return;
+	__try {
+
+		DWORD* markers = (DWORD*)ptr;
+		if(markers[-1] == (DWORD)'TRTS') {
+			int size = (int)markers[-2];
+			if(size >= 0) g_allocSize.fetch_sub(size);
+			markers[-1] = 0xDEADBEEF;   
+			::free(markers - 2);        
 			TotalSize--;
-		//};
-	}catch(...){
-	};
+		}
+
+	} __except(EXCEPTION_EXECUTE_HANDLER) {
+	}
 };
 bool CheckMemBlock(byte* ptr) {
     __try {

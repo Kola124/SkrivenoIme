@@ -507,7 +507,7 @@ STAGENEXT:
 				};
 				word s=((word*)(BUF+1))[0];
 				word s1=0xAE;
-				for(int j=3;j<dwMsgSize;j++)s1+=BUF[j];
+				for(unsigned int j=3;j<dwMsgSize;j++)s1+=BUF[j];
 				
 			}else
 			if((BUF[0]==0xAE||BUF[0]==0xBF)&&dwMsgSize<2048){
@@ -520,7 +520,7 @@ STAGENEXT:
 				//assert(mycl!=7);
 				word s=((word*)(BUF+1))[0];
 				word s1=0xAE;
-				for(int j=3;j<dwMsgSize;j++)s1+=BUF[j];
+				for(unsigned int j=3;j<dwMsgSize;j++)s1+=BUF[j];
 				byte rtx=RealTime;
 				if(rtx==BUF[3])NFROMID1[ii]++;
 				rtx++;
@@ -1491,7 +1491,7 @@ bool SendToAllPlayersEx(DWORD Size,LPVOID lpData,bool G){
 	do{
 		if(DoNewInet){
 			hr=IPCORE.SendToAll((byte*)lpData,Size,G);
-			if(hr)hr==DP_OK;
+			if(hr)hr=DP_OK;
 			else hr=1;
 		}else{
 			if(G)hr=lpDirectPlay3A->Send(MyDPID,DPID_ALLPLAYERS,DPSEND_GUARANTEED,lpData,Size);
@@ -1539,7 +1539,7 @@ bool SendToAllPlayersExNew(DWORD Size,LPVOID lpData,bool G){
 	int ttt=GetRealTime();
 	if(DoNewInet){
 		hr=IPCORE.SendToAll((byte*)lpData,Size,G);
-		if(hr)hr==DP_OK;
+		if(hr)hr=DP_OK;
 		else hr=1;
 	}else{
 		if(G)hr=lpDirectPlay3A->Send(MyDPID,DPID_ALLPLAYERS,DPSEND_GUARANTEED,lpData,Size);
@@ -1586,7 +1586,7 @@ bool SendToPlayerEx(DWORD Size,LPVOID lpData,DWORD DPID){
 	do{
 		if(DoNewInet){
 			hr=IPCORE.SendToPeer(DPID,(byte*)lpData,Size,0);
-			if(hr)hr==DP_OK;
+			if(hr)hr=DP_OK;
 			else hr=1;
 		}else hr=lpDirectPlay3A->Send(MyDPID,DPID,0,lpData,Size);
 		if(hr==DP_OK){
@@ -1619,7 +1619,7 @@ bool SendToPlayerExNew(DWORD Size,LPVOID lpData,DWORD DPID){
 	HRESULT hr;
 	if(DoNewInet){
 		hr=IPCORE.SendToPeer(DPID,(byte*)lpData,Size,0);
-		if(hr)hr==DP_OK;
+		if(hr)hr=DP_OK;
 		else hr=1;
 	}else hr=lpDirectPlay3A->Send(MyDPID,DPID,0,lpData,Size);
 	if(hr==DP_OK){
@@ -1687,7 +1687,7 @@ void NetCash::Add(byte* Data,int size,DPID idTo){
 	}else AddOne(Data,size,idTo);
 };
 void NetCash::Process(){
-	int t0=GetRealTime();
+	unsigned int t0=GetRealTime();
 	for(int i=0;i<NCells;i++){
 		if(CELLS[i].SendTime<t0){
 			bool done;
@@ -1755,7 +1755,7 @@ bool SendToServer(DWORD Size,LPVOID lpData){
 	do{
 		if(DoNewInet){
 			hr=IPCORE.SendToPeer(ServerDPID,(byte*)lpData,Size,1);
-			if(hr)hr==DP_OK;
+			if(hr)hr=DP_OK;
 			else hr=1;
 		}else hr=lpDirectPlay3A->Send(MyDPID,ServerDPID,
 		DPSEND_GUARANTEED,lpData,Size);

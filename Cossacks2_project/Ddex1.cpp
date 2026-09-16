@@ -4035,7 +4035,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 
 	SetCDVolume(MidiSound);
 	//mpl_Play("mp3\\co_Green01.mp3");
-	//InitWinTab();
+	InitWinTab();
 	LoadFog(2);
 	LoadPalette("1\\agew_1.pal");
 	MemReport("doInit");

@@ -459,7 +459,7 @@ bool UnderstandUpgrade(GFILE* f,char* UpgName,Nation* NT,char* name,int* lpLine,
 	if(!strcmp(gg,"NONE"))p4=-1;else{
 		p4=GetIconByName(gg);
 		if(p4==-1){
-            sprintf_s(gy,sizeof(gy),"%s,Line %d :%s: Invalid icon ID:%s",name,line,Sect,gx,gg);
+            sprintf_s(gy,sizeof(gy),"%s,Line %d :%s: Invalid icon ID:%s, %s",name,line,Sect,gx,gg);
 			ErrM(gy);
 		};
 	};
