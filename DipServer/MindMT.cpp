@@ -1,4 +1,4 @@
-#include "CommonDip.h"
+﻿#include "CommonDip.h"
 #include "UnitsGroup.h"
 #include "Mind.h"
 #include "Script.h"
@@ -380,248 +380,395 @@ void Mind::Process(){
 }
 
 // MULTITHREADED Process0
-void Mind::Process0() {
-    if (NI == 0xFF) return;
-    
-    auto nt = std::make_unique<int[]>(2048);
-    auto xt = std::make_unique<int[]>(2048);
-    auto yt = std::make_unique<int[]>(2048);
-    
-    GetEnemyTopInfo(NI, nt.get(), xt.get(), yt.get());
-    SetDangerMap(nt.get());
-}
+void Mind::Process0(){
+    if(NI == 0xFF) return;
 
-// MULTITHREADED Process1 - Parallel squad processing
-void Mind::Process1() {
-    if (NI == 0xFF) return;
+    int NZ = GetNZones();
+    if(NZ <= 0) NZ = 1;
 
-    // All large arrays moved to heap
-    auto nt = std::make_unique<int[]>(2048);
-    auto xt = std::make_unique<int[]>(2048);
-    auto yt = std::make_unique<int[]>(2048);
-    
-    GetEnemyTopInfo(NI, nt.get(), xt.get(), yt.get());
+    auto nt = std::make_unique<int[]>(NZ);
+    auto xt = std::make_unique<int[]>(NZ);
+    auto yt = std::make_unique<int[]>(NZ);
+    memset(nt.get(), 0, NZ * sizeof(int));
+    memset(xt.get(), 0, NZ * sizeof(int));
+    memset(yt.get(), 0, NZ * sizeof(int));
+
+    {
+        std::lock_guard<std::mutex> lock(g_gameApiMutex);
+        GetEnemyTopInfo(NI, nt.get(), xt.get(), yt.get());
+        SetDangerMap(nt.get());
+    }
+
     CleanGroup(&New);
     CleanGroup(&Panic);
 
     int Time = GetGlobalTime();
 
-    if (Time - LastGlobalMove > 50) {
-        LastGlobalMove = Time + GetRND(30);
+    for(int i = 0; i < NSqd; i++){
+        Squad* SQD = Sqd + i;
+        GAMEOBJ* Group = &SQD->Group;
+        int NMen = CleanGroup(Group);		
+        if(NMen && Time - SQD->LastMoveTime > 100){
 
-        ClearAZones();
+            SQD->LastMoveTime = Time + GetRND(100);
 
-        auto IDSS = std::make_unique<word[]>(4096);
-        memset(IDSS.get(), 0xFF, 4096 * sizeof(word));
-        CreateTopListEnArmyBtl(IDSS.get(), NI, 1);
+            int xc, yc;
+            if(GetGrpCenter(Group, &xc, &yc)){
+                int top = GetTopZone(xc, yc);
+                if(top >= 0xFFFE){
+                    OneUnit UN;
+                    GetUnitInfo(Group, 0, &UN);
+                    xc = UN.x;
+                    yc = UN.y;
+                    top = GetTopZone(xc, yc);
+                }
+                if(top >= 0 && top < NZ){		
+                    SQD->Top = top;
 
-        auto REAR = std::make_unique<word[]>(4096);
-        memset(REAR.get(), 0xFF, 4096 * sizeof(word));
-        CreateFriendBuildingsTopList(REAR.get(), NI);
+                    std::vector<int> Fear(2048, 1);
 
-        word ZREAR = 0xFFFF;
-        int NZ = GetNZones();
-        for (int z = 0; z < NZ; z++) {
-            if (REAR[z] != 0xFFFF) {
-                ZREAR = z;
-                break;
-            }
-        }
+                    std::vector<word> IDS0(NZ, 0xFFFF);
+                    std::vector<word> IDS1(NZ, 0xFFFF);
 
-        auto dang = std::make_unique<short[]>(4096);
-        memset(dang.get(), 0, 4096 * sizeof(short));
+                    std::vector<int> Dang(NZ, 0);
 
-        int maxdang;
-        word DST = 0xFFFF;
-        int TZ = 0xFFFF;
-        if (ZREAR != 0xFFFF) TZ = FindNextZoneOnTheSafeWayToObject(ZREAR, dang.get(), IDSS.get(), &maxdang, 5, &DST);
-        
-        int MaxDist = 1000;
-        if (TZ != 0xFFFF && ZREAR != 0xFFFF) {
-            word* WL = NULL;
-            int NW = GetLastFullWay(&WL);
-            if (NW > 0) {
-                word dst = GetZonesDist(ZREAR, WL[0]);
-                if (dst < MaxDist) {
-                    MaxDist = dst;
+                    {
+                        std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                        if(!AddEnemyCaptBuildTopList(IDS0.data(), NI)){
+                            AddEnemyCenterTopList(IDS0.data(), NI);
+                        }
+                        CreateTopListEnArmyBtl(IDS1.data(), NI, NMen >> 2);
+                        CreateDangerMapBattle(NI, Dang.data(), NZ, Fear.data(), 2);
+                    }
+
+                    std::vector<short> SDang(NZ);
+                    for(int s = 0; s < NZ; s++) SDang[s] = short(Dang[s]);
+
+                    SQD->FindTargetZone(SDang.data(), IDS1.data(),
+                        SQD->TarTop[1], SQD->TarZone[1][0], SQD->TarDist[1][0]);
+
+                    int zf = SQD->TarZone[SQD->Target][SQD->MovingType];
+                    if(zf != 0xFFFF && zf != top){
+                        int dx, dy;
+                        GetTopZRealCoor(zf, &dx, &dy);
+
+                        int dir = 512;
+                        word TT = SQD->TarTop[SQD->Target];
+                        int tx, ty;
+                        if(TT != zf && GetTopZRealCoor(TT, &tx, &ty)){
+                            dir = getDir(tx - dx, ty - dy);
+                        }
+
+                        std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                        if(SQD->Brig != 0xFFFF) SelectUnits(Group, 0);
+                        SGP_MoveToPoint(NI, Group, dx, dy, dir, 0, 0, 1);
+                    }
                 }
             }
-        }
-        if (MaxDist > 23) MaxDist -= 13;
-
-        auto Fear = std::make_unique<int[]>(256);                    
-        for (int j = 0; j < 256; j++) Fear[j] = 1;
-
-        auto Dang = std::make_unique<int[]>(2 * 4096);  // Flattened 2D array
-        memset(Dang.get(), 0, 2 * 4096 * sizeof(int));
-
-        CreateDangerMapBattle(NI, &Dang[4096], GetNZones(), Fear.get(), 2);  // Dang[1]
-
-        // PARALLEL SQUAD PROCESSING
-        std::vector<std::future<void>> futures;
-        
-        for (int i = 0; i < NSqd; i++) {
-            futures.push_back(std::async(std::launch::async, [this, i, &Dang, &IDSS, ZREAR, MaxDist, &nt, &xt, &yt]() {
-                Squad* SQD = Sqd + i;
-                GAMEOBJ* Group = &SQD->Group;
-                int NMen = CleanGroup(Group);
-                if (NMen) {
-                    int xc, yc;
-                    if (GetGrpCenter(Group, &xc, &yc)) {
-                        int top = GetTopZone(xc, yc);
-                        if (top >= 0xFFFE) {
-                            OneUnit UN;
-                            GetUnitInfo(Group, 0, &UN);
-                            xc = UN.x;
-                            yc = UN.y;
-                            top = GetTopZone(xc, yc);
-                        }
-                        if (top >= 0 && top < GetNZones()) {        
-                            SQD->Top = top;
-
-                            // Thread-local heap allocations
-                            auto IDS_local = std::make_unique<word[]>(3 * 4096);
-                            memset(IDS_local.get(), 0xFF, 3 * 4096 * sizeof(word));
-
-                            bool CaptureCenter = false;
-                            if (!AddEnemyCaptBuildTopList(IDS_local.get(), NI)) {
-                                AddEnemyCenterTopList(IDS_local.get(), NI);
-                                CaptureCenter = true;
-                            }
-
-                            CreateTopListEnArmyBtl(&IDS_local[4096], NI, NMen >> 2);  // IDS_local[1]
-
-                            for (int t = 0; t < 2; t++) {
-                                for (int d = 0; d < 2; d++) {
-                                    if (t == 1 && d == 0) {
-                                        auto SDang = std::make_unique<short[]>(4096);
-                                        int NZ = GetNZones();
-                                        for (int s = 0; s < NZ; s++) SDang[s] = Dang[d * 4096 + s];
-                                        
-                                        auto IDSS_local = std::make_unique<word[]>(4096);
-                                        memcpy(IDSS_local.get(), IDSS.get(), 4096 * sizeof(word));
-                                        
-                                        // Note: Need to adjust FindTargetZone signature to accept pointers
-                                        // SQD->FindTargetZone(SDang.get(), IDSS_local.get(), SQD->TarTop[t], SQD->TarZone[t][d], SQD->TarDist[t][d]);
-                                    }
-                                }
-                            }
-
-                            bool moving = true;
-                            int zt = SQD->TarTop[1];
-                            if (zt == 0xFFFF && i) {
-                                zt = Sqd[i - 1].TarTop[1];
-                            }
-
-                            if (moving && zt != 0xFFFF) {
-                                word zf;
-                                word zb = ZREAR;
-                                
-                                zf = 0xFFFF;
-                                int fdst = 1000;
-                                int zbb = zb;                        
-                                
-                                int xx, yy;
-                                if (GetTopZRealCoor(zb, &xx, &yy)) {
-                                    int x, y;
-                                    if (GetTopZRealCoor(zt, &x, &y)) {
-                                        int Dir = getDir(x - xx, y - yy);
-
-                                        auto IDSS_local2 = std::make_unique<word[]>(4096);
-                                        memcpy(IDSS_local2.get(), IDSS.get(), 4096 * sizeof(word));
-
-                                        int NZ = GetNZones();
-                                        for (int z = 0; z < NZ; z++) {                                            
-                                            if (IDSS_local2[z] != 0xFFFF && GetTopZRealCoor(z, &x, &y)) {
-                                                int dir = abs(getDir(x - xx, y - yy) - Dir);
-                                                if (dir < 15) {
-                                                    IDSS_local2[z] = 0xFFFF;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                                int tdst = 10000;
-
-                                zb = GetNextZone(zb, zt);
-                                while (zb != 0xFFFF && zb != zt) {
-                                    int wdst = GetZonesDist(zb, zt);
-                                    int bdst = GetZonesDist(zb, zbb);
-                                    
-                                    if (wdst < fdst && bdst < MaxDist) {
-                                        fdst = wdst;
-                                        tdst = bdst;
-                                        zf = zb;
-                                    }
-                                    zb = GetNextZone(zb, zt);
-                                }
-                                
-                                int btogdist = 1000;
-                                if (zbb != 0xFFFF) {
-                                    btogdist = GetZonesDist(zbb, zt);
-                                }
-                                                            
-                                if (btogdist > 19 && zf != 0xFFFF) {
-                                    int dx, dy;
-                                    GetTopZRealCoor(zf, &dx, &dy);
-                                    
-                                    int dir = 512;
-                                    word TT = zt;
-                                    
-                                    int tx = 0, ty = 0, tn = 0;
-                                    
-                                    int nz = GetNZones();
-                                    for (int j = 0; j < nz; j++) {
-                                        int nn = nt[j];
-                                        if (nn) {
-                                            word ds = GetZonesDist(j, zt);
-                                            if (ds < 0xFFFE) {
-                                                if (ds > 1) nn /= ds;
-                                                if (nn) {
-                                                    tx += xt[j] * nn;
-                                                    ty += yt[j] * nn;
-                                                    tn += nn;
-                                                }
-                                            }
-                                        }
-                                    }
-                                    if (tn) {
-                                        tx /= tn;
-                                        ty /= tn;
-                                        dir = getDir(tx - dx, ty - dy);
-                                    }
-                                    
-                                    if (SQD->Brig != 0xFFFF) SelectUnits(Group, 0);
-                                    
-                                    {
-                                        std::lock_guard<std::mutex> lock(g_gameApiMutex);
-                                        SGP_MoveToPoint(NI, Group, dx + 16 - GetRND(32), dy + 16 - GetRND(32), dir, 0, 0, 1);
-                                        SetUnitsState(Group, 0, 0, 0, 0);
-                                    }
-                                } else {
-                                    int d = GetZonesDist(top, zt);
-                                    {
-                                        std::lock_guard<std::mutex> lock(g_gameApiMutex);
-                                        if (d < 12) {
-                                            SetUnitsState(Group, 1, 1, 0, 0);
-                                        } else {
-                                            SetUnitsState(Group, 0, 1, 0, 0);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }                    
-                }
-            }));
-        }
-
-        // Wait for all squads to finish processing
-        for (auto& f : futures) {
-            f.get();
         }
     }
+
+    if(Time - LastGlobalMove > 90){
+        LastGlobalMove = Time + 100 + GetRND(200);
+
+        NTrgList = 0;
+        memset(NSqdList, 0, sizeof(NSqdList));
+
+        for(int i = 0; i < NSqd; i++){
+            Squad* SQD = Sqd + i;
+            GAMEOBJ* Group = &SQD->Group;
+            int NMen = GetNUnits(Group);			
+            if(NMen){
+                word TT = SQD->TarTop[1];
+                word DST = SQD->TarDist[1][0];
+
+                if(DST > 50){
+                    SQD->Target = 0;
+                    SQD->MovingType = 0;
+                } else {
+                    word MinTT = 0xFFFF;
+                    word MinDst = 130;
+                    word TargID = 0xFFFF;
+
+                    for(int t = 0; t < NTrgList; t++){
+                        word dst = GetZonesDist(TT, TrgList[t]);
+                        if(dst < MinDst){
+                            MinTT = TrgList[t];
+                            MinDst = dst;
+                            TargID = t;
+                        }
+                    }
+
+                    if(MinTT == 0xFFFF){
+                        TrgList[NTrgList] = TT;
+                        TargID = NTrgList;
+                        NTrgList++;
+                    }
+
+                    if(TargID != 0xFFFF){
+                        word NS = NSqdList[TargID];
+                        SqdList[TargID][NS] = i;
+                        DstList[TargID][0][NS] = SQD->TarDist[1][0];
+                        DstList[TargID][1][NS] = SQD->TarDist[1][1];
+                        NSqdList[TargID]++;
+                    }
+                }
+            }
+        }
+
+        for(int i = 0; i < NTrgList; i++){
+            word MaxDirDist = 0;
+            word SqdID = 0xFFFF;
+            word NSL = NSqdList[i];
+
+            for(int s = 0; s < NSL; s++){
+                if(DstList[i][0][s] > MaxDirDist){
+                    MaxDirDist = DstList[i][0][s];
+                    SqdID = s;
+                }
+            }
+
+            if(SqdID != 0xFFFF){
+                for(int s = 0; s < NSL; s++){
+                    Squad* SQD = Sqd + SqdList[i][s];
+                    if(DstList[i][0][s] < MaxDirDist - 3){
+                        SQD->Target = 1;
+                        SQD->MovingType = 1;
+                    } else {
+                        SQD->Target = 1;
+                        SQD->MovingType = 0;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// MULTITHREADED Process1 - Parallel squad processing
+void Mind::Process1(){
+	if(NI==0xFF) return;
+
+	int NZ = GetNZones();
+	if(NZ <= 0) NZ = 1;
+
+	auto nt = std::make_unique<int[]>(NZ);
+	auto xt = std::make_unique<int[]>(NZ);
+	auto yt = std::make_unique<int[]>(NZ);
+	memset(nt.get(),0,NZ*sizeof(int));
+	memset(xt.get(),0,NZ*sizeof(int));
+	memset(yt.get(),0,NZ*sizeof(int));
+
+	{
+		std::lock_guard<std::mutex> lock(g_gameApiMutex);
+		GetEnemyTopInfo(NI, nt.get(), xt.get(), yt.get());
+	}
+
+	CleanGroup(&New);
+	CleanGroup(&Panic);
+
+	int Time=GetGlobalTime();
+
+	if(Time-LastGlobalMove>50){
+		LastGlobalMove=Time+GetRND(30);
+
+		ClearAZones();
+
+		auto IDSS = std::make_unique<word[]>(NZ);
+		for(int i=0;i<NZ;i++) IDSS[i]=0xFFFF;
+		{
+			std::lock_guard<std::mutex> lock(g_gameApiMutex);
+			CreateTopListEnArmyBtl(IDSS.get(),NI,1);
+		}
+
+		auto REAR = std::make_unique<word[]>(NZ);
+		for(int i=0;i<NZ;i++) REAR[i]=0xFFFF;
+		{
+			std::lock_guard<std::mutex> lock(g_gameApiMutex);
+			CreateFriendBuildingsTopList(REAR.get(),NI);
+		}
+
+		word ZREAR=0xFFFF;
+		for(int z=0;z<NZ;z++){
+			if(REAR[z]!=0xFFFF){
+				ZREAR=z;
+				break;
+			}
+		}
+
+		auto dang = std::make_unique<short[]>(NZ);
+		memset(dang.get(),0,NZ*sizeof(short));
+
+		int maxdang;
+		word DST=0xFFFF;
+		int TZ=0xFFFF;
+		if(ZREAR!=0xFFFF)
+			TZ=FindNextZoneOnTheSafeWayToObject(ZREAR,dang.get(),IDSS.get(),&maxdang,5,&DST);
+
+		int MaxDist=1000;
+		if(TZ!=0xFFFF && ZREAR!=0xFFFF){
+			word* WL=NULL;
+			int NW=GetLastFullWay(&WL);
+			if(NW>0){
+				word dst=GetZonesDist(ZREAR,WL[0]);
+				if(dst<MaxDist) MaxDist=dst;
+			}
+		}
+		if(MaxDist>23) MaxDist-=13;
+
+		int Fear[256];
+		for(int j=0;j<256;j++)Fear[j]=1;
+
+		auto Dang = std::make_unique<int[]>(NZ);
+		memset(Dang.get(),0,NZ*sizeof(int));
+		{
+			std::lock_guard<std::mutex> lock(g_gameApiMutex);
+			CreateDangerMapBattle(NI,Dang.get(),NZ,Fear,2);
+		}
+
+		// ---------- PARALLEL: per-squad target search and movement ----------
+		std::vector<std::future<void>> futures;
+
+		for(int i=0;i<NSqd;i++){
+			futures.push_back(std::async(std::launch::async,
+				[this, i, NZ, ZREAR, MaxDist,
+				 &nt, &xt, &yt, &IDSS, &Dang]()
+			{
+				Squad* SQD = Sqd + i;
+				GAMEOBJ* Group = &SQD->Group;
+				int NMen = CleanGroup(Group);
+				if(!NMen) return;
+
+				int xc, yc;
+				if(!GetGrpCenter(Group, &xc, &yc)) return;
+
+				int top = GetTopZone(xc, yc);
+				if(top >= 0xFFFE){
+					OneUnit UN;
+					GetUnitInfo(Group, 0, &UN);
+					xc = UN.x;
+					yc = UN.y;
+					top = GetTopZone(xc, yc);
+				}
+				if(top < 0 || top >= NZ) return;
+
+				SQD->Top = top;
+
+				// thread-local copies so we don't touch shared IDSS/Dang
+				auto IDSS_local = std::make_unique<word[]>(NZ);
+				memcpy(IDSS_local.get(), IDSS.get(), NZ*sizeof(word));
+
+				auto Dang_local = std::make_unique<int[]>(NZ);
+				memcpy(Dang_local.get(), Dang.get(), NZ*sizeof(int));
+
+				{
+					std::lock_guard<std::mutex> lock(g_gameApiMutex);
+					SelectUnits(Group, 0);
+					char name[256];
+					sprintf(name, "Squad %d", i);
+					CreateAGroup(NI, name);
+				}
+
+				auto IDS0 = std::make_unique<word[]>(NZ);
+				for(int q=0;q<NZ;q++) IDS0[q]=0xFFFF;
+				auto IDS1 = std::make_unique<word[]>(NZ);
+				for(int q=0;q<NZ;q++) IDS1[q]=0xFFFF;
+
+				{
+					std::lock_guard<std::mutex> lock(g_gameApiMutex);
+					if(!AddEnemyCaptBuildTopList(IDS0.get(), NI)){
+						AddEnemyCenterTopList(IDS0.get(), NI);
+					}
+					CreateTopListEnArmyBtl(IDS1.get(), NI, NMen >> 2);
+				}
+
+				auto SDang = std::make_unique<short[]>(NZ);
+				for(int s=0;s<NZ;s++) SDang[s] = short(Dang_local[s]);
+				SQD->FindTargetZone(SDang.get(), IDSS_local.get(),
+					SQD->TarTop[1], SQD->TarZone[1][0], SQD->TarDist[1][0]);
+
+				bool moving = true;
+				int zt = SQD->TarTop[1];
+				if(zt == 0xFFFF && i)
+					zt = Sqd[i-1].TarTop[1];
+
+				if(!(moving && zt != 0xFFFF)) return;
+
+				word zf = 0xFFFF;
+				word zb = ZREAR;
+				int fdst = 1000;
+				int zbb = zb;
+
+				int xx, yy;
+				if(GetTopZRealCoor(zb, &xx, &yy)){
+					int x, y;
+					if(GetTopZRealCoor(zt, &x, &y)){
+						int Dir = getDir(x - xx, y - yy);
+						for(int z = 0; z < NZ; z++){
+							if(IDSS_local[z] != 0xFFFF && GetTopZRealCoor(z, &x, &y)){
+								int dir = abs(getDir(x - xx, y - yy) - Dir);
+								if(dir < 15) IDSS_local[z] = 0xFFFF;
+							}
+						}
+					}
+				}
+
+				int tdst = 10000;
+				zb = GetNextZone(zb, zt);
+				while(zb != 0xFFFF && zb != zt){
+					int wdst = GetZonesDist(zb, zt);
+					int bdst = GetZonesDist(zb, zbb);
+					if(wdst < fdst && bdst < MaxDist){
+						fdst = wdst;
+						tdst = bdst;
+						zf = zb;
+					}
+					zb = GetNextZone(zb, zt);
+				}
+
+				int btogdist = 1000;
+				if(zbb != 0xFFFF) btogdist = GetZonesDist(zbb, zt);
+
+				if(btogdist > 19 && zf != 0xFFFF){
+					int dx, dy;
+					GetTopZRealCoor(zf, &dx, &dy);
+
+					int dir = 512;
+					int tx=0, ty=0, tn=0;
+					for(int j=0;j<NZ;j++){
+						int nn = nt[j];
+						if(nn){
+							word ds = GetZonesDist(j, zt);
+							if(ds < 0xFFFE){
+								if(ds > 1) nn /= ds;
+								if(nn){
+									tx += xt[j] * nn;
+									ty += yt[j] * nn;
+									tn += nn;
+								}
+							}
+						}
+					}
+					if(tn){
+						tx /= tn;
+						ty /= tn;
+						dir = getDir(tx - dx, ty - dy);
+					}
+
+					std::lock_guard<std::mutex> lock(g_gameApiMutex);
+					if(SQD->Brig != 0xFFFF) SelectUnits(Group, 0);
+					SGP_MoveToPoint(NI, Group, dx + 16 - GetRND(32), dy + 16 - GetRND(32), dir, 0, 0, 1);
+					SetUnitsState(Group, 0, 0, 0, 0);
+				}else{
+					int d = GetZonesDist(top, zt);
+					std::lock_guard<std::mutex> lock(g_gameApiMutex);
+					if(d < 12) SetUnitsState(Group, 1, 1, 0, 0);
+					else       SetUnitsState(Group, 0, 1, 0, 0);
+				}
+			}));
+		}
+
+		for(auto& f : futures) f.get();
+	}
 }
 
 void GetArmyMap(int* ArmyMap, int* Dang, ActiveArmy* AA, int& NAA){
@@ -1268,26 +1415,38 @@ void Mind::ProcessCannons(int TimeToStorm){
 }
 
 void Mind::Process3(){
-    if(NI==0xFF) return;
+	if(NI==0xFF) return;
 
-    int Time=GetGlobalTime();
+	int Time=GetGlobalTime();
 
-    if(true){
-        SetGameGoals();
-        SetDangerMap(Dang);
-        RefreshSquadInfo();
-        ClearAZones();
-        GetArmyMap(&ENM,DefTent,DangerMap);
-        MarkArmy();
-        SetLink0();
-        GlobalAttack();
+	if(!true) return;
 
-        switch(ShowMode){
-        case 1:
-            ShowVistrel(); 
-            break;
-        }
-    }
+	SetGameGoals();
+
+	// pass a heap-sized danger map to SetDangerMap
+	int NZ = GetNZones();
+	if(NZ > 0){
+		auto tmp = std::make_unique<int[]>(NZ);
+		for(int i=0;i<NZ;i++) tmp[i] = Dang[i];
+		std::lock_guard<std::mutex> lock(g_gameApiMutex);
+		SetDangerMap(tmp.get());
+	}
+
+	RefreshSquadInfo();
+
+	ClearAZones();
+
+	GetArmyMap(&ENM, DefTent, DangerMap);  // already multithreaded internally in your code
+
+	MarkArmy();
+
+	SetLink0();
+
+	GlobalAttack();
+
+	if(ShowMode == 1){
+		ShowVistrel();
+	}
 }
 
 void Mind::SetLink0(){
@@ -1386,30 +1545,33 @@ void MindCheats(byte NI, char* com) {
 }
 
 int Mind::SetGameGoals(){
-    int NZ=GetNZones();
-    memset(Dang,0,sizeof(Dang));
+	int NZ=GetNZones();
+	if(NZ > 4096) NZ = 4096;   // clamp to the global array size
 
-    ArmyTopInfo* ATI=&ENM.TopInf;
-    CreateArmyInfo(NI,ATI->Life,ATI->Damage, NZ);
-    for(int i=0;i<NZ;i++){
-        if(ATI->Life[i])
-            Dang[i]=ATI->Power[i]=(ATI->Life[i]*ATI->Damage[i])>>10;
-    }
-    
-    for(int i=0;i<NZ;i++) DangerMap[i]=Dang[i];
-    
-    memset(MapVistrel,0,sizeof MapVistrel);
-    memset(MapKartech,0,sizeof MapKartech);
-    SetMapOfShooters(NI,MapVistrel,MapKartech);
-    ShowVistrel();
+	memset(Dang,0,sizeof(Dang));
 
-    memset(DefTent,0xFF,sizeof(DefTent));
-    CreateFriendBuildingsTopList(DefTent,NI);
-    
-    memset(CapTent,0xFF,sizeof(CapTent));
-    AddEnemyCaptBuildTopList(CapTent,NI);
-    
-    return 1;
+	ArmyTopInfo* ATI=&ENM.TopInf;
+	CreateArmyInfo(NI,ATI->Life,ATI->Damage, NZ);
+	for(int i=0;i<NZ;i++){
+		if(ATI->Life[i])
+			Dang[i]=ATI->Power[i]=(ATI->Life[i]*ATI->Damage[i])>>10;
+	}
+	
+	int NZones = GetNZones();
+	for(int i=0;i<NZones && i<4096;i++) DangerMap[i]=Dang[i];
+	
+	memset(MapVistrel,0,sizeof MapVistrel);
+	memset(MapKartech,0,sizeof MapKartech);
+	SetMapOfShooters(NI,MapVistrel,MapKartech);
+	ShowVistrel();
+
+	memset(DefTent,0xFF,sizeof(DefTent));
+	CreateFriendBuildingsTopList(DefTent,NI);
+	
+	memset(CapTent,0xFF,sizeof(CapTent));
+	AddEnemyCaptBuildTopList(CapTent,NI);
+	
+	return 1;
 }
 
 void Mind::RefreshSquadInfo(){
@@ -1463,15 +1625,26 @@ int Mind::GetArmyActorPower(ActiveArmy* arm){
 }
 
 void Mind::GlobalAttack(){
-    for(int i=0;i<NSqd;i++){
-        Squad* SQD=Sqd+i;
-        GAMEOBJ* Group=&SQD->Group;
-        
-        if(SQD->Top<0xFFFE&&SQD->ArmyID!=0xFFFF){
-            SQD->Top=ENM.AA[SQD->ArmyID].TopCenter;            
-            SQD->MoveToTop(NULL);
-        }
-    }
+	int NSqdLocal = NSqd;
+	if(NSqdLocal <= 0) return;
+
+	std::vector<std::future<void>> futures;
+	for(int i = 0; i < NSqdLocal; i++){
+		futures.push_back(std::async(std::launch::async, [this, i](){
+			Squad* SQD = Sqd + i;
+			if(SQD->Top < 0xFFFE && SQD->ArmyID != 0xFFFF){
+				int armyIdx = SQD->ArmyID;
+				// read the army center — no lock needed if SetLink0 already
+				// finished before GlobalAttack (which it did, synchronously)
+				int newTop = ENM.AA[armyIdx].TopCenter;
+				SQD->Top = newTop;
+
+				// MoveToTop takes the mutex for SGP_MoveToPoint / SetUnitsState internally
+				SQD->MoveToTop(NULL);
+			}
+		}));
+	}
+	for(auto& f : futures) f.get();
 }
 
 void Mind::ActivateArmy(ActiveArmy* AA, int NA) {

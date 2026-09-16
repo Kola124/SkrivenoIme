@@ -1,4 +1,4 @@
-#include "CommonDip.h"
+Ôªø#include "CommonDip.h"
 
 #ifndef NOTMULTITHREAD
 #include <thread>
@@ -159,28 +159,12 @@ void DiplomacySystem::PerformCommand(char* Data,int size){
 	};
 };
 
-#pragma warning(disable : 4035)
 int Norma(int x, int y) {
-	__asm{
-		mov		eax,x
-		cmp		eax,0
-		jge		ggg1
-		neg		eax
-ggg1:	mov		ebx,y
-		cmp		ebx,0
-		jge		ggg2
-		neg		ebx
-ggg2:	mov		ecx,eax
-		cmp		eax,ebx
-		ja		ggg3
-		mov		ecx,ebx
-ggg3:	add		ecx,eax
-		add		ecx,ebx
-		shr		ecx,1
-		mov		eax,ecx
-	};
-};
-#pragma warning(default : 4035)
+    int ax = (x < 0) ? -x : x;
+    int ay = (y < 0) ? -y : y;
+    int mx = (ax > ay) ? ax : ay;
+    return (ax + ay + mx) >> 1;
+}
 
 void SetZone(GAMEOBJ* Zone, int X, int Y, int R){
 	Zone->Index = X;
@@ -224,7 +208,7 @@ void DiplomacySystem::Process(){
 				}
 				if(clr!=0xFF){
 					word Data[8];
-					Data[0]=1;// œÂÂ‰‡Ú¸ ÔÎÂÏˇ AI
+					Data[0]=1;// ƒéƒ∫ƒëƒ∫√§≈ï≈à√º ƒè√´ƒ∫ƒõÀô AI
 					Data[1]=i;//Index of tribe
 					Data[2]=clr;//color of player
 					Data[3]=0xFFFF;//Index of shaman
@@ -269,7 +253,7 @@ void DiplomacySystem::Process(){
 			int T0=GetGlobalTime();
 			
 			if(Grp->StormID!=0xFFFF){
-				// ¯ÚÛÏ
+				// ≈ô≈à√≥ƒëƒõ
 				OneUnit u;
 				GetUnitGlobalInfo(Grp->StormID,&u);
 
@@ -279,7 +263,7 @@ void DiplomacySystem::Process(){
 				}
 
 				if(u.Index!=0xFFFF && u.Serial==Grp->StormSN){
-					// ÔÓˆÂÒÒ ¯ÚÛÏ‡
+					// ƒèƒë√Æ√∂ƒ∫≈Ñ≈Ñ ≈ô≈à√≥ƒëƒõ≈ï
 					int x=u.x, y=u.y;
 					GetBuildingEntryPoint(&x, &y, u.Index, 64);
 					
@@ -317,7 +301,7 @@ void DiplomacySystem::Process(){
 					AttackEnemyInZone2(Group,&Z,Grp->Owner);					
 
 				}else{
-					// ¯ÚÛÏ Û‰‡ÎÒˇ
+					// ≈ô≈à√≥ƒëƒõ √≥√§≈ï√´≈ÑÀô
 					if(u.Index!=0xFFFF) DieUnit(u.Index);
 					Grp->StormID=0xFFFF;
 					RemoveGroup(StrGrp,Group);
@@ -325,7 +309,7 @@ void DiplomacySystem::Process(){
 				}
 				
 			}else{
-				// ÔÓ‰„ÓÚÓ‚Í‡ Í ¯ÚÛÏÛ
+				// ƒè√Æ√§ƒÉ√Æ≈à√Æ√¢ƒô≈ï ƒô ≈ô≈à√≥ƒëƒõ√≥
 				if(/*CheckIfNotBusy(&Grp->Group)||*/T0-Grp->LastMoveTime>100){
 					Grp->LastMoveTime=T0;
 					
@@ -910,12 +894,12 @@ void DiplomacySystem::Process(){
 						int Force=GetGroupForce(&Grp->Group);
 						int AliForce=-GetEnemyForce(&Zone,Owner);
 						
-						bool attacking=true;	// Ì‡Ô‡‰‡ÂÏ, ÓÚÒÚÛÔ‡ÂÏ
-						bool moving=true;		// ÔÂÂÈÚË ‚ ÌÓ‚Û˛ ÚÓÔ-ÁÓÌÛ
-						bool thinktwice=false;	// ‰ÛÏ‡Ú¸ ˜‡Ò˜Â
-						bool retreat=false;		// ÔÓÎÌÓÂ ÓÚÒÚÛÔÎÂÌËÂ
+						bool attacking=true;	// √≠≈ïƒè≈ï√§≈ïƒ∫ƒõ, √Æ≈à≈Ñ≈à√≥ƒè≈ïƒ∫ƒõ
+						bool moving=true;		// ƒèƒ∫ƒëƒ∫√©≈àƒç √¢ √≠√Æ√¢√≥≈£ ≈à√Æƒè-√ß√Æ√≠√≥
+						bool thinktwice=false;	// √§√≥ƒõ≈ï≈à√º √∑≈ï≈Ñ√∑ƒ∫
+						bool retreat=false;		// ƒè√Æ√´√≠√Æƒ∫ √Æ≈à≈Ñ≈à√≥ƒè√´ƒ∫√≠ƒçƒ∫
 
-						// ÔÓËÒÍ ˘ËÚ‡
+						// ƒè√Æƒç≈Ñƒô ≈Øƒç≈à≈ï
 						if(Grp->ShieldID>=0xFFFE||!GetNUnits(&STORMS[Grp->ShieldID].Group)){
 							memset(IDS,0xFF,sizeof(IDS));
 							for(int i=0;i<NStorms;i++){
@@ -1031,7 +1015,7 @@ void DiplomacySystem::Process(){
 						//if(attacking&&Grp->LastTop!=0xFFFF) Dang[Grp->LastTop]+=4000;
 
 						// looking for nearest firest
-						//bool find=false;	// ÔÓËÒÍ ÚÓÔ-ÁÓÌ˚ ‰Îˇ ÔËÍ˚ÚËˇ
+						//bool find=false;	// ƒè√Æƒç≈Ñƒô ≈à√Æƒè-√ß√Æ√≠≈± √§√´Àô ƒèƒëƒçƒôƒë≈±≈àƒçÀô
 						/*
 						memset(IDS,0xFF,sizeof(IDS));
 						for(int f=0;f<NFirers;f++){
@@ -1189,20 +1173,33 @@ void ProcessStormRange(DiplomacySystem* dipSystem, int start, int end, int T0) {
         
         DeleteHiddenUnits(StrGrp);
         int N = CleanGroup(Group) + CleanGroup(StrGrp);
-        if(!N) continue;
+        if(!N) {
+            Grp->Top = 0xFFFF;
+            continue;
+        }
 
         if(Grp->StormID != 0xFFFF) {
             OneUnit u;
-            GetUnitGlobalInfo(Grp->StormID, &u);
+            u.Index = 0xFFFF;
+            {
+                std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                GetUnitGlobalInfo(Grp->StormID, &u);
+            }
 
             int xc, yc;
-            if(GetGrpCenter(&Grp->Group, &xc, &yc)) {
-                Grp->Top = GetTopZone(xc, yc);
+            bool haveCenter = false;
+            {
+                std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                haveCenter = GetGrpCenter(&Grp->Group, &xc, &yc) != 0;
             }
+            Grp->Top = haveCenter ? GetTopZone(xc, yc) : 0xFFFF;
 
             if(u.Index != 0xFFFF && u.Serial == Grp->StormSN) {
                 int x = u.x, y = u.y;
-                GetBuildingEntryPoint(&x, &y, u.Index, 64);
+                {
+                    std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                    GetBuildingEntryPoint(&x, &y, u.Index, 64);
+                }
                 
                 GAMEOBJ Z;
                 Z.Type = '@   ' - '   ' + 1000;
@@ -1210,7 +1207,10 @@ void ProcessStormRange(DiplomacySystem* dipSystem, int start, int end, int T0) {
                 Z.Serial = y;
 
                 int NIn = 0;
-                GetBuildingOposit(u.Index, NIn);
+                {
+                    std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                    GetBuildingOposit(u.Index, NIn);
+                }
                 if(NIn > 8) {
                     NIn >>= 1;
                     if(Grp->Difficulty < 3) NIn >>= 1;
@@ -1246,190 +1246,195 @@ void ProcessStormRange(DiplomacySystem* dipSystem, int start, int end, int T0) {
                 RemoveGroup(StrGrp, Group);
 
                 int xc, yc;
-                if(GetGrpCenter(Group, &xc, &yc)) {
-                    int top = GetTopZone(xc, yc);
+                if(!GetGrpCenter(Group, &xc, &yc)) {
+                    Grp->Top = 0xFFFF;
+                    continue;
+                }
+                int top = GetTopZone(xc, yc);
+                Grp->Top = top;
+                
+                if(top >= 0xFFFE) {
+                    OneUnit UN;
+                    GetUnitInfo(Group, 0, &UN);
+                    xc = UN.x;
+                    yc = UN.y;
+                    top = GetTopZone(xc, yc);
                     Grp->Top = top;
+                }
+                
+                if(top >= 0 && top < GetNZones()) {
+                    byte Owner = Grp->Owner;
+                    int NZones = GetNZones();
                     
-                    if(top >= 0xFFFE) {
-                        OneUnit UN;
-                        GetUnitInfo(Group, 0, &UN);
-                        xc = UN.x;
-                        yc = UN.y;
-                        top = GetTopZone(xc, yc);
-                    }
+                    std::vector<short> Dang(NZones, 0);
+                    std::vector<int> Fear(2048, 3);
+                    Fear[1] = 10;
                     
-                    if(top>=0&&top<GetNZones()){
-                        byte Owner=Grp->Owner;
-                        
-                        // Large arrays moved to heap using std::vector
-                        std::vector<short> Dang(4096);
-                        std::vector<int> Fear(256);
-                        std::vector<word> IDS(4096);
-                        
-                        for(int j=0;j<256;j++) Fear[j]=3;
-                        Fear[1]=10;
-                        
-                        if(Grp->Difficulty>1)
-                            CreateDangerMapForStormHard(Owner,Dang.data(),GetNZones(),Fear.data(),2);
+                    {
+                        std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                        if(Grp->Difficulty > 1)
+                            CreateDangerMapForStormHard(Owner, Dang.data(), NZones, Fear.data(), 2);
                         else
-                            CreateDangerMapForStorm(Owner,Dang.data(),GetNZones(),Fear.data(),2);
-                        
-                        if(Grp->LastTop!=0xFFFF) Dang[Grp->LastTop]+=4000;
-
-                        bool find=false;
-                        CannonGroup* Can=NULL;
-                        int Force=2000;
-                        for(int f=NCannons-1;f>=0;f--){
-                            CannonGroup* can=CANNONS+f;
-                            if(can->Owner==Grp->Owner){
-                                int t=can->Top;
-                                int f=can->DefForce;
-                                if(t<0xFFFE){
-                                    if(t==top){
-                                        Can=can;
-                                        find=true;
-                                        break;
-                                    }
-                                    if(f<Force){
-                                        Can=can;
-                                        Force=f;
-                                        find=true;
-                                    }
-                                }
-                            }
-                        }
-
-                        word DST=0xFFFF;
-                        int zf=0xFFFF;
-
-                        word StrmNIndex=0xFFFF;
-                        int n=GetNUnits(Group);
-                        for(int i=0;i<n;i++){
-                            OneUnit OU;
-                            if(GetUnitInfo(Group,i,&OU)){
-                                StrmNIndex=OU.NIndex;
-                                break;
-                            }
-                        }
-
-                        int maxdang;
-                        if(!find){
-                            if(Grp->Difficulty>1){
-                                int NSt=N<<(4-Grp->Difficulty);
-                                CreateTopListForStormHard(IDS.data(),Owner,NSt,StrmNIndex);
-                            }else{
-                                CreateTopListForStorm(IDS.data(),Owner,StrmNIndex);
-                            }
-                            zf=FindNextZoneOnTheSafeWayToObject(top,Dang.data(),IDS.data(),&maxdang,3,&DST);
-                        }else{
-                            zf=FindNextZoneOnTheSafeWay(top,Can->Top,Dang.data(),&maxdang,3);
-                        }
-                        
-                        if(zf>=0xFFFE){
-                            if(Grp->Difficulty>1){
-                                Grp->Difficulty=0;
-                            }else{
-                                if(DetArcher(StrmNIndex)&&(GetRND(4)&1)) {
-                                    std::lock_guard<std::mutex> lock(g_gameApiMutex);
-                                    dipSystem->AddFirers(Group,Grp->Owner);
-                                } else {
-                                    std::lock_guard<std::mutex> lock(g_gameApiMutex);
-                                    dipSystem->AddKillers(Group,Grp->Owner,0);
-                                }
-                            }
-                        }
-                        
-                        if(zf<0xFFFE){
-                            int tx=-1;
-                            int ty=-1;
-                            
-                            OneUnit OU;
-                            OU.Index=0xFFFF;
-                            if(DST!=0xFFFF&&GetUnitGlobalInfo(DST,&OU)){
-                                tx=OU.x;
-                                ty=OU.y;
-                            }
-                            
-                            int r=GetTopDist(xc,yc,tx,ty);
-                            
-                            if(r<25){
-                                int n=GetNUnits(Group);
-                                for(int i=0;i<n;i++){
-                                    OneUnit OU;
-                                    if(GetUnitInfo(Group,i,&OU)){
-                                        int rr=GetTopDist(OU.x,OU.y,tx,ty);
-                                        if(rr<r){
-                                            r=rr;
-                                        }
-                                    }
-                                }
-                            }
-                            
-                            if(r<12){
-                                if(!find){
-                                    Grp->StormID=OU.Index;
-                                    Grp->StormSN=OU.Serial;
-                                    
-                                    std::lock_guard<std::mutex> lock(g_gameApiMutex);
-                                    SGP_ComeIntoBuilding(StrGrp,0,OU.Index);
-                                }else{
-                                    GAMEOBJ Z;
-                                    Z.Index=xc;
-                                    Z.Serial=yc;
-                                    Z.Type='@   '-'   '+1000;
-                                    
-                                    std::lock_guard<std::mutex> lock(g_gameApiMutex);
-                                    AttackEnemyInZone2(Group,&Z,Owner);
-                                }
-                            }else{
-                                GAMEOBJ Z;
-                                Z.Index=xc;
-                                Z.Serial=yc;
-                                Z.Type='@   '-'   '+600;
-                                
-                                if(!find){
-                                    if(zf!=top&&r>3){
-                                        int x,y;
-                                        bool Attack=false;
-                                        if(r<30){
-                                            GetBuildingEntryPoint(&x, &y, OU.Index, 64);
-                                        }else{
-                                            word* Way;
-                                            int NWayPoint=GetLastFullWay(&Way);
-                                            if(NWayPoint>2) GetTopZRealCoor(Way[NWayPoint-3],&x,&y);
-                                            else GetTopZRealCoor(zf,&x,&y);
-                                            
-                                            std::lock_guard<std::mutex> lock(g_gameApiMutex);
-                                            Attack=AttackEnemyInZone2(&Grp->Group,&Z,Owner);
-                                        }
-                                        if(!Attack){
-                                            std::lock_guard<std::mutex> lock(g_gameApiMutex);
-                                            SGP_MoveToPoint(Owner,Group,x,y,512,0,0,32);
-                                        }
-                                    }
-                                }else{
-                                    Z.Type='@   '-'   '+1400;
-                                    std::lock_guard<std::mutex> lock(g_gameApiMutex);
-                                    AttackEnemyInZone2(&Grp->Group,&Z,Owner);
-                                }
-                            }
-                        }else{
-                            GAMEOBJ Z;
-                            Z.Index=xc;
-                            Z.Serial=yc;
-                            Z.Type='@   '-'   '+1000;
-                            
-                            std::lock_guard<std::mutex> lock(g_gameApiMutex);
-                            AttackEnemyInZone2(&Grp->Group,&Z,Owner);
-                        }
-                        Grp->LastTop=top;
+                            CreateDangerMapForStorm(Owner, Dang.data(), NZones, Fear.data(), 2);
                     }
+                    
+                    if(Grp->LastTop != 0xFFFF && Grp->LastTop < NZones)
+                        Dang[Grp->LastTop] += 4000;
+
+                    bool find = false;
+                    CannonGroup* Can = NULL;
+                    int Force = 2000;
+                    for(int f = NCannons - 1; f >= 0; f--) {
+                        CannonGroup* can = CANNONS + f;
+                        if(can->Owner == Grp->Owner) {
+                            int t = can->Top;
+                            int cf = can->DefForce;
+                            if(t < 0xFFFE) {
+                                if(t == top) {
+                                    Can = can;
+                                    find = true;
+                                    break;
+                                }
+                                if(cf < Force) {
+                                    Can = can;
+                                    Force = cf;
+                                    find = true;
+                                }
+                            }
+                        }
+                    }
+
+                    word DST = 0xFFFF;
+                    int zf = 0xFFFF;
+
+                    word StrmNIndex = 0xFFFF;
+                    int n = GetNUnits(Group);
+                    for(int k = 0; k < n; k++) {
+                        OneUnit OU;
+                        if(GetUnitInfo(Group, k, &OU)) {
+                            StrmNIndex = OU.NIndex;
+                            break;
+                        }
+                    }
+
+                    int maxdang;
+                    std::vector<word> IDS(NZones, 0xFFFF);
+                    if(!find) {
+                        std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                        if(Grp->Difficulty > 1) {
+                            int NSt = N << (4 - Grp->Difficulty);
+                            CreateTopListForStormHard(IDS.data(), Owner, NSt, StrmNIndex);
+                        } else {
+                            CreateTopListForStorm(IDS.data(), Owner, StrmNIndex);
+                        }
+                        zf = FindNextZoneOnTheSafeWayToObject(top, Dang.data(), IDS.data(), &maxdang, 3, &DST);
+                    } else {
+                        zf = FindNextZoneOnTheSafeWay(top, Can->Top, Dang.data(), &maxdang, 3);
+                    }
+                    
+                    if(zf >= 0xFFFE) {
+                        if(Grp->Difficulty > 1) {
+                            Grp->Difficulty = 0;
+                        } else {
+                            bool isArcher = DetArcher(StrmNIndex);
+                            if(isArcher && (GetRND(4) & 1)) {
+                                std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                                dipSystem->AddFirers(Group, Grp->Owner);
+                            } else {
+                                std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                                dipSystem->AddKillers(Group, Grp->Owner, 0);
+                            }
+                        }
+                    }
+                    
+                    if(zf < 0xFFFE) {
+                        int tx = -1, ty = -1;
+                        OneUnit OU;
+                        OU.Index = 0xFFFF;
+                        if(DST != 0xFFFF) {
+                            std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                            GetUnitGlobalInfo(DST, &OU);
+                        }
+                        if(OU.Index != 0xFFFF) {
+                            tx = OU.x;
+                            ty = OU.y;
+                        }
+                        
+                        int r = GetTopDist(xc, yc, tx, ty);
+                        
+                        if(r < 25) {
+                            int nn = GetNUnits(Group);
+                            for(int k = 0; k < nn; k++) {
+                                OneUnit UU;
+                                if(GetUnitInfo(Group, k, &UU)) {
+                                    int rr = GetTopDist(UU.x, UU.y, tx, ty);
+                                    if(rr < r) r = rr;
+                                }
+                            }
+                        }
+                        
+                        if(r < 12) {
+                            if(!find) {
+                                Grp->StormID = OU.Index;
+                                Grp->StormSN = OU.Serial;
+                                std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                                SGP_ComeIntoBuilding(StrGrp, 0, OU.Index);
+                            } else {
+                                GAMEOBJ Z;
+                                Z.Index = xc;
+                                Z.Serial = yc;
+                                Z.Type = '@   ' - '   ' + 1000;
+                                std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                                AttackEnemyInZone2(Group, &Z, Owner);
+                            }
+                        } else {
+                            GAMEOBJ Z;
+                            Z.Index = xc;
+                            Z.Serial = yc;
+                            Z.Type = '@   ' - '   ' + 600;
+                            
+                            if(!find) {
+                                if(zf != top && r > 3) {
+                                    int x, y;
+                                    bool Attack = false;
+                                    if(r < 30) {
+                                        std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                                        GetBuildingEntryPoint(&x, &y, OU.Index, 64);
+                                    } else {
+                                        word* Way;
+                                        int NWayPoint = GetLastFullWay(&Way);
+                                        if(NWayPoint > 2) GetTopZRealCoor(Way[NWayPoint - 3], &x, &y);
+                                        else GetTopZRealCoor(zf, &x, &y);
+                                        
+                                        std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                                        Attack = AttackEnemyInZone2(&Grp->Group, &Z, Owner);
+                                    }
+                                    if(!Attack) {
+                                        std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                                        SGP_MoveToPoint(Owner, Group, x, y, 512, 0, 0, 32);
+                                    }
+                                }
+                            } else {
+                                Z.Type = '@   ' - '   ' + 1400;
+                                std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                                AttackEnemyInZone2(&Grp->Group, &Z, Owner);
+                            }
+                        }
+                    } else {
+                        GAMEOBJ Z;
+                        Z.Index = xc;
+                        Z.Serial = yc;
+                        Z.Type = '@   ' - '   ' + 1000;
+                        std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                        AttackEnemyInZone2(&Grp->Group, &Z, Owner);
+                    }
+                    Grp->LastTop = top;
                 }
             }
         }
     }
 }
-
+CIMPORT word getDir(int dx,int dy);
 void ProcessCannonRange(DiplomacySystem* dipSystem, int start, int end) {
     CannonGroup* CANNONS = dipSystem->CANNONS;
     int NCannons = dipSystem->NCannons;
@@ -1437,182 +1442,203 @@ void ProcessCannonRange(DiplomacySystem* dipSystem, int start, int end) {
     for(int i = start; i < end; i++) { 
         CannonGroup* Grp = CANNONS + i;
         GAMEOBJ* Group = &Grp->Group;
+        int top = 0xFFFF;
+
         int N = CleanGroup(Group);
-        if(!N) continue;
+        if(!N) {
+            Grp->Top = 0xFFFF;
+            continue;
+        }
 
-        int xc, yc;
-        if(GetGrpCenter(Group, &xc, &yc)) {
-            GAMEOBJ Z;
-            SetZone(&Z, xc, yc, 1000);
+        int xc = 0, yc = 0;
+        bool haveCenter = false;
+        {
+            std::lock_guard<std::mutex> lock(g_gameApiMutex);
+            haveCenter = GetGrpCenter(Group, &xc, &yc) != 0;
+        }
+        if(!haveCenter) {
+            Grp->Top = 0xFFFF;
+            continue;
+        }
+
+        GAMEOBJ Z;
+        SetZone(&Z, xc, yc, 1000);
+        {
+            std::lock_guard<std::mutex> lock(g_gameApiMutex);
             Grp->DefForce = GetAlliesForce(&Z, Grp->Owner);
+            top = GetTopZone(xc, yc);
+        }
 
-            int top = GetTopZone(xc, yc);
-            if(top>=0&&top<GetNZones()){
-                for(int j=0;j<NCannons;j++) if(j!=i){
-                    CannonGroup* Allies=CANNONS+j;
-                    if(GetNUnits(&Allies->Group)){
-                        int dist=GetZonesDist(top,Allies->Top);
-                        if(dist<10){
-                            RemoveGroup(&Allies->Group,Group);
-                        }
+        if(top < 0 || top >= GetNZones()) {
+            Grp->Top = 0xFFFF;
+            continue;
+        }
+
+        // Merge with nearby friendly cannons
+        for(int j = 0; j < NCannons; j++) {
+            if(j == i) continue;
+            CannonGroup* Allies = CANNONS + j;
+            if(!GetNUnits(&Allies->Group)) continue;
+            if(Allies->Top >= 0xFFFE) continue;
+            int dist = GetZonesDist(top, Allies->Top);
+            if(dist < 10) {
+                RemoveGroup(&Allies->Group, Group);
+            }
+        }
+
+        if(CheckIfNotBusy(Group)) {
+            int ax = Grp->ArtDepoX;
+            int ay = Grp->ArtDepoY;
+            byte Owner = Grp->Owner;
+            int NZones = GetNZones();
+
+            std::vector<short> Dang(NZones > 0 ? NZones : 1, 0);
+            std::vector<int> Fear(2048, 3);   // sized for full NIndex range
+            Fear[1] = 10;
+
+            {
+                std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                CreateDangerMapWithoutPeasants(Owner, Dang.data(), NZones, Fear.data(), 4);
+            }
+            if(Grp->LastTop != 0xFFFF && Grp->LastTop < NZones)
+                Dang[Grp->LastTop] += 4000;
+
+            std::vector<word> IDS(NZones > 0 ? NZones : 1, 0xFFFF);
+            {
+                std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                CreateNonFiredEnemyBuildingsTopList(IDS.data(), Owner);
+            }
+
+            int maxdang;
+            word DST = 0xFFFF;
+            int zf = FindNextZoneOnTheSafeWayToObject(top, Dang.data(), IDS.data(), &maxdang, 3, &DST);
+
+            int dx = 0, dy = 0;
+            if(DST != 0xFFFF && zf < 0xFFFE && GetTopZRealCoor(zf, &dx, &dy)) {
+                word* WAY = NULL;
+                int NStep = GetLastFullWay(&WAY);
+                int DanTop = 0xFFFF;
+                for(int s = 0; s < NStep; s++) {
+                    int DT = WAY[s];
+                    if(DT < NZones && Dang[DT] > 1000) DanTop = DT;
+                }
+
+                int destnorm = 10000;
+                int dnx = -1, dny = -1;
+                if(DanTop != 0xFFFF) {
+                    if(GetTopZRealCoor(DanTop, &dnx, &dny)) {
+                        destnorm = Norma(xc - dnx, yc - dny);
+                    }
+                } else {
+                    OneUnit u;
+                    {
+                        std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                        GetUnitGlobalInfo(DST, &u);
+                    }
+                    if(u.Index != 0xFFFF) {
+                        destnorm = Norma(xc - u.x, yc - u.y);
                     }
                 }
-            
-                if(CheckIfNotBusy(Group)){
-                    int ax=Grp->ArtDepoX;
-                    int ay=Grp->ArtDepoY;
-                    byte Owner=Grp->Owner;
 
-                    // Large arrays moved to heap using std::vector
-                    std::vector<short> Dang(4096);
-                    std::vector<int> Fear(256);
-                    for(int j=0;j<256;j++) Fear[j]=3;
-                    CreateDangerMapWithoutPeasants(Owner,Dang.data(),GetNZones(),Fear.data(),4);
-                    if(Grp->LastTop!=0xFFFF) Dang[Grp->LastTop]+=4000;
+                int artnorm = Norma(xc - ax, yc - ay);
 
-                    std::vector<word> IDS(2048);
-                    CreateNonFiredEnemyBuildingsTopList(IDS.data(),Owner);
-                    int maxdang;
-                    word DST=0xFFFF;
-                    
-                    int zf=FindNextZoneOnTheSafeWayToObject(top,Dang.data(),IDS.data(),&maxdang,3,&DST);
-                    int dx,dy;
-                    if(DST!=0xFFFF&&GetTopZRealCoor(zf,&dx,&dy)){
-                        word* WAY;
-                        int NStep=GetLastFullWay(&WAY);
-                        int DanTop=0xFFFF;
-                        for(int s=0;s<NStep;s++){
-                            int DT=WAY[s];
-                            if(Dang[DT]>1000){
-                                DanTop=DT;
-                            }
-                        }
+                if(artnorm > 1000 && destnorm < 5600) {
+                    std::lock_guard<std::mutex> lock(g_gameApiMutex);
 
-                        int destnorm=10000;
-                        int dnx=-1;
-                        int dny=-1;
-                        if(DanTop!=0xFFFF){
-                            if(GetTopZRealCoor(DanTop,&dnx,&dny)){
-                                destnorm=Norma(xc-dnx,yc-dny);
-                            }
-                        }else{
-                            OneUnit u;
-                            GetUnitGlobalInfo(DST,&u);
-                            if(u.Index!=0xFFFF){
-                                destnorm=Norma(xc-u.x,yc-u.y);
-                            }
-                        }
+                    bool canFire = true;
 
-                        int artnorm=Norma(xc-ax,yc-ay);
-                        word getDir(int dx, int dy);
+                    // ===== FRIENDLY FIRE CHECK =====
+                    if(DanTop != 0xFFFF && dnx != -1) {
+                        int dirToTarget = getDir(dnx - xc, dny - yc);
+                        int friendlyUnitsInCone = 0;
+                        int enemyUnitsInCone = 0;
 
-                        if(artnorm>1000 && destnorm<5600){
-                            std::lock_guard<std::mutex> lock(g_gameApiMutex);
-                            
-                            bool canFire = true;
-                            
-                            // Check for grapeshot friendly fire
-                            if(DanTop!=0xFFFF && dnx!=-1){
-                                // Calculate direction to grapeshot target
-                                int dirToTarget = getDir(dnx - xc, dny - yc);
-                                
-                                // Count units in 30-degree cone (±15 degrees from center)
-                                int totalUnitsInCone = 0;
-                                int friendlyUnitsInCone = 0;
-                                
-                                // Check area within grapeshot range (100 units from target)
-                                int MO = GetMaxObject();
-                                for(int obj = 0; obj < MO; obj++){
-                                    OneObject* OB = GetOBJ(obj);
-                                    if(OB && !OB->Sdoxlo && !OB->NewBuilding && OB->LockType == 0){
-                                        int ux = OB->RealX >> 4;
-                                        int uy = OB->RealY >> 4;
-                                        
-                                        // Check if unit is near the grapeshot impact area
-                                        int distToImpact = Norma(ux - dnx, uy - dny);
-                                        if(distToImpact < 1000){
-                                            // Calculate angle from cannon to this unit
-                                            int dirToUnit = getDir(ux - xc, uy - yc);
-                                            int angleDiff = abs(dirToUnit - dirToTarget);
-                                            if(angleDiff > 128) angleDiff = 256 - angleDiff;
-                                            
-                                            // Check if unit is within 30-degree cone (15 degrees each side)
-                                            if(angleDiff < 22){
-                                                totalUnitsInCone++;
-                                                if(OB->NNUM == Owner){
-                                                    friendlyUnitsInCone++;
-                                                }
-                                            }
-                                        }
+                        int MO = GetMaxObject();
+                        for(int obj = 0; obj < MO; obj++) {
+                            OneObject* OB = GetOBJ(obj);
+                            if(OB && !OB->Sdoxlo && !OB->NewBuilding && OB->LockType == 0) {
+                                int ux = OB->RealX >> 4;
+                                int uy = OB->RealY >> 4;
+                                int distToImpact = Norma(ux - dnx, uy - dny);
+                                if(distToImpact < 1500) {
+                                    int dirToUnit = getDir(ux - xc, uy - yc);
+                                    int angleDiff = abs(dirToUnit - dirToTarget);
+                                    if(angleDiff > 128) angleDiff = 256 - angleDiff;
+                                    if(angleDiff < 26) {
+                                        if(OB->NNUM == Owner) friendlyUnitsInCone++;
+                                        else enemyUnitsInCone++;
                                     }
                                 }
                             }
-                            // Check for friendly buildings in line of fire
-                            if(canFire && DST!=0xFFFF){
-                                OneUnit targetUnit;
-                                GetUnitGlobalInfo(DST, &targetUnit);
-                                if(targetUnit.Index != 0xFFFF){
-                                    // Calculate direction to target
-                                    int tx = targetUnit.x;
-                                    int ty = targetUnit.y;
-                                    int dirToTarget = getDir(tx - xc, ty - yc);
-                                    
-                                    // Check all zones along the path for friendly buildings
-                                    int MO = GetMaxObject();
-                                    for(int obj = 0; obj < MO; obj++){
-                                        OneObject* OB = GetOBJ(obj);
-                                        if(OB && !OB->Sdoxlo && OB->NewBuilding && OB->NNUM == Owner){
-                                            int bx = OB->RealX >> 4;
-                                            int by = OB->RealY >> 4;
-                                            
-                                            // Check if building is roughly in line of fire
-                                            int dirToBuilding = getDir(bx - xc, by - yc);
-                                            int angleDiff = abs(dirToBuilding - dirToTarget);
-                                            if(angleDiff > 128) angleDiff = 256 - angleDiff;
-                                            
-                                            // If building is within 15 degrees of firing line
-                                            if(angleDiff < 15){
-                                                int distToBuilding = Norma(bx - xc, by - yc);
-                                                int distToTarget = Norma(tx - xc, ty - yc);
-                                                
-                                                // If building is between cannon and target
-                                                if(distToBuilding < distToTarget && distToBuilding < 5000){
-                                                    int perpDist = distToBuilding * sin(angleDiff * 3.14159f / 128.0f);
-                                                    
-                                                    // If building is very close to line of fire (within 200 units)
-                                                    if(perpDist < 200){
-                                                        canFire = false;
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                        }
+
+                        int totalUnitsInCone = friendlyUnitsInCone + enemyUnitsInCone;
+                        if(totalUnitsInCone == 0) {
+                            canFire = false;
+                        } else {
+                            bool friendliesAcceptable = (friendlyUnitsInCone * 10) <= totalUnitsInCone;
+                            bool enemiesAcceptable = (enemyUnitsInCone * 10) >= (totalUnitsInCone * 9);
+                            if(!friendliesAcceptable || !enemiesAcceptable) {
+                                canFire = false;
                             }
-                            
-                            // Fire only if safe
-                            if(canFire){
-                                if(DanTop!=0xFFFF && dnx!=-1){
-                                    ArtAttackGroud(Owner,Group,dnx,dny);
-                                }else{
-                                    ArtAttackObject(Owner,Group,DST);
-                                }
-                            }else{
-                                // Move closer instead of firing
-                                SGP_MoveToPoint(Owner,Group,dx,dy,512,200,0,32);
-                                Grp->LastTop=top;
-                            }
-                        }else{
-                            std::lock_guard<std::mutex> lock(g_gameApiMutex);
-                            SGP_MoveToPoint(Owner,Group,dx,dy,512,200,0,32);
-                            Grp->LastTop=top;
                         }
                     }
+
+                    // ===== BUILDING LINE-OF-FIRE CHECK =====
+                    if(canFire && DST != 0xFFFF) {
+                        OneUnit targetUnit;
+                        GetUnitGlobalInfo(DST, &targetUnit);
+                        if(targetUnit.Index != 0xFFFF) {
+                            int tx = targetUnit.x;
+                            int ty = targetUnit.y;
+                            int dirToTarget = getDir(tx - xc, ty - yc);
+
+                            int MO = GetMaxObject();
+                            for(int obj = 0; obj < MO; obj++) {
+                                OneObject* OB = GetOBJ(obj);
+                                if(OB && !OB->Sdoxlo && OB->NewBuilding && OB->NNUM == Owner) {
+                                    int bx = OB->RealX >> 4;
+                                    int by = OB->RealY >> 4;
+                                    int dirToBuilding = getDir(bx - xc, by - yc);
+                                    int angleDiff = abs(dirToBuilding - dirToTarget);
+                                    if(angleDiff > 128) angleDiff = 256 - angleDiff;
+                                    if(angleDiff < 15) {
+                                        int distToBuilding = Norma(bx - xc, by - yc);
+                                        int distToTarget = Norma(tx - xc, ty - yc);
+                                        if(distToBuilding < distToTarget && distToBuilding < 5000) {
+                                            // integer approximation of sin(angleDiff * PI / 128)
+                                            // perp = dist * sin(theta); use small table-free approx
+                                            int perpDist = (distToBuilding * angleDiff) >> 7;
+                                            if(perpDist < 200) {
+                                                canFire = false;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    // ===== END CHECKS =====
+
+                    if(canFire) {
+                        if(DanTop != 0xFFFF && dnx != -1) {
+                            ArtAttackGroud(Owner, Group, dnx, dny);
+                        } else {
+                            ArtAttackObject(Owner, Group, DST);
+                        }
+                    } else {
+                        SGP_MoveToPoint(Owner, Group, dx, dy, 512, 200, 0, 32);
+                        Grp->LastTop = top;
+                    }
+                } else {
+                    std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                    SGP_MoveToPoint(Owner, Group, dx, dy, 512, 200, 0, 32);
+                    Grp->LastTop = top;
                 }
             }
         }
-        Grp->Top = 0xFFFF;
+        Grp->Top = top;
     }
 }
 
@@ -1629,11 +1655,15 @@ void ProcessFirerRange(DiplomacySystem* dipSystem, int start, int end, int T0) {
         word BID = Grp->CurrentFiringBuilding;
         word SNS = Grp->FBSN;
         OneUnit OU;
-        GetUnitGlobalInfo(BID, &OU);
+        OU.Index = 0xFFFF;
+        if(BID != 0xFFFF) {
+            std::lock_guard<std::mutex> lock(g_gameApiMutex);
+            GetUnitGlobalInfo(BID, &OU);
+        }
         
-        if(OU.Index != 0xFFFF && OU.Serial == SNS && T0 - Grp->LastMoveTime > 150) {
+        if(BID != 0xFFFF && OU.Index != 0xFFFF && OU.Serial == SNS && T0 - Grp->LastMoveTime > 150) {
             Grp->LastMoveTime = T0;
-            if(OU.Index == 0xFFFF || OU.NI == Grp->Owner || CheckIfBuildingIsFired(BID)) {
+            if(OU.NI == Grp->Owner || CheckIfBuildingIsFired(BID)) {
                 int xc, yc;
                 if(GetGrpCenter(&Grp->Group, &xc, &yc)) {
                     GAMEOBJ Z;
@@ -1645,88 +1675,99 @@ void ProcessFirerRange(DiplomacySystem* dipSystem, int start, int end, int T0) {
                     AttackEnemyInZone2(&Grp->Group, &Z, Grp->Owner);
                 }
                 Grp->CurrentFiringBuilding = 0xFFFF;
+                Grp->FBSN = 0xFFFF;
             } else {
                 std::lock_guard<std::mutex> lock(g_gameApiMutex);
                 GrpAttackObject(Grp->Owner, &Grp->Group, BID);
+                return;   // done for this tick; keep the target
             }
-        } else {
-            if(T0-Grp->LastMoveTime>150){
-                Grp->LastMoveTime=T0;
+        }
 
-                SetToInternalResourcesZero(Group);
-                int xc,yc;
-                if(GetGrpCenter(&Grp->Group,&xc,&yc)){
-                    int top=GetTopZone(xc,yc);
-                    if(top>=0xFFFE){
-                        OneUnit UN;
-                        GetUnitInfo(Group,0,&UN);
-                        xc=UN.x;
-                        yc=UN.y;
-                        top=GetTopZone(xc,yc);
-                    }
-                    if(top>=0&&top<GetNZones()){
-                        byte Owner=FIRERS[i].Owner;
-                        
-                        // Large arrays moved to heap using std::vector
-                        std::vector<short> Dang(4096);
-                        std::vector<int> Fear(256);
-                        std::vector<word> IDS(4096);
-                        
-                        for(int j=0;j<256;j++) Fear[j]=3;
-                        Fear[1]=10;
-                        CreateDangerMapForFire(Owner,Dang.data(),GetNZones(),Fear.data(),3);
-                        if(Grp->LastTop!=0xFFFF) Dang[Grp->LastTop]+=4000;
+        // ===== No valid current target: search for a new one =====
+        if(T0 - Grp->LastMoveTime > 150) {
+            Grp->LastMoveTime = T0;
+            Grp->CurrentFiringBuilding = 0xFFFF;
+            Grp->FBSN = 0xFFFF;
 
-                        bool find=false;
-                        if(!find) CreateNonFiredEnemyBuildingsTopList(IDS.data(),Owner);
+            SetToInternalResourcesZero(Group);
+            int xc, yc;
+            if(!GetGrpCenter(&Grp->Group, &xc, &yc)) continue;
 
-                        int maxdang;
-                        word DST=0xFFFF;
-                        int zf=FindNextZoneOnTheSafeWayToObject(top,Dang.data(),IDS.data(),&maxdang,3,&DST);
-                        if(DST!=0xFFFF&&zf<0xFFFE){
-                            int tx=-1;
-                            int ty=-1;
-                            if(!find){
-                                if(GetUnitGlobalInfo(DST,&OU)){
-                                    tx=OU.x;
-                                    ty=OU.y;
-                                }
-                            }else{
-                                GetTopZRealCoor(DST,&tx,&ty);
-                            }
-                            
-                            if(tx!=-1){
-                                int r=GetTopDist(xc,yc,tx,ty);
-                                
-                                if(r<30){
-                                    std::lock_guard<std::mutex> lock(g_gameApiMutex);
-                                    GrpAttackObject(Owner,&Grp->Group,DST);
-                                    Grp->CurrentFiringBuilding=OU.Index;
-                                    Grp->FBSN=OU.Serial;
-                                }else{
-                                    GAMEOBJ Z;
-                                    Z.Index=xc;
-                                    Z.Serial=yc;
-                                    Z.Type='@   '-'   '+600;
-                                    if(zf!=top&&r>3){
-                                        int x,y;
-                                        
-                                        word* Way;
-                                        int NWayPoint=GetLastFullWay(&Way);
-                                        if(NWayPoint>2) GetTopZRealCoor(Way[NWayPoint-3],&x,&y);
-                                        else GetTopZRealCoor(zf,&x,&y);
-                                        
-                                        std::lock_guard<std::mutex> lock(g_gameApiMutex);
-                                        SGP_MoveToPoint(Owner,Group,x,y,512,128-GetRND(256),128-GetRND(256),32);
-                                        Grp->LastTop=top;
-                                    }
-                                }
-                            }
-                        }else{
+            int top = GetTopZone(xc, yc);
+            if(top >= 0xFFFE) {
+                OneUnit UN;
+                GetUnitInfo(Group, 0, &UN);
+                xc = UN.x;
+                yc = UN.y;
+                top = GetTopZone(xc, yc);
+            }
+            if(top < 0 || top >= GetNZones()) continue;
+
+            byte Owner = FIRERS[i].Owner;
+            int NZones = GetNZones();
+
+            std::vector<short> Dang(NZones, 0);
+            std::vector<int> Fear(2048, 3);
+            Fear[1] = 10;
+
+            {
+                std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                CreateDangerMapForFire(Owner, Dang.data(), NZones, Fear.data(), 3);
+            }
+            if(Grp->LastTop != 0xFFFF && Grp->LastTop < NZones)
+                Dang[Grp->LastTop] += 4000;
+
+            std::vector<word> IDS(NZones, 0xFFFF);
+            {
+                std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                CreateNonFiredEnemyBuildingsTopList(IDS.data(), Owner);
+            }
+
+            int maxdang;
+            word DST = 0xFFFF;
+            int zf = FindNextZoneOnTheSafeWayToObject(top, Dang.data(), IDS.data(), &maxdang, 3, &DST);
+
+            if(DST != 0xFFFF && zf < 0xFFFE) {
+                int tx = -1, ty = -1;
+                OneUnit TargetOU;
+                TargetOU.Index = 0xFFFF;
+                {
+                    std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                    GetUnitGlobalInfo(DST, &TargetOU);
+                }
+                if(TargetOU.Index != 0xFFFF) {
+                    tx = TargetOU.x;
+                    ty = TargetOU.y;
+                }
+
+                if(tx != -1) {
+                    int r = GetTopDist(xc, yc, tx, ty);
+
+                    if(r < 30) {
+                        std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                        GrpAttackObject(Owner, &Grp->Group, DST);
+                        Grp->CurrentFiringBuilding = TargetOU.Index;
+                        Grp->FBSN = TargetOU.Serial;
+                    } else {
+                        if(zf != top && r > 3) {
+                            int x, y;
+                            word* Way;
+                            int NWayPoint = GetLastFullWay(&Way);
+                            if(NWayPoint > 2) GetTopZRealCoor(Way[NWayPoint - 3], &x, &y);
+                            else GetTopZRealCoor(zf, &x, &y);
+
                             std::lock_guard<std::mutex> lock(g_gameApiMutex);
-                            dipSystem->AddTomahawks(Group,Grp->Owner,0,0);
+                            SGP_MoveToPoint(Owner, Group, x, y, 512,
+                                            128 - GetRND(256), 128 - GetRND(256), 32);
+                            Grp->LastTop = top;
                         }
                     }
+                }
+            } else {
+                if(T0 - Grp->LastThinkTime > 2000) {
+                    Grp->LastThinkTime = T0;
+                    std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                    dipSystem->AddTomahawks(Group, Grp->Owner, 0, 0);
                 }
             }
         }
@@ -1746,84 +1787,95 @@ void ProcessKillerRange(KillersGroup* KILLERS, int start, int end, int T0) {
         Grp->LastMoveTime = T0;
 
         int xc, yc;
-        if(GetGrpCenter(&KILLERS[i].Group, &xc, &yc)) {
-            int top = GetTopZone(xc, yc);
-            if(top >= 0xFFFE) {
-                OneUnit UN;
-                GetUnitInfo(Group, 0, &UN);
-                xc = UN.x;
-                yc = UN.y;
-                top = GetTopZone(xc, yc);
+        if(!GetGrpCenter(&KILLERS[i].Group, &xc, &yc)) continue;
+
+        int top = GetTopZone(xc, yc);
+        if(top >= 0xFFFE) {
+            OneUnit UN;
+            GetUnitInfo(Group, 0, &UN);
+            xc = UN.x;
+            yc = UN.y;
+            top = GetTopZone(xc, yc);
+        }
+        if(top < 0 || top >= GetNZones()) continue;
+
+        byte Owner = KILLERS[i].Owner;
+        int NZones = GetNZones();
+        
+        std::vector<short> Dang(NZones, 0);
+        std::vector<int> Fear(2048, 5);
+        Fear[1] = 10;
+        
+        {
+            std::lock_guard<std::mutex> lock(g_gameApiMutex);
+            CreateDangerMap(Owner, Dang.data(), NZones, Fear.data(), 3);
+        }
+        if(KILLERS[i].LastTop != 0xFFFF && KILLERS[i].LastTop < NZones)
+            Dang[KILLERS[i].LastTop] += 4000;
+
+        int MinPS = NUnits >> 3;
+        if(MinPS > 12) MinPS = 12;
+
+        std::vector<word> IDS(NZones, 0xFFFF);
+        {
+            std::lock_guard<std::mutex> lock(g_gameApiMutex);
+            CreatePeasantsTopList(IDS.data(), Owner, MinPS, Grp->SeakMine);
+        }
+        int maxdang;
+        word DST = 0xFFFF;
+        int zf = FindNextZoneOnTheSafeWayToObject(top, Dang.data(), IDS.data(), &maxdang, 3, &DST);
+        bool FindPeasant = true;
+
+        if(DST != 0xFFFF) {
+            OU.Index = 0xFFFF;
+            {
+                std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                GetUnitGlobalInfo(DST, &OU);
             }
-            if(top>=0&&top<GetNZones()){
-                byte Owner=KILLERS[i].Owner;
-                
-                // Large arrays moved to heap using std::vector
-                std::vector<short> Dang(4096);
-                std::vector<int> Fear(256);
-                std::vector<word> IDS(4096);
-                
-                for(int j=0;j<256;j++) Fear[j]=5;
-                Fear[1]=10;
-                
-                CreateDangerMap(Owner,Dang.data(),GetNZones(),Fear.data(),3);
-                if(KILLERS[i].LastTop!=0xFFFF) Dang[KILLERS[i].LastTop]+=4000;
-
-                int MinPS=NUnits>>3;
-                if(MinPS>12) MinPS=12;
-                CreatePeasantsTopList(IDS.data(),Owner,MinPS,Grp->SeakMine);
-                int maxdang;
-                word DST=0xFFFF;
-                int zf=FindNextZoneOnTheSafeWayToObject(top,Dang.data(),IDS.data(),&maxdang,3,&DST);
-                bool FindPeasant=true;
-
-                if(DST!=0xFFFF){
-                    if(GetUnitGlobalInfo(DST,&OU)){
-                        GAMEOBJ Z;
-                        Z.Index=xc;
-                        Z.Serial=yc;
-                        Z.Type='@   '-'   '+1500;
-                        int r=GetTopDist(xc,yc,OU.x,OU.y);
-                        if(r<12){
-                            Z.Index=OU.x;
-                            Z.Serial=OU.y;
-                            if(OU.Building){
-                                Z.Type='@   '-'   '+800;
-                                std::lock_guard<std::mutex> lock(g_gameApiMutex);
-                                if(!AttackEnemyInZone2(&KILLERS[i].Group,&Z,Owner)) {
-                                    SGP_MoveToPoint(7,Group,OU.x,OU.y,512,0,0,0);
-                                }
-                            }else{
-                                std::lock_guard<std::mutex> lock(g_gameApiMutex);
-                                if(FindPeasant) AttackEnemyPeasantsInZone(&KILLERS[i].Group,&Z,OU.NI);
-                                else AttackEnemyInZone2(&KILLERS[i].Group,&Z,Owner);
-                            }
-                        }else{
-                            SetToInternalResourcesZero(Group);
-                            
-                            int x,y;
-                            if(r<25){
-                                x=OU.x;
-                                y=OU.y;
-                            }else{
-                                word* Way;
-                                int NWayPoint=GetLastFullWay(&Way);
-                                if(NWayPoint>2) GetTopZRealCoor(Way[NWayPoint-3],&x,&y);
-                                else GetTopZRealCoor(zf,&x,&y);
-                            }
-                            
-                            std::lock_guard<std::mutex> lock(g_gameApiMutex);
-                            SGP_MoveToPoint(Owner,Group,x,y,512,128-GetRND(256),128-GetRND(256),32);
-                            
-                            KILLERS[i].LastMoveTime=T0+15;
-                            KILLERS[i].LastTop=top;
-                        }
+            if(OU.Index != 0xFFFF) {
+                GAMEOBJ Z;
+                Z.Index = xc;
+                Z.Serial = yc;
+                Z.Type = '@   ' - '   ' + 1500;
+                int r = GetTopDist(xc, yc, OU.x, OU.y);
+                if(r < 12) {
+                    Z.Index = OU.x;
+                    Z.Serial = OU.y;
+                    if(OU.Building) {
+                        Z.Type = '@   ' - '   ' + 800;
+                        std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                        if(!AttackEnemyInZone2(&KILLERS[i].Group, &Z, Owner))
+                            SGP_MoveToPoint(7, Group, OU.x, OU.y, 512, 0, 0, 0);
+                    } else {
+                        std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                        if(FindPeasant) AttackEnemyPeasantsInZone(&KILLERS[i].Group, &Z, OU.NI);
+                        else AttackEnemyInZone2(&KILLERS[i].Group, &Z, Owner);
                     }
-                }else{
+                } else {
+                    SetToInternalResourcesZero(Group);
+                    
+                    int x, y;
+                    if(r < 25) {
+                        x = OU.x;
+                        y = OU.y;
+                    } else {
+                        word* Way;
+                        int NWayPoint = GetLastFullWay(&Way);
+                        if(NWayPoint > 2) GetTopZRealCoor(Way[NWayPoint - 3], &x, &y);
+                        else GetTopZRealCoor(zf, &x, &y);
+                    }
+                    
                     std::lock_guard<std::mutex> lock(g_gameApiMutex);
-                    AddStorm(Group,Grp->Owner,2);
+                    SGP_MoveToPoint(Owner, Group, x, y, 512,
+                                    128 - GetRND(256), 128 - GetRND(256), 32);
+                    
+                    KILLERS[i].LastMoveTime = T0 + 15;
+                    KILLERS[i].LastTop = top;
                 }
             }
+        } else {
+            std::lock_guard<std::mutex> lock(g_gameApiMutex);
+            AddStorm(Group, Grp->Owner, 2);
         }
     }
 }
@@ -1844,226 +1896,220 @@ void ProcessTomahawkRange(DiplomacySystem* dipSystem, int start, int end, int T0
         Grp->LastMoveTime = T0;
 
         int xc, yc;
-        if(GetGrpCenter(&Grp->Group, &xc, &yc)) {
-            Grp->x = xc;
-            Grp->y = yc;
-            int top = GetTopZone(xc, yc);
-            if(top >= 0xFFFE) {
-                OneUnit UN;
-                GetUnitInfo(&Grp->Group, 0, &UN);
-                xc = UN.x;
-                yc = UN.y;
-                top = GetTopZone(xc, yc);
+        if(!GetGrpCenter(&Grp->Group, &xc, &yc)) continue;
+        
+        Grp->x = xc;
+        Grp->y = yc;
+        int top = GetTopZone(xc, yc);
+        if(top >= 0xFFFE) {
+            OneUnit UN;
+            GetUnitInfo(&Grp->Group, 0, &UN);
+            xc = UN.x;
+            yc = UN.y;
+            top = GetTopZone(xc, yc);
+        }
+        if(top < 0 || top >= GetNZones()) continue;
+
+        byte Owner = Grp->Owner;
+        int NZones = GetNZones();
+        
+        std::vector<short> Dang(NZones, 0);
+        std::vector<int> Fear(2048, 2);
+        Fear[1] = 100;
+        CreateDangerMapForTom(Owner, Dang.data(), NZones, Fear.data(), 3);
+
+        int maxdang;
+        
+        GAMEOBJ Zone;
+        SetZone(&Zone, xc, yc, Grp->MaxAttR + 300);
+        int Force = GetGroupForce(&Grp->Group);
+        int AliForce = -GetEnemyForce(&Zone, Owner);
+        
+        bool attacking = true;
+        bool moving = true;
+        bool thinktwice = false;
+        bool retreat = false;
+
+        bool shieldValid = (Grp->ShieldID < (word)NStorms);
+        if(shieldValid && !GetNUnits(&STORMS[Grp->ShieldID].Group)) shieldValid = false;
+        
+        if(!shieldValid) {
+            std::vector<word> IDS(NZones, 0xFFFF);
+            for(int s = 0; s < NStorms; s++) {
+                StormGroup* GRP = STORMS + s;
+                if(GRP->Owner == Grp->Owner) {
+                    int ST = GRP->Top;
+                    if(GetNUnits(&GRP->Group) + GetNUnits(&GRP->StrGrp) > 0 && ST >= 0 && ST < 0xFFFE && ST < NZones) {
+                        IDS[ST] = s;
+                    }
+                }
             }
-            if(top>=0&&top<GetNZones()){
-                byte Owner=Grp->Owner;
-                
-                // Large arrays moved to heap using std::vector
-                std::vector<short> Dang(4096);
-                std::vector<int> Fear(256);
-                std::vector<word> IDS(4096);
-                
-                for(int j=0;j<256;j++) Fear[j]=2;
-                Fear[1]=100;
-                CreateDangerMapForTom(Owner,Dang.data(),GetNZones(),Fear.data(),3);
-
-                int maxdang;
-                
-                GAMEOBJ Zone;
-                SetZone(&Zone,xc,yc,Grp->MaxAttR+300);
-                int Force=GetGroupForce(&Grp->Group);
-                int AliForce=-GetEnemyForce(&Zone,Owner);
-                
-                bool attacking=true;
-                bool moving=true;
-                bool thinktwice=false;
-                bool retreat=false;
-
-                // Shield search
-                if(Grp->ShieldID>=0xFFFE||!GetNUnits(&STORMS[Grp->ShieldID].Group)){
-                    // Initialize IDS vector with 0xFF
-                    std::fill(IDS.begin(), IDS.end(), 0xFF);
-                    for(int i=0;i<NStorms;i++){
-                        StormGroup* GRP=STORMS+i;
-                        if(GRP->Owner==Grp->Owner){
-                            int ST=GRP->Top;
-                            if(GetNUnits(&GRP->Group)+GetNUnits(&GRP->StrGrp)>0 && ST>=0 && ST<0xFFFE){
-                                IDS[ST]=i;
-                            }
-                        }
-                    }
-                    word DST=0xFFFF;
-                    int zf=FindNextZoneOnTheSafeWayToObject(top,Dang.data(),IDS.data(),&maxdang,5,&DST);
-                    if(DST!=0xFFFF) Grp->ShieldID=DST;
-                    else Grp->ShieldID=0xFFFF;
-                }
-                word DST=0xFFFF;
-                if(Grp->ShieldID!=0xFFFF) DST=STORMS[Grp->ShieldID].Top;
-                bool findstm=(DST!=0xFFFF);
-                
-                if(findstm){
-                    int sx,sy;
-                    if(GetTopZRealCoor(DST,&sx,&sy)){
-                        if(Norma(sx-xc,sy-yc)<800) DST=0xFFFF;
-                    }
-                }
-
-                SetZone(&Zone,xc,yc,Grp->MaxAttR+200);
-                {
-                    std::lock_guard<std::mutex> lock(g_gameApiMutex);
-                    SetUnitsState(Group,1,0,0,0);
-                }
-                
-                word BID=0xFFFF;
-                if(T0-Grp->AttackTime>0&&(AliForce>=Force||GetRND(100)>30)) {
-                    std::lock_guard<std::mutex> lock(g_gameApiMutex);
-                    BID=MakeOneShotToBuild(&Zone,&Grp->Group,Owner);
-                }
-                
-                bool building=false;
-                if(BID!=0xFFFF){
-                    OneObject* BOB=GetOBJ(BID);
-                    if(BOB&&!(BOB->Sdoxlo||BOB->NNUM==7)){
-                        building=true;
-                    }
-                }
-
-                if(building&&Grp->Strelok) moving=false;
-                
-                int NIn=0;
-                if(building){
-                    if(GetBuildingOposit(BID,NIn)){
-                        AliForce -= NIn*5;
-                        NIn>>=1;
-                        NIn++;
-                    }
-                }
-                
-                if(building&&NIn<NMen){
-                    if(isUnitAbsorber(BID)){
-                        int NStr=GetRND(GetDiff(Grp->Owner))+1;
-
-                        int N=CleanGroup(Group);
-                        OneUnit u;
-                        for(int id=0;id<N&&NStr>0;id++){
-                            GetUnitInfo(Group,id,&u);
-                            bool ru=(GetRND(300)==0);
-                            if(u.Index!=0xFFFF&&(u.ChargeProgress||ru)){
-                                std::lock_guard<std::mutex> lock(g_gameApiMutex);
-                                InviteUnitIntoBuilding(BID,u.Index,0);
-                                DeleteUnitFromGroup(Group,id);
-                                if(ru) ru=0;
-                                NStr--;
-                            }
-                        }
-                    }else{
-                        building=false;
-                    }
-                }
-
-                if(moving){
-                    if(AliForce>Force-(Force>>3)){
-                        std::lock_guard<std::mutex> lock(g_gameApiMutex);
-                        if(Grp->Strelok){
-                            SetUnitsState(Group,1,0,1,0);
-                        }else{
-                            SetUnitsState(Group,1,0,1,0);
-                        }
-                        
-                        SetZone(&Zone,xc,yc,Grp->MaxAttR+200);
-                        if(AttackEnemyInZone2(&Grp->Group,&Zone,Owner)){
-                            Grp->LastThinkTime=T0;
-                        }
-                    }else{
-                        if(T0-Grp->LastThinkTime>100){
-                            thinktwice=true;
-                            attacking=false;
-                            if(building) retreat=true;
-                        }else{
-                            std::lock_guard<std::mutex> lock(g_gameApiMutex);
-                            SetUnitsState(Group,1,0,1,0);
-                            if(!Grp->Strelok) AttackEnemyInZone2(&Grp->Group,&Zone,Owner);
-                            moving=false;
-                        }
-                    }
-                }
-                
-                if(Grp->LastTop!=0xFFFF&&!thinktwice) Dang[Grp->LastTop]+=4000;
-
-                if(thinktwice&&T0-Grp->AttackTime>0){
-                    SetZone(&Zone,xc,yc,Grp->MaxAttR+500);
-                    std::lock_guard<std::mutex> lock(g_gameApiMutex);
-                    if(Grp->Strelok) SetUnitsState(Group,1,0,0,0);
-                    else SetUnitsState(Group,1,0,0,1);
-                    int NArm;
-                    bool at=AttackByTomahawks(&Grp->Group,&Zone,Owner,NArm);
-                    
-                    if(!at){
-                        Grp->LastMoveTime=T0;
-                    }
-                }
-
-                bool SearchEnemy=false;
-                if(moving){
-                    if(attacking && T0-Grp->AttackTime>0){
-                        CreateTopListEnArmy(IDS.data(),Owner,NMen>>4);
-                        SearchEnemy=true;
-                    }else{
-                        if(DST==0xFFFF){
-                            CreateFriendBuildingsTopList(IDS.data(),Owner);
-                            IDS[top]=0xFFFF;
-                            if(Grp->LastTop!=0xFFFF) IDS[Grp->LastTop]=0xFFFF;
-                        }
-                    }
-                    
-                    int zf;
-                    if(DST==0xFFFF||attacking) zf=FindNextZoneOnTheSafeWayToObject(top,Dang.data(),IDS.data(),&maxdang,5,&DST);
-                    else zf=DST;
-
-                    Grp->LastMoveTime=T0;
-
-                    if(DST!=0xFFFF&&zf!=top){
-                        int dx,dy;
-                        
-                        if(GetTopZRealCoor(zf,&dx,&dy)){
-                            if(GetGroupCharge(Group)||!attacking){
-                                if(!thinktwice){
-                                    word* Way;
-                                    int NWayPoint=GetLastFullWay(&Way);
-                                    if(NWayPoint>2) GetTopZRealCoor(Way[NWayPoint-3],&dx,&dy);
-                                }
-
-                                std::lock_guard<std::mutex> lock(g_gameApiMutex);
-                                SGP_MoveToPoint(Owner,Group,dx,dy,512,128-GetRND(256),128-GetRND(256),32);
-                            }
-                            
-                            if(moving&&attacking) Grp->LastTop=top;
-                            else Grp->LastTop=0xFFFF;
-                            
-                            if(thinktwice){ 
-                                Grp->LastMoveTime=T0-62;
-                            }else if(retreat && !findstm && T0-Grp->AttackTime>0){
-                                Grp->AttackTime=T0+256;
-                            }else{
-                                Grp->LastMoveTime=T0;
-                            }
-                        }
-                    }else{
-                        std::lock_guard<std::mutex> lock(g_gameApiMutex);
-                        if(Grp->Strelok){
-                            SetUnitsState(Group,1,0,0,0);
-                        }else{
-                            SetUnitsState(Group,1,0,1,0);
-                        }
-                        AttackEnemyInZone2(&Grp->Group,&Zone,Owner);
-                    }
-                }else{
-                    Grp->LastMoveTime=T0;
-                }
-
-                if(!moving) Grp->LastMoveTime=T0-60;
+            word DST = 0xFFFF;
+            int zf = FindNextZoneOnTheSafeWayToObject(top, Dang.data(), IDS.data(), &maxdang, 5, &DST);
+            if(DST != 0xFFFF) Grp->ShieldID = DST;
+            else Grp->ShieldID = 0xFFFF;
+        }
+        
+        word DST = 0xFFFF;
+        if(Grp->ShieldID != 0xFFFF && Grp->ShieldID < NStorms) {
+            DST = STORMS[Grp->ShieldID].Top;
+        }
+        bool findstm = (DST != 0xFFFF && DST < NZones);
+        
+        if(findstm) {
+            int sx, sy;
+            if(GetTopZRealCoor(DST, &sx, &sy)) {
+                if(Norma(sx - xc, sy - yc) < 800) DST = 0xFFFF;
             }
         }
+
+        SetZone(&Zone, xc, yc, Grp->MaxAttR + 200);
+        {
+            std::lock_guard<std::mutex> lock(g_gameApiMutex);
+            SetUnitsState(Group, 1, 0, 0, 0);
+        }
+        
+        word BID = 0xFFFF;
+        if(T0 - Grp->AttackTime > 0 && (AliForce >= Force || GetRND(100) > 30)) {
+            std::lock_guard<std::mutex> lock(g_gameApiMutex);
+            BID = MakeOneShotToBuild(&Zone, &Grp->Group, Owner);
+        }
+        
+        bool building = false;
+        if(BID != 0xFFFF) {
+            OneObject* BOB = GetOBJ(BID);
+            if(BOB && !(BOB->Sdoxlo || BOB->NNUM == 7)) {
+                building = true;
+            }
+        }
+
+        if(building && Grp->Strelok) moving = false;
+        
+        int NIn = 0;
+        if(building) {
+            if(GetBuildingOposit(BID, NIn)) {
+                AliForce -= NIn * 5;
+                NIn >>= 1;
+                NIn++;
+            }
+        }
+        
+        if(building && NIn < NMen) {
+            if(isUnitAbsorber(BID)) {
+                int NStr = GetRND(GetDiff(Grp->Owner)) + 1;
+
+                int n = CleanGroup(Group);
+                OneUnit u;
+                for(int id = 0; id < n && NStr > 0; id++) {
+                    GetUnitInfo(Group, id, &u);
+                    bool ru = (GetRND(300) == 0);
+                    if(u.Index != 0xFFFF && (u.ChargeProgress || ru)) {
+                        std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                        InviteUnitIntoBuilding(BID, u.Index, 0);
+                        DeleteUnitFromGroup(Group, id);
+                        if(ru) ru = 0;
+                        NStr--;
+                    }
+                }
+            } else {
+                building = false;
+            }
+        }
+
+        if(moving) {
+            if(AliForce > Force - (Force >> 3)) {
+                std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                SetUnitsState(Group, 1, 0, 1, 0);
+                SetZone(&Zone, xc, yc, Grp->MaxAttR + 200);
+                if(AttackEnemyInZone2(&Grp->Group, &Zone, Owner)) {
+                    Grp->LastThinkTime = T0;
+                }
+            } else {
+                if(T0 - Grp->LastThinkTime > 100) {
+                    thinktwice = true;
+                    attacking = false;
+                    if(building) retreat = true;
+                } else {
+                    std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                    SetUnitsState(Group, 1, 0, 1, 0);
+                    if(!Grp->Strelok) AttackEnemyInZone2(&Grp->Group, &Zone, Owner);
+                    moving = false;
+                }
+            }
+        }
+        
+        if(Grp->LastTop != 0xFFFF && Grp->LastTop < NZones && !thinktwice)
+            Dang[Grp->LastTop] += 4000;
+
+        if(thinktwice && T0 - Grp->AttackTime > 0) {
+            SetZone(&Zone, xc, yc, Grp->MaxAttR + 500);
+            std::lock_guard<std::mutex> lock(g_gameApiMutex);
+            if(Grp->Strelok) SetUnitsState(Group, 1, 0, 0, 0);
+            else SetUnitsState(Group, 1, 0, 0, 1);
+            int NArm;
+            bool at = AttackByTomahawks(&Grp->Group, &Zone, Owner, NArm);
+            if(!at) Grp->LastMoveTime = T0;
+        }
+
+        bool SearchEnemy = false;
+        if(moving) {
+            std::vector<word> IDS(NZones, 0xFFFF);
+            if(attacking && T0 - Grp->AttackTime > 0) {
+                CreateTopListEnArmy(IDS.data(), Owner, NMen >> 4);
+                SearchEnemy = true;
+            } else {
+                if(DST == 0xFFFF) {
+                    CreateFriendBuildingsTopList(IDS.data(), Owner);
+                    IDS[top] = 0xFFFF;
+                    if(Grp->LastTop != 0xFFFF && Grp->LastTop < NZones)
+                        IDS[Grp->LastTop] = 0xFFFF;
+                }
+            }
+            
+            int zf;
+            if(DST == 0xFFFF || attacking)
+                zf = FindNextZoneOnTheSafeWayToObject(top, Dang.data(), IDS.data(), &maxdang, 5, &DST);
+            else
+                zf = DST;
+
+            Grp->LastMoveTime = T0;
+
+            if(DST != 0xFFFF && zf != top) {
+                int dx, dy;
+                if(GetTopZRealCoor(zf, &dx, &dy)) {
+                    if(GetGroupCharge(Group) || !attacking) {
+                        if(!thinktwice) {
+                            word* Way;
+                            int NWayPoint = GetLastFullWay(&Way);
+                            if(NWayPoint > 2) GetTopZRealCoor(Way[NWayPoint - 3], &dx, &dy);
+                        }
+                        std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                        SGP_MoveToPoint(Owner, Group, dx, dy, 512,
+                                        128 - GetRND(256), 128 - GetRND(256), 32);
+                    }
+                    
+                    if(moving && attacking) Grp->LastTop = top;
+                    else Grp->LastTop = 0xFFFF;
+                    
+                    if(thinktwice) {
+                        Grp->LastMoveTime = T0 - 62;
+                    } else if(retreat && !findstm && T0 - Grp->AttackTime > 0) {
+                        Grp->AttackTime = T0 + 256;
+                    } else {
+                        Grp->LastMoveTime = T0;
+                    }
+                }
+            } else {
+                std::lock_guard<std::mutex> lock(g_gameApiMutex);
+                if(Grp->Strelok) SetUnitsState(Group, 1, 0, 0, 0);
+                else SetUnitsState(Group, 1, 0, 1, 0);
+                AttackEnemyInZone2(&Grp->Group, &Zone, Owner);
+            }
+        } else {
+            Grp->LastMoveTime = T0;
+        }
+
+        if(!moving) Grp->LastMoveTime = T0 - 60;
     }
 }
 
@@ -2320,18 +2366,19 @@ void DiplomacySystem::AddStorm(GAMEOBJ* Src, byte Owner, int Diff){
 
 	NStorms++;
 };
-void DiplomacySystem::AddFirers(GAMEOBJ* Src,byte Owner){
-	if(!(Src->Type=='UNIT'&&CleanGroup(Src))) return;
-	FIRERS=(FiringGroup*)realloc(FIRERS,(NFirers+1)*sizeof FiringGroup);
-	RegisterDynGroup(&FIRERS[NFirers].Group);
-	CopyUnits(Src,&FIRERS[NFirers].Group,0,10000,0,1);
-	FIRERS[NFirers].Owner=Owner;
-	FIRERS[NFirers].CurrentFiringBuilding=0xFFFF;
-	FIRERS[NFirers].LastMoveTime=GetGlobalTime();
-	FIRERS[NFirers].LastThinkTime=GetGlobalTime();
+void DiplomacySystem::AddFirers(GAMEOBJ* Src, byte Owner){
+    if(!(Src->Type=='UNIT'&&CleanGroup(Src))) return;
+    FIRERS=(FiringGroup*)realloc(FIRERS,(NFirers+1)*sizeof FiringGroup);
+    RegisterDynGroup(&FIRERS[NFirers].Group);
+    CopyUnits(Src,&FIRERS[NFirers].Group,0,10000,0,1);
+    FIRERS[NFirers].Owner=Owner;
+    FIRERS[NFirers].CurrentFiringBuilding=0xFFFF;
+    FIRERS[NFirers].FBSN=0xFFFF;
+    FIRERS[NFirers].LastMoveTime=GetGlobalTime();
+    FIRERS[NFirers].LastThinkTime=GetGlobalTime();  
 
-	FIRERS[NFirers].LastTop=0xFFFF;
-	NFirers++;
+    FIRERS[NFirers].LastTop=0xFFFF;
+    NFirers++;
 };
 void DiplomacySystem::AddKillers(GAMEOBJ* Src,byte Owner, bool SeakMine){
 	if(!(Src->Type=='UNIT'&&CleanGroup(Src))) return;

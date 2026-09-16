@@ -459,14 +459,22 @@ void Mind::Process(){
 void Mind::Process0(){
 	if(NI==0xFF) return;
 
-	int nt[2048];
-	int xt[2048];
-	int yt[2048];
+	int NZ = GetNZones();
+	if(NZ <= 0) NZ = 1;
+
+	int* nt = new int[NZ];
+	int* xt = new int[NZ];
+	int* yt = new int[NZ];
 
 	GetEnemyTopInfo(NI, nt, xt, yt);
 	SetDangerMap(nt);
+
+	delete[] nt;
+	delete[] xt;
+	delete[] yt;
 	return;
 
+	// unreachable code below preserved for reference
 	CleanGroup(&New);
 	CleanGroup(&Panic);
 
@@ -495,61 +503,41 @@ void Mind::Process0(){
 					
 					SQD->Top=top;
 
-					// сила страха для разных категорий юнитов
 					int Fear[256];					
 					for(int j=0;j<256;j++)Fear[j]=1;
 
-					// список целей по топ зонам
 					word IDS[2][4096];
 					memset(IDS,0xFF,sizeof(IDS));
 
-					// топологическая карта опасностей
 					int Dang[2][4096];
 					memset(Dang,0,sizeof(Dang));
 
-					// Primary target
 					bool CaptureCenter=false;
 					if(!AddEnemyCaptBuildTopList(IDS[0],NI)){
 						AddEnemyCenterTopList(IDS[0],NI);
 						CaptureCenter=true;
 					}
 
-					// Secondary target (enemy armies)
 					CreateTopListEnArmyBtl(IDS[1],NI,NMen>>2);
 
-					// Direct danger map					
-
-					// Round danger map
 					CreateDangerMapBattle(NI,Dang[1],GetNZones(),Fear,2);
 
 
 					for(int t=0;t<2;t++){
 						for(int d=0;d<2;d++){
 							short SDang[4096];
-							int NZ=GetNZones();
-							for(int s=0;s<NZ;s++) SDang[s]=short(Dang[d][s]);
+							int NZ2=GetNZones();
+							for(int s=0;s<NZ2;s++) SDang[s]=short(Dang[d][s]);
 
 							SQD->FindTargetZone(SDang,IDS[t],SQD->TarTop[t],SQD->TarZone[t][d],SQD->TarDist[t][d]);
 						}
 					}
 
-
-
-					bool moving=true;		// перейти в новую топ-зону
+					bool moving=true;		
 					
-					//GAMEOBJ Zone;
-					//SetZone(&Zone,xc,yc,1600);
-					/*
-					if(AttackEnemyInZone2(Group,&Zone,NI)){
-						moving=false;
-					}
-					*/
-
 					if(moving){
-
 						int zf=SQD->TarZone[SQD->Target][SQD->MovingType];
-						if(zf!=0xFFFF&&zf!=top /*&&SQD->MovingType==1*/){
-
+						if(zf!=0xFFFF&&zf!=top){
 							int dx,dy;
 							GetTopZRealCoor(zf,&dx,&dy);
 
@@ -562,13 +550,10 @@ void Mind::Process0(){
 
 							if(SQD->Brig!=0xFFFF) SelectUnits(Group,0);
 							SGP_MoveToPoint(NI,Group,dx,dy,dir,0,0,1);
-
 						}
-
 					}
 				}
 			}					
-
 		}
 	}
 
@@ -577,31 +562,24 @@ void Mind::Process0(){
 		LastGlobalMove=Time+100+GetRND(200);
 
 		NTrgList=0;
-		//memset(NTrgList,0,sizeof(NTrgList));
 		memset(NSqdList,0,sizeof(NSqdList));
 		
-		// заполнение матриц оценки
 		for(int i=0;i<NSqd;i++){
 			Squad* SQD=Sqd+i;
 			GAMEOBJ* Group=&SQD->Group;
 			int NMen=GetNUnits(Group);			
 			if(NMen){
-
 				word TT=SQD->TarTop[1];
 				word DST=SQD->TarDist[1][0];
 
 				if(DST>50){
-					// цель далеко
 					SQD->Target=0;
 					SQD->MovingType=0;
-
 				}else{
-
 					word MinTT=0xFFFF;
 					word MinDst=130;
-					word TargID=0xFFFF;	//  индекс цели
+					word TargID=0xFFFF;	
 
-					// поиск цели
 					for(int t=0;t<NTrgList;t++){
 						word dst=GetZonesDist(TT,TrgList[t]);
 						if(dst<MinDst){
@@ -612,30 +590,22 @@ void Mind::Process0(){
 					}				
 
 					if(MinTT==0xFFFF){				
-						// создать новую цель
 						TrgList[NTrgList]=TT;
 						TargID=NTrgList;
 						NTrgList++;						
 					}
 
 					if(TargID!=0xFFFF){					
-
 						word NS=NSqdList[TargID];
-
 						SqdList[TargID][NS]=i;
 						DstList[TargID][0][NS]=SQD->TarDist[1][0];
 						DstList[TargID][1][NS]=SQD->TarDist[1][1];
-						
 						NSqdList[TargID]++;
-							
 					}
-
 				}
-
 			}
 		}
 
-		// раздача слонов
 		for(int i=0;i<NTrgList;i++){
 			word MinRndDist=1000;
 			word MaxDirDist=0;
@@ -643,9 +613,7 @@ void Mind::Process0(){
 
 			word NSL=NSqdList[i];
 
-			// найти передовой обходной отряд
 			for(int s=0;s<NSL;s++){
-				//if(DstList[i][1][s]<MinRndDist){
 				if(DstList[i][0][s]>MaxDirDist){
 					MaxDirDist=DstList[i][0][s];
 					SqdID=s;
@@ -671,12 +639,17 @@ void Mind::Process0(){
 void Mind::Process1(){
 	if(NI==0xFF) return;
 
-	int nt[2048];
-	int xt[2048];
-	int yt[2048];
+	int NZ = GetNZones();
+	if(NZ <= 0) NZ = 1;
+
+	int* nt = new int[NZ];
+	int* xt = new int[NZ];
+	int* yt = new int[NZ];
+	memset(nt, 0, NZ*sizeof(int));
+	memset(xt, 0, NZ*sizeof(int));
+	memset(yt, 0, NZ*sizeof(int));
 
 	GetEnemyTopInfo(NI, nt, xt, yt);
-	//SetDangerMap(nt);
 
 	CleanGroup(&New);
 	CleanGroup(&Panic);
@@ -688,16 +661,15 @@ void Mind::Process1(){
 
 		ClearAZones();
 
-		word IDSS[4096];
-		memset(IDSS,0xFF,sizeof(IDSS));
+		word* IDSS = new word[NZ];
+		for(int i=0;i<NZ;i++) IDSS[i]=0xFFFF;
 		CreateTopListEnArmyBtl(IDSS,NI,1);
 
-		word REAR[4096];
-		memset(REAR,0xFF,sizeof(REAR));
+		word* REAR = new word[NZ];
+		for(int i=0;i<NZ;i++) REAR[i]=0xFFFF;
 		CreateFriendBuildingsTopList(REAR,NI);
 
 		word ZREAR=0xFFFF;
-		int NZ=GetNZones();
 		for(int z=0;z<NZ;z++){
 			if(REAR[z]!=0xFFFF){
 				ZREAR=z;
@@ -705,15 +677,15 @@ void Mind::Process1(){
 			}
 		}
 
-		short dang[4096];
-		memset(dang,0,sizeof(dang));
+		short* dang = new short[NZ];
+		memset(dang,0,NZ*sizeof(short));
 
 		int maxdang;
 		word DST=0xFFFF;
 		int TZ=0xFFFF;
 		if(ZREAR!=0xFFFF) TZ=FindNextZoneOnTheSafeWayToObject(ZREAR,dang,IDSS,&maxdang,5,&DST);
 		
-		int MaxDist=1000;	// дистанция на которую можно отходить от базы
+		int MaxDist=1000;
 		if(TZ!=0xFFFF && ZREAR!=0xFFFF){
 			word* WL=NULL;
 			int NW=GetLastFullWay(&WL);
@@ -726,27 +698,20 @@ void Mind::Process1(){
 		}
 		if(MaxDist>23) MaxDist-=13;
 
-		// сила страха для разных категорий юнитов
 		int Fear[256];					
 		for(int j=0;j<256;j++)Fear[j]=1;
 
-		// топологическая карта опасностей
-		int Dang[2][4096];
-		memset(Dang,0,sizeof(Dang));
-
-		// Direct danger map					
-
-		// Round danger map
-		CreateDangerMapBattle(NI,Dang[1],GetNZones(),Fear,2);
+		// danger map for battle (single map, sized to NZ)
+		int* Dang = new int[NZ];
+		memset(Dang,0,NZ*sizeof(int));
+		CreateDangerMapBattle(NI,Dang,NZ,Fear,2);
 
 		// local target managment
 		for(int i=0;i<NSqd;i++){
 			Squad* SQD=Sqd+i;
 			GAMEOBJ* Group=&SQD->Group;
 			int NMen=CleanGroup(Group);
-			if(NMen /*&& Time-SQD->LastMoveTime>50*/){
-
-				//SQD->LastMoveTime=Time+GetRND(30);
+			if(NMen){
 
 				int xc,yc;
 				if(GetGrpCenter(Group,&xc,&yc)){
@@ -758,7 +723,7 @@ void Mind::Process1(){
 						yc=UN.y;
 						top=GetTopZone(xc,yc);
 					}
-					if(top>=0&&top<GetNZones()){		
+					if(top>=0&&top<NZ){		
 						
 						SQD->Top=top;
 
@@ -767,56 +732,34 @@ void Mind::Process1(){
 						sprintf(name,"Squad %d",i);
 						CreateAGroup(NI,name);
 
-						// список целей по топ зонам
-						word IDS[3][4096];
-						memset(IDS,0xFF,sizeof(IDS));
+						word* IDS0 = new word[NZ]; for(int q=0;q<NZ;q++) IDS0[q]=0xFFFF;
+						word* IDS1 = new word[NZ]; for(int q=0;q<NZ;q++) IDS1[q]=0xFFFF;
 
-						// Primary target
 						bool CaptureCenter=false;
-						if(!AddEnemyCaptBuildTopList(IDS[0],NI)){
-							AddEnemyCenterTopList(IDS[0],NI);
+						if(!AddEnemyCaptBuildTopList(IDS0,NI)){
+							AddEnemyCenterTopList(IDS0,NI);
 							CaptureCenter=true;
 						}
 
-						// Secondary target (enemy armies)
-						CreateTopListEnArmyBtl(IDS[1],NI,NMen>>2);
+						CreateTopListEnArmyBtl(IDS1,NI,NMen>>2);
 
 						for(int t=0;t<2;t++){
 							for(int d=0;d<2;d++){
 								if(t==1&&d==0){
-									short SDang[4096];
-									int NZ=GetNZones();
-									for(int s=0;s<NZ;s++) SDang[s]=Dang[d][s];
+									short* SDang = new short[NZ];
+									for(int s=0;s<NZ;s++) SDang[s]=short(Dang[s]);
 									
 									SQD->FindTargetZone(SDang,IDSS,SQD->TarTop[t],SQD->TarZone[t][d],SQD->TarDist[t][d]);
-									word TT=SQD->TarTop[t];
-																		
-									/*
-									if(TT!=0xFFFF){
-										IDSS[TT]=0xFFFF;
-										word* zl=NULL;
-										int nz=GetListOfNearZones(TT,&zl);
-										for(int i=0;i<nz;i++){
-											if(zl[i+i]!=0xFFFF) IDSS[zl[i+i]]=0xFFFF;
-										}
-									}
-									*/
-									
+									delete[] SDang;
 								}
 							}
 						}
 
-						bool moving=true;		// перейти в новую топ-зону
-						
-						//GAMEOBJ Zone;
-						//SetZone(&Zone,xc,yc,1600);
-						/*
-						if(AttackEnemyInZone2(Group,&Zone,NI)){
-							moving=false;
-						}
-						*/
-						
-						// find defend zone
+						delete[] IDS0;
+						delete[] IDS1;
+
+						bool moving=true;		
+
 						int zt=SQD->TarTop[1];
 						if(zt==0xFFFF&&i){
 							zt=Sqd[i-1].TarTop[1];
@@ -825,27 +768,19 @@ void Mind::Process1(){
 						if(moving&&zt!=0xFFFF){
 
 							word zf;
-
 							word zb=ZREAR;
-							//word dst;
 							
-							//CreateFriendBuildingsTopList(IDS[3],NI);
-							//SQD->FindTargetZone(Dang[0],IDS[3],zb,zf,dst);
-
 							zf=0xFFFF;
 							int fdst=1000;
 							int zbb=zb;						
-							
-							// вырезать цели в этом секторе
+
 							int xx,yy;
 							if(GetTopZRealCoor(zb,&xx,&yy)){
 								int x,y;
 								if(GetTopZRealCoor(zt,&x,&y)){
-									int Dir=getDir(x-xx,y-yy);	// направление на найденную цель
+									int Dir=getDir(x-xx,y-yy);
 
-									int NZ=GetNZones();
 									for(int z=0;z<NZ;z++){											
-										
 										if(IDSS[z]!=0xFFFF && GetTopZRealCoor(z,&x,&y)){
 											int dir=abs(getDir(x-xx,y-yy)-Dir);
 											if(dir<15){
@@ -858,27 +793,25 @@ void Mind::Process1(){
 
 							int tdst=10000;
 
-							// найти зону прикрытия
 							zb=GetNextZone(zb,zt);
 							while(zb!=0xFFFF && zb!=zt){
 								int wdst=GetZonesDist(zb,zt);
 								int bdst=GetZonesDist(zb,zbb);
 								
-								if(wdst<fdst /*&&wdst>15*/ && bdst<MaxDist){
+								if(wdst<fdst && bdst<MaxDist){
 									fdst=wdst;
 									tdst=bdst;
 									zf=zb;
 								}
 								zb=GetNextZone(zb,zt);
 							}
-							//if(zt!=0xFFFF) zf=zt;
 							
 							int btogdist=1000;
 							if(zbb!=0xFFFF){
 								btogdist=GetZonesDist(zbb,zt);
 							}
 													
-							if(btogdist>19 && zf!=0xFFFF /*&&zf!=top*/ /*&&SQD->MovingType==1*/){
+							if(btogdist>19 && zf!=0xFFFF){
 
 								int dx,dy;
 								GetTopZRealCoor(zf,&dx,&dy);
@@ -889,17 +822,15 @@ void Mind::Process1(){
 								
 								int tx=0,ty=0,tn=0;
 								
-								int nz=GetNZones();
-								for(int i=0;i<nz;i++){
-									int nn=nt[i];
+								for(int j=0;j<NZ;j++){
+									int nn=nt[j];
 									if(nn){
-										word ds=GetZonesDist(i,zt);
+										word ds=GetZonesDist(j,zt);
 										if(ds<0xFFFE){
-											//ds>>=1;																				
 											if(ds>1) nn/=ds;
 											if(nn){
-												tx+=xt[i]*nn;
-												ty+=yt[i]*nn;
+												tx+=xt[j]*nn;
+												ty+=yt[j]*nn;
 												tn+=nn;
 											}
 										}
@@ -911,12 +842,6 @@ void Mind::Process1(){
 									dir=getDir(tx-dx,ty-dy);
 								}
 								
-								/*
-								if(TT!=zf&&GetTopZRealCoor(TT,&tx,&ty)){
-									dir=getDir(tx-dx,ty-dy);
-								};
-								*/
-								
 								if(SQD->Brig!=0xFFFF) SelectUnits(Group,0);
 								SGP_MoveToPoint(NI,Group,dx+16-GetRND(32),dy+16-GetRND(32),dir,0,0,1);
 								
@@ -925,20 +850,26 @@ void Mind::Process1(){
 							}else{
 								int d=GetZonesDist(top,zt);
 								if(d<12){
-									//if(SQD->Brig) BrigReformation(NI,SQD->Brig,2);
 									SetUnitsState(Group,1,1,0,0);
 								}else{
 									SetUnitsState(Group,0,1,0,0);
 								}
 							}
-
 						}
 					}
 				}					
-
 			}
 		}
+
+		delete[] Dang;
+		delete[] REAR;
+		delete[] IDSS;
+		delete[] dang;
 	}
+
+	delete[] nt;
+	delete[] xt;
+	delete[] yt;
 }
 
 void GetArmyMap(int* ArmyMap, int* Dang, ActiveArmy* AA, int& NAA){
@@ -1617,12 +1548,17 @@ void Mind::Process3(){
 
 	int Time=GetGlobalTime();
 
-	if(true){//Time-LastGlobalMove>0
-		//LastGlobalMove=Time+GetRND(50)+60;
-
+	if(true){
 		SetGameGoals();
-		//return;
-		SetDangerMap(Dang);
+
+		// pass the global Dang but bounded to GetNZones()
+		int NZ = GetNZones();
+		if(NZ > 0){
+			int* tmp = new int[NZ];
+			for(int i=0;i<NZ;i++) tmp[i]=Dang[i];
+			SetDangerMap(tmp);
+			delete[] tmp;
+		}
 
 		RefreshSquadInfo();
 
@@ -1641,9 +1577,7 @@ void Mind::Process3(){
 		case 1:
 			ShowVistrel(); break;
 		};		
-	
 	}
-
 }
 
 void Mind::SetLink0(){
