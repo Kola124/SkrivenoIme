@@ -3400,7 +3400,7 @@ bool CreateRandomTerrain(char* Name,int NPlay,int MountStyle,int Ng,int NI,int N
 			RClose(RF);
 			return false;
 		};
-		i=(int(/*mrand()*/mrpos)*N)>>15;
+		i=(int(rand())*N)>>15;
 		RSeek(RF,8+i*4);
 		int P1,P2;
 		RBlockRead(RF,&P1,4);
