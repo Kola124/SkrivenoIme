@@ -350,7 +350,7 @@ LONG __stdcall FEX_CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pEx)
 			}
 
 			if(calls)
-				FEX_LOG(FEX_logfile, "\nCalls: %u before address: 0x%X (%X%X%X%X%X%X%X)\n", calls, ptr, Opcode[0], Opcode[1], Opcode[2], Opcode[3], Opcode[4], Opcode[5], Opcode[6], Opcode[7]);
+				FEX_LOG(FEX_logfile, "\nCalls: %u before address: 0x%X (%X%X%X%X%X%X%X%X)\n", calls, ptr, Opcode[0], Opcode[1], Opcode[2], Opcode[3], Opcode[4], Opcode[5], Opcode[6], Opcode[7]);
 
 			// - теперь мы имеем набор предположительных адресов вызова
 			for(int i = 0; i < calls; i++)
