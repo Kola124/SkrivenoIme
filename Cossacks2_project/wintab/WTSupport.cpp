@@ -25,7 +25,7 @@ extern int RealLx;
 extern int RealLy;
 bool PenBackSide=0;
 void OnWTPacket(WPARAM wSerial, LPARAM hCtx){
-	/*
+	
 	WT_IS_INIT=1;
 	PACKET pkt;
 	WTPacket( (HCTX)hCtx, wSerial, &pkt );
@@ -38,7 +38,7 @@ void OnWTPacket(WPARAM wSerial, LPARAM hCtx){
 		Lpressed=1;
 		realLpressed=1;
 	};
-	*/
+	
 };
 void ProcessTablet(){
 	if(!hCtx)return;
@@ -49,14 +49,14 @@ void ProcessTablet(){
 		if(n){
 			WT_IS_INIT=1;
 			CurPressure=pkt.pkNormalPressure;
-			//mouseX=(RealLx*pkt.pkX)/lc.lcInExtX;
-			//mouseY=RealLy-(RealLy*pkt.pkY)/lc.lcInExtY;
-			//SetCursorPos(mouseX,mouseY);
+			mouseX=(RealLx*pkt.pkX)/lc.lcInExtX;
+			mouseY=RealLy-(RealLy*pkt.pkY)/lc.lcInExtY;
+			SetCursorPos(mouseX,mouseY);
 			PenBackSide=pkt.pkStatus&TPS_INVERT;
-			//if(CurPressure){
-			//	Lpressed=1;
-			//	realLpressed=1;
-			//};
+			if(CurPressure){
+				Lpressed=1;
+				realLpressed=1;
+			};
 		};
 	}while(n);
 };

@@ -1821,6 +1821,7 @@ void CreateDangerMapForStorm(byte NI,short* DangMap,int MaxSize,int* FearArray,i
 };
 // не прит€гиватьс€ к рабочим
 DLLEXPORT
+DLLEXPORT
 void CreateDangerMapForStormHard(byte NI,short* DangMap,int MaxSize,int* FearArray,int ItrAmount){
 	byte MASK=NATIONS[NI].NMask;
 	memset(DangMap,0,MaxSize<<1);
@@ -1879,9 +1880,17 @@ void CreateDangerMapForStormHard(byte NI,short* DangMap,int MaxSize,int* FearArr
 			else if(DD<-6) DD=-6;
 		DangMap[j]=DD;
 	}
-	int Dang[2048];
-	for(int i=0;i<MaxSize;i++) Dang[i]=DangMap[i];
+
+	// --- patched: build a correctly-sized int buffer for SetDangerMap ---
+	int NA = GetNAreas();
+	if(NA <= 0) NA = 1;
+	int* Dang = new int[NA];
+	int n = (MaxSize < NA) ? MaxSize : NA;
+	for(int i = 0; i < n; i++)   Dang[i] = DangMap[i];
+	for(int i = n; i < NA; i++)  Dang[i] = 0;
 	SetDangerMap(Dang);
+	delete[] Dang;
+	// --- end patch ---
 };
 DLLEXPORT
 void CreateDangerMapForFire(byte NI,short* DangMap,int MaxSize,int* FearArray,int ItrAmount){
